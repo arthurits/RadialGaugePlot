@@ -18,11 +18,7 @@ namespace Test
             InitializeComponent();
 
             double[] values = {100, 80, 65, 42, 20 };
-
-
-
             formsPlot1.Plot.Palette = ScottPlot.Drawing.Palette.Nord;
-
             Color[] colors = Enumerable.Range(0, values.Length)
                                        .Select(i => formsPlot1.Plot.GetSettings(false).PlottablePalette.GetColor(i))   // modify later
                                        .ToArray();
@@ -43,21 +39,29 @@ namespace Test
             };
 
             //ScottPlot.Plottable.RadialGaugePlot plottable = new(values, colors, false, new double []{ values.Max() * 4 / 3 });
-            plottable = new(values, colors, false);
-            plottable.CategoryLabels = new string [] { "C #1", "C #2", "C #3", "C #4", "C #5" };
-            plottable.GroupLabels = new string[] { "G #1", "G #2", "G #3", "G #4", "G #5" };
-            //plottable.StartingAngle = 150;
+            plottable = new(values, colors);
+            plottable.GaugeLabels = new string[] { "Data #1", "Data #2", "Data #3", "Data #4", "Data #5" };
             formsPlot1.Plot.Add(plottable);
             formsPlot1.Plot.Frameless();
             formsPlot1.Plot.Grid(enable: false);
             //formsPlot1.Plot.XAxis2.Label("Radial gauge plot");
             formsPlot1.Plot.Title("Radial gauge plot");
-            formsPlot1.Plot.Legend(enable: true, ScottPlot.Alignment.LowerRight);
+            formsPlot1.Plot.Legend(enable: true, ScottPlot.Alignment.UpperRight);
 
-            // Combo
+            // Combo boxes
             comboBox1.SelectedIndex = 0;
             comboBox2.SelectedIndex = 0;
             comboBox3.SelectedIndex = 0;
+
+            // Check boxes
+            checkBox1.Checked = plottable.ShowGaugeValues;
+            checkBox2.Checked = plottable.NormBackGauge;
+
+            // Other numeric controls
+            numStart.Value = (decimal)plottable.StartingAngle;
+            numSpace.Value = (decimal)plottable.GaugeSpacePercentage;
+            numDim.Value = (decimal)plottable.DimPercentage;
+            numRange.Value = (decimal)plottable.AngleRange;
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -88,6 +92,66 @@ namespace Test
         {
             plottable.NormBackGauge = checkBox2.Checked;
             formsPlot1.Render();
+        }
+
+        private void numStart_ValueChanged(object sender, EventArgs e)
+        {
+            int ratio = Convert.ToInt32(numStart.Value);
+            if (trackStart.Value != ratio) trackStart.Value = ratio;
+
+            plottable.StartingAngle = (float)numStart.Value;
+            formsPlot1.Render();
+        }
+
+        private void trackStart_ValueChanged(object sender, EventArgs e)
+        {
+            int ratio = trackStart.Value;
+            if (numStart.Value != ratio) numStart.Value = ratio;
+        }
+
+        private void numSpace_ValueChanged(object sender, EventArgs e)
+        {
+            int ratio = Convert.ToInt32(numSpace.Value);
+            if (trackSpace.Value != ratio) trackSpace.Value = ratio;
+
+            plottable.GaugeSpacePercentage = (float)numSpace.Value;
+            formsPlot1.Render();
+        }
+
+        private void trackSpace_ValueChanged(object sender, EventArgs e)
+        {
+            int ratio = trackSpace.Value;
+            if (numSpace.Value != ratio) numSpace.Value = ratio;
+        }
+
+        private void numDim_ValueChanged(object sender, EventArgs e)
+        {
+            int ratio = Convert.ToInt32(numDim.Value);
+            if (trackDim.Value != ratio) trackDim.Value = ratio;
+
+            plottable.DimPercentage = (float)numDim.Value;
+            formsPlot1.Render();
+        }
+
+        private void trackDim_ValueChanged(object sender, EventArgs e)
+        {
+            int ratio = trackDim.Value;
+            if (numDim.Value != ratio) numDim.Value = ratio;
+        }
+
+        private void numMax_ValueChanged(object sender, EventArgs e)
+        {
+            int ratio = Convert.ToInt32(numRange.Value);
+            if (trackRange.Value != ratio) trackRange.Value = ratio;
+
+            plottable.AngleRange = (float)numRange.Value;
+            formsPlot1.Render();
+        }
+
+        private void trackMax_ValueChanged(object sender, EventArgs e)
+        {
+            int ratio = trackRange.Value;
+            if (numRange.Value != ratio) numRange.Value = ratio;
         }
     }
 }

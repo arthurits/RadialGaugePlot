@@ -26,7 +26,7 @@ using ScottPlot.Drawing;
 namespace ScottPlot.Plottable
 {
     /// <summary>
-    /// A radar chart is a graphical method of displaying multivariate data in the form of 
+    /// A radial gauge chart is a graphical method of displaying multivariate data in the form of 
     /// a two-dimensional chart of three or more quantitative variables represented on axes 
     /// starting from the same point.
     /// 
@@ -35,61 +35,34 @@ namespace ScottPlot.Plottable
     public class RadialGaugePlot : IPlottable
     {
         /// <summary>
-        /// Data to be plotted. It's a copy of the data passed in the constructor or in the Update() method.
+        /// Data to be plotted.
+        /// It's copied from of the data passed to either the constructor or the <see cref="Update(double[], bool)"/> method.
         /// </summary>
-        private double[] Data;
+        protected double[] DataRaw;
 
         /// <summary>
-        /// Tha maximum value for scaling the gauges. It represents the value of an hypothetical 360° gauge.
+        /// Tha maximum value for scaling the gauges.
+        /// This value is associated to <see cref="StartingAngle"/> + <see cref="AngleRange"/>.
         /// </summary>
-        private double MaxScale;
+        protected double MaxScale;
 
         /// <summary>
-        /// Tha maximum angle value [0-360] corresponding to the ScaleMax property.
+        /// The maximum angular interval that the gauges will consist of.
+        /// It takes values in the range [0-360], default value is 360. Outside this range, unexpected side-effects might happen.
         /// </summary>
-        private double MaxAngle;
-
-        //public int PointCount { get => Data.Length; }
-
-        ///// <summary>
-        ///// Values for every group (rows) and category (columns) normalized from 0 to 1.
-        ///// </summary>
-        //private double[] Norm;
-
-        ///// <summary>
-        ///// Single value to normalize all values against for all groups/categories.
-        ///// </summary>
-        //private double NormMax;
-
-        ///// <summary>
-        ///// Individual values (one per category) to use for normalization.
-        ///// Length must be equal to the number of columns (categories) in the original data.
-        ///// </summary>
-        //private double[] NormMaxes;
+        public double AngleRange = 360;
 
         /// <summary>
-        /// Labels for each category.
-        /// Length must be equal to the number of columns (categories) in the original data.
+        /// Labels for each gauge.
+        /// Length must be equal to the length of data passed to either the constructor or the <see cref="Update(double[], bool)"/> method.
         /// </summary>
-        public string[] CategoryLabels;
+        public string[] GaugeLabels;
 
         /// <summary>
-        /// Labels for each group.
-        /// Length must be equal to the number of rows (groups) in the original data.
+        /// Colors for each gauge. These colors are dimmed according to <see cref="DimPercentage"/> to draw the gauges' background.
+        /// Length must be equal to the length of data passed to either the constructor or the <see cref="Update(double[], bool)"/> method.
         /// </summary>
-        public string[] GroupLabels;
-
-        /// <summary>
-        /// Colors (typically semi-transparent) to shade the inner area of each group.
-        /// Length must be equal to the number of rows (groups) in the original data.
-        /// </summary>
-        //public Color[] FillColors;
-
-        /// <summary>
-        /// Colors to outline the shape for each group.
-        /// Length must be equal to the number of rows (groups) in the original data.
-        /// </summary>
-        public Color[] LineColors;
+        public Color[] GaugeColors;
 
         /// <summary>
         /// Color of the axis lines and concentric circles representing ticks
@@ -97,12 +70,14 @@ namespace ScottPlot.Plottable
         public Color WebColor = Color.Gray;
 
         /// <summary>
-        /// Gets or sets the size (in pixels) of each gauge. If <0, then its will be calculated from the available space.
+        /// Gets or sets the size (in pixels) of each gauge.
+        /// If <0, then it will be calculated from the available space.
         /// </summary>
         public float LineWidth = -1;
 
         /// <summary>
-        /// Dimmed percentage used to draw the background gauge.
+        /// Dimmed percentage used to draw the gauges' background.
+        /// Values in the range [0-100], default value is 90 [percent]. Outside this range, unexpected side-effects might happen.
         /// </summary>
         public float DimPercentage = 90f;
 
@@ -112,7 +87,7 @@ namespace ScottPlot.Plottable
         public RadialGaugeDirection GaugeDirection = RadialGaugeDirection.Clockwise;
 
         /// <summary>
-        /// Determins whether the gauges are drawn stacked (dafault value), sequentially of as a single gauge (ressembling a pie plot).
+        /// Determins whether the gauges are drawn stacked (dafault value), sequentially, or as a single gauge (ressembling a pie plot).
         /// </summary>
         public RadialGaugeMode GaugeMode
         {
@@ -120,196 +95,125 @@ namespace ScottPlot.Plottable
             set
             {
                 _GaugeMode = value;
-                Compute_ScaleMax_Factor();
+                Compute_MaxScale();
             }
         }
         private RadialGaugeMode _GaugeMode;
 
         /// <summary>
-        /// Determines whether the gauges are drawn starting from the inside (default value) or the outside
+        /// Determines whether the gauges are drawn starting from the inside (default value) or from the outside.
         /// </summary>
         public RadialGaugeStart GaugeStart = RadialGaugeStart.InsideToOutside;
 
         /// <summary>
-        /// True if the background gauge is also normalized as well as and according to the values.
+        /// <see langword="True"/> if the gauges' background is adjusted to <see cref="StartingAngle"/>.
+        /// Default value is set to <see langword="False"/>.
         /// </summary>
         public bool NormBackGauge = false;
 
         /// <summary>
-        /// Angle (in degrees) at which the gauges start: 270 for North, 0 for East, 90 for South, 180 for West, and so on
+        /// Angle (in degrees) at which the gauges start: 270 for North (default value), 0 for East, 90 for South, 180 for West, and so on.
+        /// Expected values in the range [0-360], otherwise unexpected side-effects might happen.
         /// </summary>
         public float StartingAngle = 270f;
 
         /// <summary>
-        /// The empty space between gauges as a percentage of the gauge width. Values in the range [0-100], default value is 50 [percent]. Other values might produce unexpected side-effects.
+        /// The empty space between gauges as a percentage of the gauge width.
+        /// Values in the range [0-100], default value is 50 [percent]. Other values might produce unexpected side-effects.
         /// </summary>
         public float GaugeSpacePercentage = 50f;
 
         /// <summary>
-        /// Color of the value labels drawn inside the gauges.
+        /// <see langword="Color"/> of the value labels drawn inside the gauges.
         /// </summary>
         public Color GaugeLabelsColor = Color.White;
 
         /// <summary>
-        /// Size of the gague label text as a percentage of the gauge width
+        /// Size of the gague label text as a percentage of the gauge width.
+        /// Values in the range [0-100], default value is 75 [percent]. Other values might produce unexpected side-effects.
         /// </summary>
         public float GaugeLabelsFontPct = 75f;
 
         /// <summary>
-        /// Controls if values along each category axis are scaled independently or uniformly across all axes.
-        /// </summary>
-        public bool IndependentAxes;
-
-        /// <summary>
-        /// Font used for labeling values on the plot
+        /// <see langword="Font"/> used for labeling values on the plot
         /// </summary>
         public Drawing.Font Font = new();
 
         /// <summary>
-        /// If true, each value will be written in text on the plot.
+        /// <see langword="True"/> if value labels are shown inside the gauges.
+        /// Size of the text is set by <see cref="GaugeLabelsFontPct"/> and color by <see cref="GaugeLabelsColor"/>.
         /// </summary>
         public bool ShowGaugeValues = true;
 
         /// <summary>
         /// Controls rendering style of the concentric circles (ticks) of the web
         /// </summary>
-        public RadarAxis AxisType { get; set; } = RadarAxis.Circle;
+        //public RadarAxis AxisType { get; set; } = RadarAxis.None;
 
+        // These 3 properties are needed as part of IPlottable
         public bool IsVisible { get; set; } = true;
         public int XAxisIndex { get; set; } = 0;
         public int YAxisIndex { get; set; } = 0;
 
-        public RadialGaugePlot(double[] values, Color[] lineColors, bool independentAxes, double? maxValues = null)
+        /// <summary>
+        /// Initializes the instance.
+        /// </summary>
+        /// <param name="values">Array of (positive) values to be plotted as gauges.</param>
+        /// <param name="lineColors">Array colors for the gauges.</param>
+        public RadialGaugePlot(double[] values, Color[] lineColors)
         {
-            LineColors = lineColors;
-            IndependentAxes = independentAxes;
-            Update(values, independentAxes, maxValues);
+            GaugeColors = lineColors;
+            Update(values);
         }
 
         public override string ToString() =>
-            $"PlottableRadialGauge with {Data.Length} points.";
-
-        //public override string ToString() =>
-        //    $"PlottableRadialGauge with {PointCount} points and {Norm.GetUpperBound(1) + 1} categories.";
+            $"RadialGauge with {DataRaw.Length} points.";
 
         /// <summary>
-        /// Replace the data values with new ones.
+        /// Replace the data values with new ones. This data is copied and stored in <see cref="DataRaw"/>.
         /// </summary>
-        /// <param name="values">2D array of groups (rows) of values for each category (columns)</param>
-        /// <param name="independentAxes">Controls if values along each category axis are scaled independently or uniformly across all axes</param>
-        /// <param name="maxValues">If provided, these values will be used to normalize each category (columns)</param>
-        public void Update(double[] values, bool independentAxes = false, double? maxValues = null)
+        /// <param name="values">Array of (positive) values to be plotted as gauges.</param>
+        public void Update(double[] values)
         {
-            IndependentAxes = independentAxes;
-            //Norm = new double[values.GetLength(0)];
-            //Array.Copy(values, 0, Norm, 0, values.Length);
-            Data = new double[values.Length];
-            Array.Copy(values, 0, Data, 0, values.Length);
+            DataRaw = new double[values.Length];
+            Array.Copy(values, 0, DataRaw, 0, values.Length);
 
-            Compute_ScaleMax_Factor(maxValues);
+            Compute_MaxScale();
 
-            //if (IndependentAxes)
-            //    NormMax = NormalizeInPlace(Norm, maxValues);
-            //else
-            //    NormMax = NormalizeInPlace(Norm, maxValues);
         }
 
-        private void Compute_ScaleMax_Factor(double? maxValues = null)
+        private void Compute_MaxScale()
         {
             if (GaugeMode == RadialGaugeMode.Sequential || GaugeMode == RadialGaugeMode.SingleGauge)
-            {
-                if (maxValues != null)
-                {
-                    MaxScale += Data.Sum();
-                }
-                else
-                    MaxScale = Data.Sum();
-            }
+                MaxScale = DataRaw.Sum();
             else
-                MaxScale = Data.Max();
+                MaxScale = DataRaw.Max();
         }
 
         public void ValidateData(bool deep = false)
         {
-            if (GroupLabels != null && GroupLabels.Length != Data.Length)
-                throw new InvalidOperationException("group names must match size of values");
-
-            if (CategoryLabels != null && CategoryLabels.Length != Data.Length)
-                throw new InvalidOperationException("category names must match size of values");
+            if (GaugeLabels != null && GaugeLabels.Length != DataRaw.Length)
+                throw new InvalidOperationException("Gauge labels must match size of data values");
         }
 
-        /// <summary>
-        /// Normalize a 2D array by dividing all values by the maximum value.
-        /// </summary>
-        /// <returns>maximum value in the array before normalization</returns>
-        //private double NormalizeInPlace(double[] input, double[] maxValues = null)
-        //{
-        //    double max;
-        //    if (maxValues != null && maxValues.Length == 1)
-        //    {
-        //        max = maxValues[0];
-        //    }
-        //    else
-        //    {
-        //        max = input[0];
-        //        for (int i = 0; i < input.GetLength(0); i++)
-        //            max = Math.Max(max, input[i]);
-        //    }
-
-        //    for (int i = 0; i < input.GetLength(0); i++)
-        //            input[i] /= max;
-
-        //    return max;
-        //}
+        public double[] GetData() => DataRaw;
 
         /// <summary>
-        /// Normalize each row of a 2D array independently by dividing all values by the maximum value.
+        /// Needed as part of IPlottable
         /// </summary>
-        /// <returns>maximum value in each row of the array before normalization</returns>
-        //private double[] NormalizeSeveralInPlace(double[] input, double[] maxValues = null)
-        //{
-        //    double[] maxes;
-        //    if (maxValues != null && input.GetLength(1) == maxValues.Length)
-        //    {
-        //        maxes = maxValues;
-        //    }
-        //    else
-        //    {
-        //        maxes = new double[input.GetLength(1)];
-        //        for (int i = 0; i < input.GetLength(1); i++)
-        //        {
-        //            double max = input[0, i];
-        //            for (int j = 0; j < input.GetLength(0); j++)
-        //            {
-        //                max = Math.Max(input[j, i], max);
-        //            }
-        //            maxes[i] = max;
-        //        }
-        //    }
-
-        //    for (int i = 0; i < input.GetLength(0); i++)
-        //    {
-        //        for (int j = 0; j < input.GetLength(1); j++)
-        //        {
-        //            input[i, j] /= maxes[j];
-        //        }
-        //    }
-
-        //    return maxes;
-        //}
-
+        /// <returns></returns>
         public LegendItem[] GetLegendItems()
         {
-            if (GroupLabels is null)
+            if (GaugeLabels is null)
                 return null;
 
             List<LegendItem> legendItems = new List<LegendItem>();
-            for (int i = 0; i < GroupLabels.Length; i++)
+            for (int i = 0; i < GaugeLabels.Length; i++)
             {
                 var item = new LegendItem()
                 {
-                    label = GroupLabels[i],
-                    color = LineColors[i],
+                    label = GaugeLabels[i],
+                    color = GaugeColors[i],
                     lineWidth = 10,
                     markerShape = MarkerShape.none
                 };
@@ -319,8 +223,12 @@ namespace ScottPlot.Plottable
             return legendItems.ToArray();
         }
 
+        /// <summary>
+        /// Needed as part of IPlottable
+        /// </summary>
+        /// <returns></returns>
         public AxisLimits GetAxisLimits() =>
-            (GroupLabels != null) ? new AxisLimits(-3.5, 3.5, -3.5, 3.5) : new AxisLimits(-2.5, 2.5, -2.5, 2.5);
+            (GaugeLabels != null) ? new AxisLimits(-3.5, 3.5, -3.5, 3.5) : new AxisLimits(-2.5, 2.5, -2.5, 2.5);
 
 
         /// <summary>
@@ -331,7 +239,7 @@ namespace ScottPlot.Plottable
         /// <param name="lowQuality"></param>
         public virtual void Render(PlotDimensions dims, Bitmap bmp, bool lowQuality = false)
         {
-            int numGroups = Data.Length;
+            int numGroups = DataRaw.Length;
             float sweepAngle;
             double minScale = new double[] { dims.GetPixelX(1), dims.GetPixelY(1) }.Min();
             PointF origin = new PointF(dims.GetPixelX(0), dims.GetPixelY(0));
@@ -339,17 +247,13 @@ namespace ScottPlot.Plottable
             using Graphics gfx = GDI.Graphics(bmp, dims, lowQuality);
             using Pen pen = GDI.Pen(WebColor);
             using Pen penCircle = GDI.Pen(WebColor);
-            //using Brush brush = GDI.Brush(Color.Black);
-            using StringFormat sf = new StringFormat() { LineAlignment = StringAlignment.Center };
-            using StringFormat sf2 = new StringFormat();
-            using System.Drawing.Font font = GDI.Font(Font);
             using Brush labelBrush = GDI.Brush(GaugeLabelsColor);
 
             float lineWidth = (LineWidth < 0) ? (float)(minScale / ((numGroups) * (GaugeSpacePercentage + 100) / 100)) : LineWidth;
             float radiusSpace = lineWidth * (GaugeSpacePercentage + 100) / 100;
-            float gaugeRadius = 0;
-            float maxBackAngle = (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * (NormBackGauge ? (float)MaxScale : 1) * 360f;
-            float gaugeAngleStart = StartingAngle;
+            float gaugeRadius = numGroups * radiusSpace;  // By default, the outer-most radius is computed
+            float maxBackAngle = (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * (NormBackGauge ? (float)AngleRange : 360) ;
+            float gaugeAngleStart = StartingAngle - (GaugeMode == RadialGaugeMode.SingleGauge ? (360f - (float)AngleRange) : 0) * (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1);
 
             pen.Width = (float)lineWidth;
             pen.StartCap = System.Drawing.Drawing2D.LineCap.Round;
@@ -358,23 +262,27 @@ namespace ScottPlot.Plottable
             penCircle.StartCap = System.Drawing.Drawing2D.LineCap.Round;
             penCircle.EndCap = System.Drawing.Drawing2D.LineCap.Round;
 
-            using System.Drawing.Font fontGauge = new(font.FontFamily, 0.75f * lineWidth, FontStyle.Bold);
-
+            using System.Drawing.Font fontGauge = new(Font.Name, lineWidth * GaugeLabelsFontPct / 100, FontStyle.Bold);
+            
             lock (this)
             {
+                int index;
                 for (int i = 0; i < numGroups; i++)
                 {
-                    sweepAngle = (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * (float)(360f * Data[i] / MaxScale);
+                    // Draw data in reverse order if SingleGauge mode is selected
+                    index = GaugeMode == RadialGaugeMode.SingleGauge ? (numGroups - i - 1) : i;
+
+                    // Compute the angular value to be plotted
+                    sweepAngle = (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * (float)(AngleRange * DataRaw[index] / MaxScale);
+
                     if (GaugeMode == RadialGaugeMode.SingleGauge)
-                    {
-                        gaugeRadius = (numGroups - 1) * radiusSpace;
-                        gaugeAngleStart -= sweepAngle;
-                    }
+                        gaugeAngleStart -=  sweepAngle;  // Data is drawn reversed
                     else
                         gaugeRadius = (GaugeStart == RadialGaugeStart.InsideToOutside ? i + 1 : (numGroups - i)) * radiusSpace;
 
-                    pen.Color = LineColors[i];
-                    penCircle.Color = LightenBy(LineColors[i], DimPercentage);
+                    // Set color values
+                    pen.Color = GaugeColors[index];
+                    penCircle.Color = LightenBy(GaugeColors[index], DimPercentage);
 
                     // Draw gauge background
                     if (GaugeMode != RadialGaugeMode.SingleGauge)
@@ -383,6 +291,7 @@ namespace ScottPlot.Plottable
                     // Draw gauge
                     gfx.DrawArc(pen, (origin.X - gaugeRadius), (origin.Y - gaugeRadius), (gaugeRadius * 2), (gaugeRadius * 2), gaugeAngleStart, sweepAngle);
 
+                    // Draw gauge labels
                     if (ShowGaugeValues)
                     {
                         DrawTextOnCircle(gfx,
@@ -393,9 +302,10 @@ namespace ScottPlot.Plottable
                             gaugeAngleStart + sweepAngle,
                             origin.X,
                             origin.Y,
-                            Data[i].ToString("0.##"));
+                            DataRaw[index].ToString("0.##"));
                     }
 
+                    // Sequential starting angle
                     if (GaugeMode == RadialGaugeMode.Sequential)
                         gaugeAngleStart += sweepAngle;
     
@@ -498,28 +408,28 @@ namespace ScottPlot.Plottable
             for (int i = 0; i < text.Length; i++)
             {
                 // Increment theta half the angular width of the current character
-                if (anglePos > 180) // In the top half of the gauge, the text is drawn backwards
-                    theta -= (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * rects[rects.Count - 1].Width / 2 * width_to_angle;
-                else
+                if (anglePos <180 && anglePos > 0)
                     theta -= (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * rects[0].Width / 2 * width_to_angle;
+                else    // In the top half of the gauge, the text is drawn backwards
+                    theta -= (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * rects[rects.Count - 1].Width / 2 * width_to_angle;
 
                 // Calculate the position of the upper-left corner
                 double x = cx + radius * Math.Cos(theta);
                 double y = cy + radius * Math.Sin(theta);
 
                 // Transform to position the character.
-                if (anglePos > 180)
-                    gfx.RotateTransform((float)(RadToDeg * (theta + Math.PI / 2)));
-                else
+                if (anglePos < 180 && anglePos > 0)
                     gfx.RotateTransform((float)(RadToDeg * (theta - Math.PI / 2)));
+                else
+                    gfx.RotateTransform((float)(RadToDeg * (theta + Math.PI / 2)));
 
                 gfx.TranslateTransform((float)x, (float)y, System.Drawing.Drawing2D.MatrixOrder.Append);
 
                 // Draw the character.
-                if (anglePos > 180)
-                    charPos = text.Length - 1 - i;
-                else
+                if (anglePos < 180 && anglePos > 0)
                     charPos = i;
+                else
+                    charPos = text.Length - 1 - i;
 
                 if (GaugeDirection == RadialGaugeDirection.AntiClockwise)
                     charPos = text.Length - 1 - charPos;
@@ -528,10 +438,10 @@ namespace ScottPlot.Plottable
                 gfx.ResetTransform();
 
                 // Increment theta the remaining half character.
-                if (anglePos > 180)
-                    theta -= (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * rects[rects.Count -1 - i].Width / 2 * width_to_angle;
-                else
+                if (anglePos < 180 && anglePos > 0)
                     theta -= (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * rects[i].Width / 2 * width_to_angle;
+                else
+                    theta -= (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * rects[rects.Count - 1 - i].Width / 2 * width_to_angle;
             }
 
                 
@@ -678,7 +588,7 @@ namespace ScottPlot
 
             Color[] fills = colors.Select(x => Color.FromArgb(50, x)).ToArray();
 
-            ScottPlot.Plottable.RadialGaugePlot plottable = new(values, colors, independentAxes, maxValues);
+            ScottPlot.Plottable.RadialGaugePlot plottable = new(values, colors);
             Add(plottable);
 
             if (disableFrameAndGrid)

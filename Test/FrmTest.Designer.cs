@@ -29,6 +29,8 @@ namespace Test
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmTest));
             this.formsPlot1 = new ScottPlot.FormsPlot();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
@@ -38,15 +40,30 @@ namespace Test
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.trackBar1 = new System.Windows.Forms.TrackBar();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
-            this.trackBar2 = new System.Windows.Forms.TrackBar();
-            this.trackBar3 = new System.Windows.Forms.TrackBar();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar3)).BeginInit();
+            this.trackStart = new System.Windows.Forms.TrackBar();
+            this.lblStarting = new System.Windows.Forms.Label();
+            this.lblSpace = new System.Windows.Forms.Label();
+            this.lblDim = new System.Windows.Forms.Label();
+            this.trackSpace = new System.Windows.Forms.TrackBar();
+            this.trackDim = new System.Windows.Forms.TrackBar();
+            this.trackRange = new System.Windows.Forms.TrackBar();
+            this.lblRange = new System.Windows.Forms.Label();
+            this.numStart = new System.Windows.Forms.NumericUpDown();
+            this.numSpace = new System.Windows.Forms.NumericUpDown();
+            this.numDim = new System.Windows.Forms.NumericUpDown();
+            this.numRange = new System.Windows.Forms.NumericUpDown();
+            this.tipRange = new System.Windows.Forms.ToolTip(this.components);
+            this.tipDim = new System.Windows.Forms.ToolTip(this.components);
+            this.tipSpace = new System.Windows.Forms.ToolTip(this.components);
+            this.tipStarting = new System.Windows.Forms.ToolTip(this.components);
+            ((System.ComponentModel.ISupportInitialize)(this.trackStart)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackSpace)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackDim)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackRange)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numStart)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numSpace)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numDim)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numRange)).BeginInit();
             this.SuspendLayout();
             // 
             // formsPlot1
@@ -68,7 +85,7 @@ namespace Test
             this.comboBox1.Items.AddRange(new object[] {
             "Clockwise",
             "Anti-clockwise"});
-            this.comboBox1.Location = new System.Drawing.Point(124, 409);
+            this.comboBox1.Location = new System.Drawing.Point(113, 409);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(114, 23);
             this.comboBox1.TabIndex = 1;
@@ -82,7 +99,7 @@ namespace Test
             "Stacked",
             "Sequential",
             "SingleGauge"});
-            this.comboBox2.Location = new System.Drawing.Point(124, 440);
+            this.comboBox2.Location = new System.Drawing.Point(113, 440);
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(114, 23);
             this.comboBox2.TabIndex = 2;
@@ -94,7 +111,7 @@ namespace Test
             this.checkBox1.AutoSize = true;
             this.checkBox1.Checked = true;
             this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox1.Location = new System.Drawing.Point(124, 525);
+            this.checkBox1.Location = new System.Drawing.Point(16, 501);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(127, 19);
             this.checkBox1.TabIndex = 3;
@@ -108,7 +125,7 @@ namespace Test
             this.checkBox2.AutoSize = true;
             this.checkBox2.Checked = true;
             this.checkBox2.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox2.Location = new System.Drawing.Point(286, 525);
+            this.checkBox2.Location = new System.Drawing.Point(16, 526);
             this.checkBox2.Name = "checkBox2";
             this.checkBox2.Size = new System.Drawing.Size(183, 19);
             this.checkBox2.TabIndex = 4;
@@ -123,7 +140,7 @@ namespace Test
             this.comboBox3.Items.AddRange(new object[] {
             "Inside",
             "Outside"});
-            this.comboBox3.Location = new System.Drawing.Point(124, 472);
+            this.comboBox3.Location = new System.Drawing.Point(113, 472);
             this.comboBox3.Name = "comboBox3";
             this.comboBox3.Size = new System.Drawing.Size(114, 23);
             this.comboBox3.TabIndex = 5;
@@ -133,7 +150,7 @@ namespace Test
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(27, 412);
+            this.label1.Location = new System.Drawing.Point(16, 412);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(91, 15);
             this.label1.TabIndex = 6;
@@ -143,7 +160,7 @@ namespace Test
             // 
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(27, 443);
+            this.label2.Location = new System.Drawing.Point(16, 443);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(75, 15);
             this.label2.TabIndex = 7;
@@ -153,81 +170,179 @@ namespace Test
             // 
             this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(27, 475);
+            this.label3.Location = new System.Drawing.Point(16, 475);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(67, 15);
             this.label3.TabIndex = 8;
             this.label3.Text = "Gauge start";
             // 
-            // trackBar1
+            // trackStart
             // 
-            this.trackBar1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.trackBar1.Location = new System.Drawing.Point(367, 409);
-            this.trackBar1.Maximum = 360;
-            this.trackBar1.Name = "trackBar1";
-            this.trackBar1.Size = new System.Drawing.Size(310, 45);
-            this.trackBar1.TabIndex = 9;
-            this.trackBar1.TickFrequency = 10;
+            this.trackStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.trackStart.Location = new System.Drawing.Point(385, 409);
+            this.trackStart.Maximum = 360;
+            this.trackStart.Name = "trackStart";
+            this.trackStart.Size = new System.Drawing.Size(292, 45);
+            this.trackStart.TabIndex = 9;
+            this.trackStart.TickFrequency = 10;
+            this.tipStarting.SetToolTip(this.trackStart, resources.GetString("trackStart.ToolTip"));
+            this.trackStart.ValueChanged += new System.EventHandler(this.trackStart_ValueChanged);
             // 
-            // label4
+            // lblStarting
             // 
-            this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(269, 412);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(80, 15);
-            this.label4.TabIndex = 10;
-            this.label4.Text = "Starting angle";
+            this.lblStarting.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblStarting.AutoSize = true;
+            this.lblStarting.Location = new System.Drawing.Point(258, 412);
+            this.lblStarting.Name = "lblStarting";
+            this.lblStarting.Size = new System.Drawing.Size(80, 15);
+            this.lblStarting.TabIndex = 10;
+            this.lblStarting.Text = "Starting angle";
             // 
-            // label5
+            // lblSpace
             // 
-            this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(269, 443);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(51, 15);
-            this.label5.TabIndex = 11;
-            this.label5.Text = "Space %";
+            this.lblSpace.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblSpace.AutoSize = true;
+            this.lblSpace.Location = new System.Drawing.Point(258, 443);
+            this.lblSpace.Name = "lblSpace";
+            this.lblSpace.Size = new System.Drawing.Size(51, 15);
+            this.lblSpace.TabIndex = 11;
+            this.lblSpace.Text = "Space %";
             // 
-            // label6
+            // lblDim
             // 
-            this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(269, 475);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(42, 15);
-            this.label6.TabIndex = 12;
-            this.label6.Text = "Dim %";
+            this.lblDim.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblDim.AutoSize = true;
+            this.lblDim.Location = new System.Drawing.Point(258, 474);
+            this.lblDim.Name = "lblDim";
+            this.lblDim.Size = new System.Drawing.Size(42, 15);
+            this.lblDim.TabIndex = 12;
+            this.lblDim.Text = "Dim %";
             // 
-            // trackBar2
+            // trackSpace
             // 
-            this.trackBar2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.trackBar2.Location = new System.Drawing.Point(367, 440);
-            this.trackBar2.Maximum = 100;
-            this.trackBar2.Name = "trackBar2";
-            this.trackBar2.Size = new System.Drawing.Size(309, 45);
-            this.trackBar2.TabIndex = 13;
-            this.trackBar2.TickFrequency = 10;
+            this.trackSpace.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.trackSpace.Location = new System.Drawing.Point(385, 440);
+            this.trackSpace.Maximum = 100;
+            this.trackSpace.Name = "trackSpace";
+            this.trackSpace.Size = new System.Drawing.Size(291, 45);
+            this.trackSpace.TabIndex = 13;
+            this.trackSpace.TickFrequency = 10;
+            this.tipSpace.SetToolTip(this.trackSpace, "The empty space between gauges as a percentage of the gauge width.\r\nValues in the" +
+        " range [0-100], default value is 50 [percent]. Other values might produce unexpe" +
+        "cted side-effects.");
+            this.trackSpace.ValueChanged += new System.EventHandler(this.trackSpace_ValueChanged);
             // 
-            // trackBar3
+            // trackDim
             // 
-            this.trackBar3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.trackBar3.Location = new System.Drawing.Point(367, 472);
-            this.trackBar3.Name = "trackBar3";
-            this.trackBar3.Size = new System.Drawing.Size(308, 45);
-            this.trackBar3.TabIndex = 14;
+            this.trackDim.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.trackDim.Location = new System.Drawing.Point(385, 471);
+            this.trackDim.Maximum = 100;
+            this.trackDim.Name = "trackDim";
+            this.trackDim.Size = new System.Drawing.Size(290, 45);
+            this.trackDim.TabIndex = 14;
+            this.trackDim.TickFrequency = 10;
+            this.tipDim.SetToolTip(this.trackDim, "Dimmed percentage used to draw the gauges\' background.\r\nValues in the range [0-10" +
+        "0], default value is 90 [percent]. Outside this range, unexpected side-effects m" +
+        "ight happen.");
+            this.trackDim.ValueChanged += new System.EventHandler(this.trackDim_ValueChanged);
+            // 
+            // trackRange
+            // 
+            this.trackRange.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.trackRange.Location = new System.Drawing.Point(385, 502);
+            this.trackRange.Maximum = 360;
+            this.trackRange.Name = "trackRange";
+            this.trackRange.Size = new System.Drawing.Size(289, 45);
+            this.trackRange.TabIndex = 15;
+            this.trackRange.TickFrequency = 10;
+            this.tipRange.SetToolTip(this.trackRange, "The maximum angular interval that the gauges will consist of.\r\nIt takes values in" +
+        " the range [0-360], default value is 360. Outside this range, unexpected side-ef" +
+        "fects might happen.");
+            this.trackRange.ValueChanged += new System.EventHandler(this.trackMax_ValueChanged);
+            // 
+            // lblRange
+            // 
+            this.lblRange.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblRange.AutoSize = true;
+            this.lblRange.Location = new System.Drawing.Point(258, 505);
+            this.lblRange.Name = "lblRange";
+            this.lblRange.Size = new System.Drawing.Size(71, 15);
+            this.lblRange.TabIndex = 16;
+            this.lblRange.Text = "Angle range";
+            // 
+            // numStart
+            // 
+            this.numStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.numStart.Location = new System.Drawing.Point(339, 410);
+            this.numStart.Maximum = new decimal(new int[] {
+            360,
+            0,
+            0,
+            0});
+            this.numStart.Name = "numStart";
+            this.numStart.Size = new System.Drawing.Size(44, 23);
+            this.numStart.TabIndex = 17;
+            this.tipStarting.SetToolTip(this.numStart, resources.GetString("numStart.ToolTip"));
+            this.numStart.ValueChanged += new System.EventHandler(this.numStart_ValueChanged);
+            // 
+            // numSpace
+            // 
+            this.numSpace.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.numSpace.Location = new System.Drawing.Point(339, 441);
+            this.numSpace.Name = "numSpace";
+            this.numSpace.Size = new System.Drawing.Size(44, 23);
+            this.numSpace.TabIndex = 18;
+            this.tipSpace.SetToolTip(this.numSpace, "The empty space between gauges as a percentage of the gauge width.\r\nValues in the" +
+        " range [0-100], default value is 50 [percent]. Other values might produce unexpe" +
+        "cted side-effects.");
+            this.numSpace.ValueChanged += new System.EventHandler(this.numSpace_ValueChanged);
+            // 
+            // numDim
+            // 
+            this.numDim.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.numDim.Location = new System.Drawing.Point(339, 472);
+            this.numDim.Name = "numDim";
+            this.numDim.Size = new System.Drawing.Size(44, 23);
+            this.numDim.TabIndex = 19;
+            this.tipDim.SetToolTip(this.numDim, "Dimmed percentage used to draw the gauges\' background.\r\nValues in the range [0-10" +
+        "0], default value is 90 [percent]. Outside this range, unexpected side-effects m" +
+        "ight happen.");
+            this.numDim.ValueChanged += new System.EventHandler(this.numDim_ValueChanged);
+            // 
+            // numRange
+            // 
+            this.numRange.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.numRange.Location = new System.Drawing.Point(339, 503);
+            this.numRange.Maximum = new decimal(new int[] {
+            360,
+            0,
+            0,
+            0});
+            this.numRange.Name = "numRange";
+            this.numRange.Size = new System.Drawing.Size(44, 23);
+            this.numRange.TabIndex = 20;
+            this.tipRange.SetToolTip(this.numRange, "The maximum angular interval that the gauges will consist of.\r\nIt takes values in" +
+        " the range [0-360], default value is 360. Outside this range, unexpected side-ef" +
+        "fects might happen.");
+            this.numRange.ValueChanged += new System.EventHandler(this.numMax_ValueChanged);
             // 
             // FrmTest
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(688, 556);
-            this.Controls.Add(this.trackBar3);
-            this.Controls.Add(this.trackBar2);
-            this.Controls.Add(this.label6);
-            this.Controls.Add(this.label5);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.trackBar1);
+            this.Controls.Add(this.numRange);
+            this.Controls.Add(this.numDim);
+            this.Controls.Add(this.numSpace);
+            this.Controls.Add(this.numStart);
+            this.Controls.Add(this.lblRange);
+            this.Controls.Add(this.trackRange);
+            this.Controls.Add(this.trackDim);
+            this.Controls.Add(this.trackSpace);
+            this.Controls.Add(this.lblDim);
+            this.Controls.Add(this.lblSpace);
+            this.Controls.Add(this.lblStarting);
+            this.Controls.Add(this.trackStart);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -240,9 +355,14 @@ namespace Test
             this.Name = "FrmTest";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Test radial gauge plot";
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackStart)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackSpace)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackDim)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackRange)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numStart)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numSpace)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numDim)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numRange)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -259,11 +379,21 @@ namespace Test
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TrackBar trackBar1;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.TrackBar trackBar2;
-        private System.Windows.Forms.TrackBar trackBar3;
+        private System.Windows.Forms.TrackBar trackStart;
+        private System.Windows.Forms.Label lblStarting;
+        private System.Windows.Forms.Label lblSpace;
+        private System.Windows.Forms.Label lblDim;
+        private System.Windows.Forms.TrackBar trackSpace;
+        private System.Windows.Forms.TrackBar trackDim;
+        private System.Windows.Forms.TrackBar trackRange;
+        private System.Windows.Forms.Label lblRange;
+        private System.Windows.Forms.NumericUpDown numStart;
+        private System.Windows.Forms.NumericUpDown numSpace;
+        private System.Windows.Forms.NumericUpDown numDim;
+        private System.Windows.Forms.NumericUpDown numRange;
+        private System.Windows.Forms.ToolTip tipRange;
+        private System.Windows.Forms.ToolTip tipDim;
+        private System.Windows.Forms.ToolTip tipSpace;
+        private System.Windows.Forms.ToolTip tipStarting;
     }
 }
