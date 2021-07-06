@@ -145,6 +145,10 @@ namespace ScottPlot.Plottable
         /// </summary>
         public bool ShowGaugeValues = true;
 
+        public System.Drawing.Drawing2D.LineCap EndCap = System.Drawing.Drawing2D.LineCap.Triangle;
+
+        public System.Drawing.Drawing2D.LineCap StartCap = System.Drawing.Drawing2D.LineCap.Round;
+
         /// <summary>
         /// Controls rendering style of the concentric circles (ticks) of the web
         /// </summary>
