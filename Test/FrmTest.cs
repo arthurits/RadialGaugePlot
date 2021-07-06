@@ -17,7 +17,7 @@ namespace Test
         {
             InitializeComponent();
 
-            double[] values = {100, 80, 65, 42, 20 };
+            double[] values = {100, 80, 65, 42, -20 };
             formsPlot1.Plot.Palette = ScottPlot.Drawing.Palette.Nord;
             Color[] colors = Enumerable.Range(0, values.Length)
                                        .Select(i => formsPlot1.Plot.GetSettings(false).PlottablePalette.GetColor(i))   // modify later

@@ -302,7 +302,8 @@ namespace ScottPlot.Plottable
                             gaugeAngleStart + sweepAngle,
                             origin.X,
                             origin.Y,
-                            DataRaw[index].ToString("0.##"));
+                            DataRaw[index].ToString("0.##"),
+                            DataRaw[index] >= 0 ? GaugeDirection : (RadialGaugeDirection.Clockwise | RadialGaugeDirection.AntiClockwise) & ~GaugeDirection);
                     }
 
                     // Sequential starting angle
@@ -374,7 +375,7 @@ namespace ScottPlot.Plottable
         /// <seealso cref="http://csharphelper.com/blog/2018/02/draw-text-on-a-circle-in-c/"/>
         protected virtual void DrawTextOnCircle(Graphics gfx, System.Drawing.Font font,
             Brush brush, RectangleF clientRectangle, float radius, float anglePos, float cx, float cy,
-            string text)
+            string text, RadialGaugeDirection direction)
         {
             // Modify anglePos to be in the range [0, 360]
             if (anglePos >= 0)
@@ -409,9 +410,9 @@ namespace ScottPlot.Plottable
             {
                 // Increment theta half the angular width of the current character
                 if (anglePos <180 && anglePos > 0)
-                    theta -= (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * rects[0].Width / 2 * width_to_angle;
+                    theta -= (direction == RadialGaugeDirection.AntiClockwise ? -1 : 1) * rects[0].Width / 2 * width_to_angle;
                 else    // In the top half of the gauge, the text is drawn backwards
-                    theta -= (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * rects[rects.Count - 1].Width / 2 * width_to_angle;
+                    theta -= (direction == RadialGaugeDirection.AntiClockwise ? -1 : 1) * rects[rects.Count - 1].Width / 2 * width_to_angle;
 
                 // Calculate the position of the upper-left corner
                 double x = cx + radius * Math.Cos(theta);
@@ -431,7 +432,7 @@ namespace ScottPlot.Plottable
                 else
                     charPos = text.Length - 1 - i;
 
-                if (GaugeDirection == RadialGaugeDirection.AntiClockwise)
+                if (direction == RadialGaugeDirection.AntiClockwise)
                     charPos = text.Length - 1 - charPos;
 
                 gfx.DrawString(text[charPos].ToString(), font, brush, 0, 0, string_format);
@@ -439,9 +440,9 @@ namespace ScottPlot.Plottable
 
                 // Increment theta the remaining half character.
                 if (anglePos < 180 && anglePos > 0)
-                    theta -= (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * rects[i].Width / 2 * width_to_angle;
+                    theta -= (direction == RadialGaugeDirection.AntiClockwise ? -1 : 1) * rects[i].Width / 2 * width_to_angle;
                 else
-                    theta -= (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * rects[rects.Count - 1 - i].Width / 2 * width_to_angle;
+                    theta -= (direction == RadialGaugeDirection.AntiClockwise ? -1 : 1) * rects[rects.Count - 1 - i].Width / 2 * width_to_angle;
             }
 
                 
