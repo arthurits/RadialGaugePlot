@@ -258,6 +258,7 @@ namespace ScottPlot.Plottable
             float gaugeRadius = numGroups * radiusSpace;  // By default, the outer-most radius is computed
             float maxBackAngle = (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * (NormBackGauge ? (float)AngleRange : 360) ;
             float gaugeAngleStart = StartingAngle - (GaugeMode == RadialGaugeMode.SingleGauge ? (360f - (float)AngleRange) : 0) * (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1);
+            float gaugeAngleStartNeg = gaugeAngleStart;
 
             pen.Width = (float)lineWidth;
             pen.StartCap = System.Drawing.Drawing2D.LineCap.Round;
@@ -291,9 +292,12 @@ namespace ScottPlot.Plottable
                     // Draw gauge background
                     if (GaugeMode != RadialGaugeMode.SingleGauge)
                         gfx.DrawArc(penCircle, (origin.X - gaugeRadius), (origin.Y - gaugeRadius), (gaugeRadius * 2), (gaugeRadius * 2), StartingAngle, maxBackAngle);
-                    
+
                     // Draw gauge
-                    gfx.DrawArc(pen, (origin.X - gaugeRadius), (origin.Y - gaugeRadius), (gaugeRadius * 2), (gaugeRadius * 2), gaugeAngleStart, sweepAngle);
+                    if (DataRaw[index] >= 0)
+                        gfx.DrawArc(pen, (origin.X - gaugeRadius), (origin.Y - gaugeRadius), (gaugeRadius * 2), (gaugeRadius * 2), gaugeAngleStart, sweepAngle);
+                    else
+                        gfx.DrawArc(pen, (origin.X - gaugeRadius), (origin.Y - gaugeRadius), (gaugeRadius * 2), (gaugeRadius * 2), gaugeAngleStartNeg, sweepAngle);
 
                     // Draw gauge labels
                     if (ShowGaugeValues)
@@ -312,7 +316,12 @@ namespace ScottPlot.Plottable
 
                     // Sequential starting angle
                     if (GaugeMode == RadialGaugeMode.Sequential)
-                        gaugeAngleStart += sweepAngle;
+                    {
+                        if (DataRaw[index] >= 0)
+                            gaugeAngleStart += sweepAngle;
+                        else
+                            gaugeAngleStartNeg += sweepAngle;
+                    }
     
                 }
 
@@ -387,6 +396,7 @@ namespace ScottPlot.Plottable
             else
                 anglePos += 360f;
 
+
             // Use a StringFormat to draw the middle top of each character at (0, 0).
             using StringFormat string_format = new StringFormat();
             string_format.Alignment = StringAlignment.Center;
@@ -412,11 +422,18 @@ namespace ScottPlot.Plottable
             // Draw the characters.
             for (int i = 0; i < text.Length; i++)
             {
+                // Get the char index position
+                if (anglePos < 180 && anglePos > 0)
+                    charPos = i;
+                else
+                    charPos = text.Length - 1 - i;
+
+                if (direction == RadialGaugeDirection.AntiClockwise)
+                    charPos = text.Length - 1 - charPos;
+
+
                 // Increment theta half the angular width of the current character
-                if (anglePos <180 && anglePos > 0)
-                    theta -= (direction == RadialGaugeDirection.AntiClockwise ? -1 : 1) * rects[0].Width / 2 * width_to_angle;
-                else    // In the top half of the gauge, the text is drawn backwards
-                    theta -= (direction == RadialGaugeDirection.AntiClockwise ? -1 : 1) * rects[rects.Count - 1].Width / 2 * width_to_angle;
+                theta -= (direction == RadialGaugeDirection.AntiClockwise ? -1 : 1) * rects[charPos].Width / 2 * width_to_angle;
 
                 // Calculate the position of the upper-left corner
                 double x = cx + radius * Math.Cos(theta);
@@ -429,24 +446,12 @@ namespace ScottPlot.Plottable
                     gfx.RotateTransform((float)(RadToDeg * (theta + Math.PI / 2)));
 
                 gfx.TranslateTransform((float)x, (float)y, System.Drawing.Drawing2D.MatrixOrder.Append);
-
-                // Draw the character.
-                if (anglePos < 180 && anglePos > 0)
-                    charPos = i;
-                else
-                    charPos = text.Length - 1 - i;
-
-                if (direction == RadialGaugeDirection.AntiClockwise)
-                    charPos = text.Length - 1 - charPos;
-
                 gfx.DrawString(text[charPos].ToString(), font, brush, 0, 0, string_format);
                 gfx.ResetTransform();
 
                 // Increment theta the remaining half character.
-                if (anglePos < 180 && anglePos > 0)
-                    theta -= (direction == RadialGaugeDirection.AntiClockwise ? -1 : 1) * rects[i].Width / 2 * width_to_angle;
-                else
-                    theta -= (direction == RadialGaugeDirection.AntiClockwise ? -1 : 1) * rects[rects.Count - 1 - i].Width / 2 * width_to_angle;
+                theta -= (direction == RadialGaugeDirection.AntiClockwise ? -1 : 1) * rects[charPos].Width / 2 * width_to_angle;
+
             }
 
                 
