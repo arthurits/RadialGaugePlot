@@ -189,9 +189,9 @@ namespace ScottPlot.Plottable
         private void Compute_MaxScale()
         {
             if (GaugeMode == RadialGaugeMode.Sequential || GaugeMode == RadialGaugeMode.SingleGauge)
-                MaxScale = DataRaw.Sum();
+                MaxScale = DataRaw.Sum(x => Math.Abs(x));
             else
-                MaxScale = DataRaw.Max();
+                MaxScale = DataRaw.Max(x => Math.Abs(x));
         }
 
         public void ValidateData(bool deep = false)
@@ -261,8 +261,8 @@ namespace ScottPlot.Plottable
             float gaugeAngleStartNeg = gaugeAngleStart;
 
             pen.Width = (float)lineWidth;
-            pen.StartCap = System.Drawing.Drawing2D.LineCap.Round;
-            pen.EndCap = System.Drawing.Drawing2D.LineCap.Triangle;
+            pen.StartCap = StartCap;
+            pen.EndCap = EndCap;
             penCircle.Width = (float)lineWidth;
             penCircle.StartCap = System.Drawing.Drawing2D.LineCap.Round;
             penCircle.EndCap = System.Drawing.Drawing2D.LineCap.Round;
@@ -281,7 +281,7 @@ namespace ScottPlot.Plottable
                     sweepAngle = (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * (float)(AngleRange * DataRaw[index] / MaxScale);
 
                     if (GaugeMode == RadialGaugeMode.SingleGauge)
-                        gaugeAngleStart -=  sweepAngle;  // Data is drawn reversed
+                        gaugeAngleStart += (DataRaw[index] >= 0 ? -1 : 1) * sweepAngle;
                     else
                         gaugeRadius = (GaugeStart == RadialGaugeStart.InsideToOutside ? i + 1 : (numGroups - i)) * radiusSpace;
 
@@ -307,7 +307,7 @@ namespace ScottPlot.Plottable
                             labelBrush,
                             new RectangleF(dims.DataOffsetX, dims.DataOffsetY, dims.DataWidth, dims.DataHeight),
                             gaugeRadius,
-                            gaugeAngleStart + sweepAngle,
+                            (DataRaw[index] >= 0 ? gaugeAngleStart : gaugeAngleStartNeg) + sweepAngle,
                             origin.X,
                             origin.Y,
                             DataRaw[index].ToString("0.##"),

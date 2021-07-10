@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31321.278
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{CA25B500-BAEC-458D-ADD4-B4BD9474963C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "Test\Test.csproj", "{CA25B500-BAEC-458D-ADD4-B4BD9474963C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RadialGaugeControl", "RadialGaugeControl\RadialGaugeControl.csproj", "{08266786-582A-4A53-BDFB-FDD50291920C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{CA25B500-BAEC-458D-ADD4-B4BD9474963C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA25B500-BAEC-458D-ADD4-B4BD9474963C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA25B500-BAEC-458D-ADD4-B4BD9474963C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08266786-582A-4A53-BDFB-FDD50291920C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08266786-582A-4A53-BDFB-FDD50291920C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08266786-582A-4A53-BDFB-FDD50291920C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08266786-582A-4A53-BDFB-FDD50291920C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
