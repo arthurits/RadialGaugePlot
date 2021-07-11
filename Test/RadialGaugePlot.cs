@@ -41,6 +41,11 @@ namespace ScottPlot.Plottable
         protected double[] DataRaw;
 
         /// <summary>
+        /// Angular data (initial angle and swept angle) computed from <see cref="DataRaw"/>
+        /// </summary>
+        protected double[,] DataAngles;
+
+        /// <summary>
         /// Tha maximum value for scaling the gauges.
         /// This value is associated to <see cref="StartingAngle"/> + <see cref="AngleRange"/>.
         /// </summary>
@@ -186,6 +191,32 @@ namespace ScottPlot.Plottable
 
         }
 
+        private void ComputeAngularData()
+        {
+            if (DataRaw == null) return;
+
+            DataAngles = new double[DataRaw.Length, 2];
+
+            float AngleSumPos = StartingAngle;
+            float AngleSumNeg = StartingAngle;
+            float AngleSwept;
+            float AngleInit = StartingAngle;
+            
+            for (int i=0; i<DataRaw.Length; i++)
+            {
+                AngleInit = (DataRaw[i] >= 0 ? AngleSumPos : AngleSumNeg);
+                AngleSwept = (DataRaw[i] >= 0 ? 1 : -1) *(float)(AngleRange * DataRaw[i] / MaxScale);
+
+                DataAngles[i, 1] = (GaugeMode == RadialGaugeMode.Stacked ? StartingAngle : AngleInit);
+                DataAngles[i, 2] = (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * AngleSwept;
+
+                if (DataRaw[i] >= 0)
+                    AngleSumPos += AngleSwept;
+                else
+                    AngleSumNeg += AngleSwept;
+            }
+        }
+
         private void Compute_MaxScale()
         {
             if (GaugeMode == RadialGaugeMode.Sequential || GaugeMode == RadialGaugeMode.SingleGauge)
@@ -252,6 +283,10 @@ namespace ScottPlot.Plottable
             using Pen pen = GDI.Pen(WebColor);
             using Pen penCircle = GDI.Pen(WebColor);
             using Brush labelBrush = GDI.Brush(GaugeLabelsColor);
+            //gfx.DrawRectangle(pen, dims.DataOffsetX, dims.DataOffsetY, dims.DataWidth, dims.DataHeight);
+            //gfx.DrawRectangle(pen, dims.GetPixelX(0), dims.GetPixelY(0), dims.Width, dims.Height);
+            //gfx.DrawRectangle(pen, dims.GetPixelX(1), dims.GetPixelY(1), dims.Width, dims.Height);
+            //gfx.DrawRectangle(pen, dims.GetPixelX(2), dims.GetPixelY(2), dims.Width, dims.Height);
 
             float lineWidth = (LineWidth < 0) ? (float)(minScale / ((numGroups) * (GaugeSpacePercentage + 100) / 100)) : LineWidth;
             float radiusSpace = lineWidth * (GaugeSpacePercentage + 100) / 100;
