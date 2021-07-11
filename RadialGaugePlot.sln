@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.31321.278
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "Test\Test.csproj", "{CA25B500-BAEC-458D-ADD4-B4BD9474963C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RadialGaugeControl", "RadialGaugeControl\RadialGaugeControl.csproj", "{08266786-582A-4A53-BDFB-FDD50291920C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RadialGaugeControl", "RadialGaugeControl\RadialGaugeControl.csproj", "{08266786-582A-4A53-BDFB-FDD50291920C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestControl", "TestControl\TestControl.csproj", "{7E69F1E5-4BEF-42FB-8F73-B711FEB3518B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{08266786-582A-4A53-BDFB-FDD50291920C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{08266786-582A-4A53-BDFB-FDD50291920C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{08266786-582A-4A53-BDFB-FDD50291920C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E69F1E5-4BEF-42FB-8F73-B711FEB3518B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E69F1E5-4BEF-42FB-8F73-B711FEB3518B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E69F1E5-4BEF-42FB-8F73-B711FEB3518B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E69F1E5-4BEF-42FB-8F73-B711FEB3518B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
