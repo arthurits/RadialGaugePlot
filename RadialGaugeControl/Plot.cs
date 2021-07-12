@@ -17,44 +17,42 @@ namespace RadialGaugeControl
             InitializeComponent();
         }
 
+
         private void OnLoad(object sender, EventArgs e)
         {
-            
+
         }
 
         private void OnSizeChanged(object sender, EventArgs e)
         {
+            // Compute dimensions before any drawing takes place
             Center = new(Width / 2, Height / 2);
             ComputeRects();
+
+            // Create the bitmap and make the corresponding drawing into it
             Bitmap bmp = new((int)Width, (int)Height);
             Render(bmp);
 
-            // If there is a previous bitmap drawn, then dispose it
+            // Set the new bitmap into the control and dispone any previous one
             var oldBitmap = pictureBox1.Image;
+            pictureBox1.Image = bmp;
             if (oldBitmap != null)
                 oldBitmap.Dispose();
-
-            // Draw the new content into the control
-            pictureBox1.Image = bmp;
         }
 
-        protected virtual void Render(Graphics newGraphics, bool lowQuality = false)
+        protected virtual void Render(Bitmap bmp, bool lowQuality = false)
         {
+            using Graphics newGraphics = Graphics.FromImage(bmp);
             newGraphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
             newGraphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
             newGraphics.DrawRectangle(new Pen(Color.Black), RectData.X, RectData.Y, RectData.Width, RectData.Height);
             newGraphics.DrawRectangle(new Pen(Color.Black), RectTitle.X, RectTitle.Y, RectTitle.Width, RectTitle.Height);
             newGraphics.DrawString(Title, Font, new SolidBrush(Color.Black), RectTitle);
-
-            return;
         }
 
-        protected virtual void Render (Bitmap bmp, bool lowQuality = false)
-        {
-            using Graphics newGraphics = Graphics.FromImage(bmp);
-            Render(newGraphics, lowQuality);
-        }
-
+        /// <summary>
+        /// Compute geometric data
+        /// </summary>
         protected virtual void ComputeRects()
         {
             // Compute the Title rect

@@ -40,7 +40,6 @@ namespace TestControl
             this.plot1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.plot1.Location = new System.Drawing.Point(0, 0);
             this.plot1.Name = "plot1";
-            this.plot1.RectData = ((System.Drawing.RectangleF)(resources.GetObject("plot1.RectData")));
             this.plot1.RectTitle = ((System.Drawing.RectangleF)(resources.GetObject("plot1.RectTitle")));
             this.plot1.Size = new System.Drawing.Size(784, 461);
             this.plot1.TabIndex = 0;
@@ -52,6 +51,7 @@ namespace TestControl
             this.ClientSize = new System.Drawing.Size(784, 461);
             this.Controls.Add(this.plot1);
             this.Name = "FrmTestControl";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Test control";
             this.ResumeLayout(false);
 

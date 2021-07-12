@@ -16,7 +16,14 @@ namespace RadialGaugeControl
         {
             if (disposing && (components != null))
             {
-                components.Dispose();
+                if (components != null)
+                    components.Dispose();
+
+                // If there is a previous bitmap drawn, then dispose it
+                var oldBitmap = pictureBox1.Image;
+                pictureBox1.Image = null;
+                if (oldBitmap != null)
+                    oldBitmap.Dispose();
             }
             base.Dispose(disposing);
         }
