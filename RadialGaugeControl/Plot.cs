@@ -30,9 +30,9 @@ namespace RadialGaugeControl
             Render(bmp);
 
             // If there is a previous bitmap drawn, then dispose it
-            var old = pictureBox1.Image;
-            if (old != null)
-                old.Dispose();
+            var oldBitmap = pictureBox1.Image;
+            if (oldBitmap != null)
+                oldBitmap.Dispose();
 
             // Draw the new content into the control
             pictureBox1.Image = bmp;
