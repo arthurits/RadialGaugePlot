@@ -35,12 +35,14 @@ namespace TestControl
             // 
             // plot1
             // 
+            this.plot1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.plot1.Center = ((System.Drawing.PointF)(resources.GetObject("plot1.Center")));
-            this.plot1.Location = new System.Drawing.Point(12, 12);
+            this.plot1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.plot1.Location = new System.Drawing.Point(0, 0);
             this.plot1.Name = "plot1";
             this.plot1.RectData = ((System.Drawing.RectangleF)(resources.GetObject("plot1.RectData")));
             this.plot1.RectTitle = ((System.Drawing.RectangleF)(resources.GetObject("plot1.RectTitle")));
-            this.plot1.Size = new System.Drawing.Size(760, 437);
+            this.plot1.Size = new System.Drawing.Size(784, 461);
             this.plot1.TabIndex = 0;
             // 
             // FrmTestControl

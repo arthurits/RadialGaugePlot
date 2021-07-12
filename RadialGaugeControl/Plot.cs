@@ -7,7 +7,7 @@ namespace RadialGaugeControl
     public partial class Plot : UserControl
     {
         public RectangleF RectTitle { get; set; }
-        public RectangleF RectData { get; set; }
+        public RectangleF RectData;
         public PointF Center { get; set; }
 
         public string Title => "Radial gauge plot";
@@ -17,22 +17,42 @@ namespace RadialGaugeControl
             InitializeComponent();
         }
 
-        private void Plot_SizeChanged(object sender, EventArgs e)
+        private void OnLoad(object sender, EventArgs e)
         {
+            
+        }
+
+        private void OnSizeChanged(object sender, EventArgs e)
+        {
+            Center = new(Width / 2, Height / 2);
             ComputeRects();
-            using Bitmap bmp = new((int)Width, (int)Height);
+            Bitmap bmp = new((int)Width, (int)Height);
             Render(bmp);
+
+            // If there is a previous bitmap drawn, then dispose it
+            var old = pictureBox1.Image;
+            if (old != null)
+                old.Dispose();
+
+            // Draw the new content into the control
             pictureBox1.Image = bmp;
         }
 
-        protected virtual void Render(Bitmap bmp, bool lowQuality = false)
+        protected virtual void Render(Graphics newGraphics, bool lowQuality = false)
         {
-            using Graphics newGraphics = Graphics.FromImage(bmp);
+            newGraphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+            newGraphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
             newGraphics.DrawRectangle(new Pen(Color.Black), RectData.X, RectData.Y, RectData.Width, RectData.Height);
             newGraphics.DrawRectangle(new Pen(Color.Black), RectTitle.X, RectTitle.Y, RectTitle.Width, RectTitle.Height);
             newGraphics.DrawString(Title, Font, new SolidBrush(Color.Black), RectTitle);
 
             return;
+        }
+
+        protected virtual void Render (Bitmap bmp, bool lowQuality = false)
+        {
+            using Graphics newGraphics = Graphics.FromImage(bmp);
+            Render(newGraphics, lowQuality);
         }
 
         protected virtual void ComputeRects()
@@ -60,9 +80,10 @@ namespace RadialGaugeControl
 
             // Compute the minimum dimension of the control and substract 2 times the space for the title
             float min = Math.Min(Width, Height);
-            min -= Title.Length > 0 ? 2 * (RectTitle.Height * 2) : 0;
-
-            RectData = new RectangleF(Center, new SizeF(0, 0));
+            min /= 2;
+            min -= Title.Length > 0 ? 2 * RectTitle.Height : 0;
+            
+            RectData = new RectangleF(Center.X, Center.Y, 0, 0);
             RectData.Inflate(min, min);
         }
     }
