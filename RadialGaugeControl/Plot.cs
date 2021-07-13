@@ -58,23 +58,23 @@ namespace RadialGaugeControl
             // Compute the Title rect
             using Bitmap bmp = new (1, 1);
             using Graphics gfx = System.Drawing.Graphics.FromImage(bmp);
-            SizeF size = gfx.MeasureString(Title, Font);
+            SizeF sizeText = gfx.MeasureString(Title, Font);
             // compensate for OS-specific differences in font scaling
             if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux))
             {
-                size.Width *= 1;
-                size.Height *= 27.16f / 22;
+                sizeText.Width *= 1;
+                sizeText.Height *= 27.16f / 22;
             }
             else if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.OSX))
             {
-                size.Width *= 82.82f / 72;
-                size.Height *= 27.16f / 20;
+                sizeText.Width *= 82.82f / 72;
+                sizeText.Height *= 27.16f / 20;
             }
 
             // ensure the measured height is at least the font size
-            size.Height = Math.Max(Font.Size, size.Height);
+            sizeText.Height = Math.Max(Font.Size, sizeText.Height);
 
-            RectTitle = new RectangleF(new PointF((Width - size.Width) / 2, size.Height * 0.5f), size);
+            RectTitle = new RectangleF(new PointF((Width - sizeText.Width) / 2, sizeText.Height * 0.5f), sizeText);
 
             // Compute the minimum dimension of the control and substract 2 times the space for the title
             float min = Math.Min(Width, Height);

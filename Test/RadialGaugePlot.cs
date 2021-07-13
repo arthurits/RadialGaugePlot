@@ -41,21 +41,41 @@ namespace ScottPlot.Plottable
         protected double[] DataRaw;
 
         /// <summary>
-        /// Angular data (initial angle and swept angle) computed from <see cref="DataRaw"/>
+        /// Angular data (first column: initial angle; second column: swept angle) computed from <see cref="DataRaw"/>
         /// </summary>
-        protected double[,] DataAngles;
+        protected double[,] DataAngular;
 
         /// <summary>
         /// Tha maximum value for scaling the gauges.
         /// This value is associated to <see cref="StartingAngle"/> + <see cref="AngleRange"/>.
         /// </summary>
-        protected double MaxScale;
+        protected double MaxScale
+        {
+            get => _MaxScale;
+            set
+            {
+                _MaxScale = value;
+                ComputeAngularData();
+            }
+        }
+        private double _MaxScale;
 
         /// <summary>
         /// The maximum angular interval that the gauges will consist of.
         /// It takes values in the range [0-360], default value is 360. Outside this range, unexpected side-effects might happen.
         /// </summary>
-        public double AngleRange = 360;
+        public double AngleRange
+        {
+            set
+            {
+                // Modify value to be in the range [0, 360]
+                _AngleRange = value;// + (value >= 0 ? -360 * (int)(value / 360) : 360);
+                ComputeAngularData();
+            }
+            get => _AngleRange;
+            
+        }
+        private double _AngleRange = 360;
 
         /// <summary>
         /// Labels for each gauge.
@@ -72,25 +92,39 @@ namespace ScottPlot.Plottable
         /// <summary>
         /// Color of the axis lines and concentric circles representing ticks
         /// </summary>
-        public Color WebColor = Color.Gray;
+        public Color WebColor { get; set; } = Color.Gray;
 
         /// <summary>
         /// Gets or sets the size (in pixels) of each gauge.
         /// If <0, then it will be calculated from the available space.
         /// </summary>
-        public float LineWidth = -1;
+        public float LineWidth { get; set; } = -1;
 
         /// <summary>
         /// Dimmed percentage used to draw the gauges' background.
         /// Values in the range [0-100], default value is 90 [percent]. Outside this range, unexpected side-effects might happen.
         /// </summary>
-        public float DimPercentage = 90f;
+        public float DimPercentage
+        {
+            get => _DimPercentage;
+            set => _DimPercentage = (value > 100 ? 100 : (value < 0 ? 0 : value));
+        }
+        private float _DimPercentage = 90f;
 
         /// <summary>
         /// Determines whether the gauges are drawn clockwise (default value) or anti-clockwise (counter clockwise).
         /// </summary>
-        public RadialGaugeDirection GaugeDirection = RadialGaugeDirection.Clockwise;
-
+        public RadialGaugeDirection GaugeDirection
+        {
+            get => _GaugeDirection;
+            set
+            {
+                _GaugeDirection = value;
+                ComputeAngularData();
+            }
+        }
+        private RadialGaugeDirection _GaugeDirection = RadialGaugeDirection.Clockwise;
+        
         /// <summary>
         /// Determins whether the gauges are drawn stacked (dafault value), sequentially, or as a single gauge (ressembling a pie plot).
         /// </summary>
@@ -101,58 +135,78 @@ namespace ScottPlot.Plottable
             {
                 _GaugeMode = value;
                 Compute_MaxScale();
+                ComputeAngularData();
             }
         }
-        private RadialGaugeMode _GaugeMode;
+        private RadialGaugeMode _GaugeMode = RadialGaugeMode.Stacked;
 
         /// <summary>
         /// Determines whether the gauges are drawn starting from the inside (default value) or from the outside.
         /// </summary>
-        public RadialGaugeStart GaugeStart = RadialGaugeStart.InsideToOutside;
+        public RadialGaugeStart GaugeStart { get; set; } = RadialGaugeStart.InsideToOutside;
 
         /// <summary>
         /// <see langword="True"/> if the gauges' background is adjusted to <see cref="StartingAngle"/>.
         /// Default value is set to <see langword="False"/>.
         /// </summary>
-        public bool NormBackGauge = false;
+        public bool NormBackGauge { get; set; } = false;
 
         /// <summary>
         /// Angle (in degrees) at which the gauges start: 270 for North (default value), 0 for East, 90 for South, 180 for West, and so on.
         /// Expected values in the range [0-360], otherwise unexpected side-effects might happen.
         /// </summary>
-        public float StartingAngle = 270f;
-
+        public float StartingAngle
+        {
+            get => _StartingAngle;
+            set
+            {
+                _StartingAngle = value;
+                ComputeAngularData();
+            }
+        }
+        private float _StartingAngle = 270f;
+        
         /// <summary>
         /// The empty space between gauges as a percentage of the gauge width.
         /// Values in the range [0-100], default value is 50 [percent]. Other values might produce unexpected side-effects.
         /// </summary>
-        public float GaugeSpacePercentage = 50f;
+        public float GaugeSpacePercentage
+        {
+            get => _GaugeSpacePercentage;
+            set => _GaugeSpacePercentage = (value > 100 ? 100 : (value < 0 ? 0 : value));
+        }
+        private float _GaugeSpacePercentage = 50f;
 
         /// <summary>
         /// <see langword="Color"/> of the value labels drawn inside the gauges.
         /// </summary>
-        public Color GaugeLabelsColor = Color.White;
+        public Color GaugeLabelsColor { get; set; } = Color.White;
 
         /// <summary>
         /// Size of the gague label text as a percentage of the gauge width.
         /// Values in the range [0-100], default value is 75 [percent]. Other values might produce unexpected side-effects.
         /// </summary>
-        public float GaugeLabelsFontPct = 75f;
+        public float GaugeLabelsFontPct
+        {
+            get => _GaugeLabelsFontPct;
+            set => _GaugeLabelsFontPct = (value > 100 ? 100 : (value < 0 ? 0 : value));
+        }
+        private float _GaugeLabelsFontPct = 75f;
 
         /// <summary>
         /// <see langword="Font"/> used for labeling values on the plot
         /// </summary>
-        public Drawing.Font Font = new();
+        public Drawing.Font Font { get; set; } = new();
 
         /// <summary>
         /// <see langword="True"/> if value labels are shown inside the gauges.
         /// Size of the text is set by <see cref="GaugeLabelsFontPct"/> and color by <see cref="GaugeLabelsColor"/>.
         /// </summary>
-        public bool ShowGaugeValues = true;
+        public bool ShowGaugeValues { get; set; } = true;
 
-        public System.Drawing.Drawing2D.LineCap EndCap = System.Drawing.Drawing2D.LineCap.Triangle;
+        public System.Drawing.Drawing2D.LineCap EndCap { get; set; } = System.Drawing.Drawing2D.LineCap.Triangle;
 
-        public System.Drawing.Drawing2D.LineCap StartCap = System.Drawing.Drawing2D.LineCap.Round;
+        public System.Drawing.Drawing2D.LineCap StartCap { get; set; } = System.Drawing.Drawing2D.LineCap.Round;
 
         /// <summary>
         /// Controls rendering style of the concentric circles (ticks) of the web
@@ -187,28 +241,35 @@ namespace ScottPlot.Plottable
             DataRaw = new double[values.Length];
             Array.Copy(values, 0, DataRaw, 0, values.Length);
 
+            // Sets MaxScale value and triggers ComputeAngularData
             Compute_MaxScale();
-
+            //ComputeAngularData();
         }
 
+        /// <summary>
+        /// Converts <see cref="DataRaw"/> into <see cref="DataAngular"/>.
+        /// Depends on <see cref="DataRaw"/>, <see cref="GaugeMode"/>, <see cref="GaugeDirection"/>, <see cref="StartingAngle"/>, <see cref="AngleRange"/>, and <see cref="MaxScale"/>
+        /// </summary>
         private void ComputeAngularData()
         {
+            // Check if there's data
             if (DataRaw == null) return;
-
-            DataAngles = new double[DataRaw.Length, 2];
-
-            float AngleSumPos = StartingAngle;
-            float AngleSumNeg = StartingAngle;
-            float AngleSwept;
-            float AngleInit = StartingAngle;
+            DataAngular = new double[DataRaw.Length, 2];
             
+            // Internal variables
+            float AngleSumPos = _StartingAngle;
+            float AngleSumNeg = _StartingAngle;
+            float AngleSwept;
+            float AngleInit;
+            
+            // Loop through DataRaw and compute DataAngular
             for (int i=0; i<DataRaw.Length; i++)
             {
                 AngleInit = (DataRaw[i] >= 0 ? AngleSumPos : AngleSumNeg);
-                AngleSwept = (DataRaw[i] >= 0 ? 1 : -1) *(float)(AngleRange * DataRaw[i] / MaxScale);
-
-                DataAngles[i, 1] = (GaugeMode == RadialGaugeMode.Stacked ? StartingAngle : AngleInit);
-                DataAngles[i, 2] = (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * AngleSwept;
+                AngleSwept = (DataRaw[i] >= 0 ? 1 : -1) * (float)(_AngleRange * DataRaw[i] / _MaxScale);
+                
+                DataAngular[i, 0] = (_GaugeMode == RadialGaugeMode.Stacked ? _StartingAngle : AngleInit);
+                DataAngular[i, 1] = (_GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * AngleSwept;
 
                 if (DataRaw[i] >= 0)
                     AngleSumPos += AngleSwept;
@@ -217,6 +278,9 @@ namespace ScottPlot.Plottable
             }
         }
 
+        /// <summary>
+        /// Sets the value of <see cref="MaxScale"/> property, which in turn triggers the <see cref="ComputeAngularData"/> routine
+        /// </summary>
         private void Compute_MaxScale()
         {
             if (GaugeMode == RadialGaugeMode.Sequential || GaugeMode == RadialGaugeMode.SingleGauge)
