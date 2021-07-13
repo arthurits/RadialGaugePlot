@@ -261,7 +261,7 @@ namespace ScottPlot.Plottable
             float AngleSumNeg = _StartingAngle;
             float AngleSwept;
             float AngleInit;
-            
+            System.Diagnostics.Debug.Print("ComputeAngularData init");
             // Loop through DataRaw and compute DataAngular
             for (int i=0; i<DataRaw.Length; i++)
             {
@@ -275,6 +275,7 @@ namespace ScottPlot.Plottable
                     AngleSumPos += AngleSwept;
                 else
                     AngleSumNeg += AngleSwept;
+                System.Diagnostics.Debug.Print("AngleInit: {1}\tAngleSwept: {2}\tDataAngular[{0}, 0]: {3}\tDataAngular[{0}, 0]: {4}\tAngleSumPos: {5}\tAngleSumNeg: {6}", i, AngleInit, AngleSwept, DataAngular[i, 0], DataAngular[i, 1], AngleSumPos, AngleSumNeg);
             }
         }
 
