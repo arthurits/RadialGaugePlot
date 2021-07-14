@@ -61,6 +61,21 @@ namespace ScottPlot.Plottable
         private double _MaxScale;
 
         /// <summary>
+        /// Tha minimum value for scaling the gauges.
+        /// This value is associated to <see cref="StartingAngle"/> + <see cref="AngleRange"/>.
+        /// </summary>
+        protected double MinScale
+        {
+            get => _MinScale;
+            set
+            {
+                _MinScale = value;
+                ComputeAngularData();
+            }
+        }
+        private double _MinScale = 0;
+
+        /// <summary>
         /// The maximum angular interval that the gauges will consist of.
         /// It takes values in the range [0-360], default value is 360. Outside this range, unexpected side-effects might happen.
         /// </summary>
@@ -261,13 +276,14 @@ namespace ScottPlot.Plottable
             float AngleSumNeg = _StartingAngle;
             float AngleSwept;
             float AngleInit;
-            System.Diagnostics.Debug.Print("ComputeAngularData init");
+            //System.Diagnostics.Debug.Print("ComputeAngularData init");
             // Loop through DataRaw and compute DataAngular
             for (int i=0; i<DataRaw.Length; i++)
             {
                 AngleInit = (DataRaw[i] >= 0 ? AngleSumPos : AngleSumNeg);
-                AngleSwept = (_GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * (float)(_AngleRange * DataRaw[i] / _MaxScale);
-                
+                AngleSwept = (_GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * (float)(_AngleRange * DataRaw[i] / (_MaxScale - _MinScale));
+
+
                 DataAngular[i, 0] = (_GaugeMode == RadialGaugeMode.Stacked ? _StartingAngle : AngleInit);
                 DataAngular[i, 1] =  AngleSwept;
 
@@ -275,7 +291,7 @@ namespace ScottPlot.Plottable
                     AngleSumPos += AngleSwept;
                 else
                     AngleSumNeg += AngleSwept;
-                System.Diagnostics.Debug.Print("AngleInit: {1}\tAngleSwept: {2}\tDataAngular[{0}, 0]: {3}\tDataAngular[{0}, 0]: {4}\tAngleSumPos: {5}\tAngleSumNeg: {6}", i, AngleInit, AngleSwept, DataAngular[i, 0], DataAngular[i, 1], AngleSumPos, AngleSumNeg);
+                //System.Diagnostics.Debug.Print("AngleInit: {1}\tAngleSwept: {2}\tDataAngular[{0}, 0]: {3}\tDataAngular[{0}, 0]: {4}\tAngleSumPos: {5}\tAngleSumNeg: {6}", i, AngleInit, AngleSwept, DataAngular[i, 0], DataAngular[i, 1], AngleSumPos, AngleSumNeg);
             }
         }
 
@@ -285,18 +301,15 @@ namespace ScottPlot.Plottable
         private void Compute_MaxScale()
         {
             if (GaugeMode == RadialGaugeMode.Sequential || GaugeMode == RadialGaugeMode.SingleGauge)
-                MaxScale = DataRaw.Sum(x => Math.Abs(x));
-            else
-                MaxScale = DataRaw.Max(x => Math.Abs(x));
-
-            var min = DataRaw.Min();
-            if (min < 0)
             {
-                if (GaugeMode == RadialGaugeMode.Stacked)
-                {
-                    MaxScale -= min;
-                    //StartingAngle += (float)min;
-                }
+                _MaxScale = DataRaw.Sum(x => Math.Abs(x));
+                _MinScale = 0;
+            }
+            else
+            {
+                _MaxScale = DataRaw.Max(x => Math.Abs(x));
+                var min = DataRaw.Min();
+                _MinScale = min < 0 ? min : 0;
             }
         }
 
@@ -378,7 +391,8 @@ namespace ScottPlot.Plottable
             float radiusSpace = lineWidth * (GaugeSpacePercentage + 100) / 100;
             float gaugeRadius = numGroups * radiusSpace;  // By default, the outer-most radius is computed
             float maxBackAngle = (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * (NormBackGauge ? (float)AngleRange : 360) ;
-            
+            float StartingAngleAdd = (_GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * (float)(_AngleRange * _MinScale / (_MaxScale - _MinScale));
+
             pen.Width = (float)lineWidth;
             pen.StartCap = StartCap;
             pen.EndCap = EndCap;
@@ -411,7 +425,7 @@ namespace ScottPlot.Plottable
 
                     // Draw gauge background
                     if (GaugeMode != RadialGaugeMode.SingleGauge)
-                        gfx.DrawArc(penCircle, (origin.X - gaugeRadius), (origin.Y - gaugeRadius), (gaugeRadius * 2), (gaugeRadius * 2), StartingAngle, maxBackAngle);
+                        gfx.DrawArc(penCircle, (origin.X - gaugeRadius), (origin.Y - gaugeRadius), (gaugeRadius * 2), (gaugeRadius * 2), _StartingAngle + StartingAngleAdd, maxBackAngle);
 
                     // Draw gauge
                     gfx.DrawArc(pen, (origin.X - gaugeRadius), (origin.Y - gaugeRadius), (gaugeRadius * 2), (gaugeRadius * 2), (float)DataAngular[index, 0], (float)DataAngular[index, 1]);
