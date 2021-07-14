@@ -69,7 +69,7 @@ namespace ScottPlot.Plottable
             set
             {
                 // Modify value to be in the range [0, 360]
-                _AngleRange = value;// + (value >= 0 ? -360 * (int)(value / 360) : 360);
+                _AngleRange = value > 360 ? 360 : (value < 0 ? 0 : value);
                 ComputeAngularData();
             }
             get => _AngleRange;
@@ -266,10 +266,10 @@ namespace ScottPlot.Plottable
             for (int i=0; i<DataRaw.Length; i++)
             {
                 AngleInit = (DataRaw[i] >= 0 ? AngleSumPos : AngleSumNeg);
-                AngleSwept = (DataRaw[i] >= 0 ? 1 : -1) * (float)(_AngleRange * DataRaw[i] / _MaxScale);
+                AngleSwept = (_GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * (float)(_AngleRange * DataRaw[i] / _MaxScale);
                 
                 DataAngular[i, 0] = (_GaugeMode == RadialGaugeMode.Stacked ? _StartingAngle : AngleInit);
-                DataAngular[i, 1] = (_GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * AngleSwept;
+                DataAngular[i, 1] =  AngleSwept;
 
                 if (DataRaw[i] >= 0)
                     AngleSumPos += AngleSwept;
@@ -288,6 +288,16 @@ namespace ScottPlot.Plottable
                 MaxScale = DataRaw.Sum(x => Math.Abs(x));
             else
                 MaxScale = DataRaw.Max(x => Math.Abs(x));
+
+            var min = DataRaw.Min();
+            if (min < 0)
+            {
+                if (GaugeMode == RadialGaugeMode.Stacked)
+                {
+                    MaxScale -= min;
+                    //StartingAngle += (float)min;
+                }
+            }
         }
 
         public void ValidateData(bool deep = false)
@@ -299,7 +309,7 @@ namespace ScottPlot.Plottable
         public double[] GetData() => DataRaw;
 
         /// <summary>
-        /// Needed as part of IPlottable
+        /// Needed as part of IPlottable in ScottPlot.ScottForm
         /// </summary>
         /// <returns></returns>
         public LegendItem[] GetLegendItems()
@@ -324,12 +334,28 @@ namespace ScottPlot.Plottable
         }
 
         /// <summary>
-        /// Needed as part of IPlottable
+        /// Needed as part of IPlottable in ScottPlot.ScottForm
         /// </summary>
         /// <returns></returns>
         public AxisLimits GetAxisLimits() =>
             (GaugeLabels != null) ? new AxisLimits(-3.5, 3.5, -3.5, 3.5) : new AxisLimits(-2.5, 2.5, -2.5, 2.5);
 
+        /// <summary>
+        /// Reduces an angle to the range [0-360]
+        /// </summary>
+        /// <param name="angle">Angle value</param>
+        /// <returns>Return the angle whithin [0-360]</returns>
+        private double ReduceAngle(double angle)
+        {
+            double reduced = angle;
+            
+            if (angle > 360.0)
+                reduced -= 360 * (int)(angle / 360);
+            else if (angle < -360.0)
+                reduced += 360 * (int)(angle / 360);
+
+            return reduced;
+        }
 
         /// <summary>
         /// This is where the drawing of the plot is done
@@ -340,7 +366,6 @@ namespace ScottPlot.Plottable
         public virtual void Render(PlotDimensions dims, Bitmap bmp, bool lowQuality = false)
         {
             int numGroups = DataRaw.Length;
-            float sweepAngle;
             double minScale = new double[] { dims.GetPixelX(1), dims.GetPixelY(1) }.Min();
             PointF origin = new PointF(dims.GetPixelX(0), dims.GetPixelY(0));
 
@@ -348,18 +373,12 @@ namespace ScottPlot.Plottable
             using Pen pen = GDI.Pen(WebColor);
             using Pen penCircle = GDI.Pen(WebColor);
             using Brush labelBrush = GDI.Brush(GaugeLabelsColor);
-            //gfx.DrawRectangle(pen, dims.DataOffsetX, dims.DataOffsetY, dims.DataWidth, dims.DataHeight);
-            //gfx.DrawRectangle(pen, dims.GetPixelX(0), dims.GetPixelY(0), dims.Width, dims.Height);
-            //gfx.DrawRectangle(pen, dims.GetPixelX(1), dims.GetPixelY(1), dims.Width, dims.Height);
-            //gfx.DrawRectangle(pen, dims.GetPixelX(2), dims.GetPixelY(2), dims.Width, dims.Height);
-
+            
             float lineWidth = (LineWidth < 0) ? (float)(minScale / ((numGroups) * (GaugeSpacePercentage + 100) / 100)) : LineWidth;
             float radiusSpace = lineWidth * (GaugeSpacePercentage + 100) / 100;
             float gaugeRadius = numGroups * radiusSpace;  // By default, the outer-most radius is computed
             float maxBackAngle = (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * (NormBackGauge ? (float)AngleRange : 360) ;
-            float gaugeAngleStart = StartingAngle - (GaugeMode == RadialGaugeMode.SingleGauge ? (360f - (float)AngleRange) : 0) * (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1);
-            float gaugeAngleStartNeg = gaugeAngleStart;
-
+            
             pen.Width = (float)lineWidth;
             pen.StartCap = StartCap;
             pen.EndCap = EndCap;
@@ -368,22 +387,23 @@ namespace ScottPlot.Plottable
             penCircle.EndCap = System.Drawing.Drawing2D.LineCap.Round;
 
             using System.Drawing.Font fontGauge = new(Font.Name, lineWidth * GaugeLabelsFontPct / 100, FontStyle.Bold);
-            
+            //System.Diagnostics.Debug.Print("Render");
             lock (this)
             {
                 int index;
                 for (int i = 0; i < numGroups; i++)
                 {
-                    // Draw data in reverse order if SingleGauge mode is selected
-                    index = GaugeMode == RadialGaugeMode.SingleGauge ? (numGroups - i - 1) : i;
-
-                    // Compute the angular value to be plotted
-                    sweepAngle = (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * (float)(AngleRange * DataRaw[index] / MaxScale);
-
-                    if (GaugeMode == RadialGaugeMode.SingleGauge)
-                        gaugeAngleStart += (DataRaw[index] >= 0 ? -1 : 1) * sweepAngle;
-                    else
+                    // Data is reversed in case SingleGauge is selected
+                    // If OutsideToInside is selected, radius is reversed
+                    if (GaugeMode != RadialGaugeMode.SingleGauge)
+                    {
+                        index = i;
                         gaugeRadius = (GaugeStart == RadialGaugeStart.InsideToOutside ? i + 1 : (numGroups - i)) * radiusSpace;
+                    }
+                    else
+                    {
+                        index = numGroups - i - 1;
+                    }
 
                     // Set color values
                     pen.Color = GaugeColors[index];
@@ -394,10 +414,9 @@ namespace ScottPlot.Plottable
                         gfx.DrawArc(penCircle, (origin.X - gaugeRadius), (origin.Y - gaugeRadius), (gaugeRadius * 2), (gaugeRadius * 2), StartingAngle, maxBackAngle);
 
                     // Draw gauge
-                    if (DataRaw[index] >= 0)
-                        gfx.DrawArc(pen, (origin.X - gaugeRadius), (origin.Y - gaugeRadius), (gaugeRadius * 2), (gaugeRadius * 2), gaugeAngleStart, sweepAngle);
-                    else
-                        gfx.DrawArc(pen, (origin.X - gaugeRadius), (origin.Y - gaugeRadius), (gaugeRadius * 2), (gaugeRadius * 2), gaugeAngleStartNeg, sweepAngle);
+                    gfx.DrawArc(pen, (origin.X - gaugeRadius), (origin.Y - gaugeRadius), (gaugeRadius * 2), (gaugeRadius * 2), (float)DataAngular[index, 0], (float)DataAngular[index, 1]);
+
+                    //System.Diagnostics.Debug.Print("DataRaw[{0}]: {1}\tsweepAngle: {2}\tangleStart: {3}\tangleStartNeg: {4}", index, DataRaw[index], sweepAngle, gaugeAngleStart, gaugeAngleStartNeg);
 
                     // Draw gauge labels
                     if (ShowGaugeValues)
@@ -407,20 +426,11 @@ namespace ScottPlot.Plottable
                             labelBrush,
                             new RectangleF(dims.DataOffsetX, dims.DataOffsetY, dims.DataWidth, dims.DataHeight),
                             gaugeRadius,
-                            (DataRaw[index] >= 0 ? gaugeAngleStart : gaugeAngleStartNeg) + sweepAngle,
+                            (float)DataAngular[index, 0] + (float)DataAngular[index, 1],
                             origin.X,
                             origin.Y,
                             DataRaw[index].ToString("0.##"),
                             DataRaw[index] >= 0 ? GaugeDirection : (RadialGaugeDirection.Clockwise | RadialGaugeDirection.AntiClockwise) & ~GaugeDirection);
-                    }
-
-                    // Sequential starting angle
-                    if (GaugeMode == RadialGaugeMode.Sequential)
-                    {
-                        if (DataRaw[index] >= 0)
-                            gaugeAngleStart += sweepAngle;
-                        else
-                            gaugeAngleStartNeg += sweepAngle;
                     }
     
                 }
