@@ -58,7 +58,7 @@ namespace Test
             checkBox2.Checked = plottable.NormBackGauge;
 
             // Other numeric controls
-            numStart.Value = (decimal)plottable.StartingAngle;
+            numStart.Value = (decimal)plottable.StartingAngleGauges;
             numSpace.Value = (decimal)plottable.GaugeSpacePercentage;
             numDim.Value = (decimal)plottable.DimPercentage;
             numRange.Value = (decimal)plottable.AngleRange;
@@ -99,7 +99,7 @@ namespace Test
             int ratio = Convert.ToInt32(numStart.Value);
             if (trackStart.Value != ratio) trackStart.Value = ratio;
 
-            plottable.StartingAngle = (float)numStart.Value;
+            plottable.StartingAngleGauges = (float)numStart.Value;
             formsPlot1.Render();
         }
 

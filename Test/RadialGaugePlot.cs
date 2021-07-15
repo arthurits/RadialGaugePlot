@@ -47,7 +47,7 @@ namespace ScottPlot.Plottable
 
         /// <summary>
         /// Tha maximum value for scaling the gauges.
-        /// This value is associated to <see cref="StartingAngle"/> + <see cref="AngleRange"/>.
+        /// This value is associated to <see cref="StartingAngleGauges"/> + <see cref="AngleRange"/>.
         /// </summary>
         protected double MaxScale
         {
@@ -62,7 +62,7 @@ namespace ScottPlot.Plottable
 
         /// <summary>
         /// Tha minimum value for scaling the gauges.
-        /// This value is associated to <see cref="StartingAngle"/> + <see cref="AngleRange"/>.
+        /// This value is associated to <see cref="StartingAngleGauges"/> + <see cref="AngleRange"/>.
         /// </summary>
         protected double MinScale
         {
@@ -149,7 +149,7 @@ namespace ScottPlot.Plottable
             set
             {
                 _GaugeMode = value;
-                Compute_MaxScale();
+                ComputeMaxMin();
                 ComputeAngularData();
             }
         }
@@ -161,26 +161,40 @@ namespace ScottPlot.Plottable
         public RadialGaugeStart GaugeStart { get; set; } = RadialGaugeStart.InsideToOutside;
 
         /// <summary>
-        /// <see langword="True"/> if the gauges' background is adjusted to <see cref="StartingAngle"/>.
+        /// <see langword="True"/> if the gauges' background is adjusted to <see cref="StartingAngleGauges"/>.
         /// Default value is set to <see langword="False"/>.
         /// </summary>
         public bool NormBackGauge { get; set; } = false;
 
         /// <summary>
-        /// Angle (in degrees) at which the gauges start: 270 for North (default value), 0 for East, 90 for South, 180 for West, and so on.
-        /// Expected values in the range [0-360], otherwise unexpected side-effects might happen.
+        /// Angle (in degrees) at which the gauges start: 270° for North (default value), 0° for East, 90° for South, 180° for West, and so on.
+        /// Expected values in the range [0°-360°], otherwise unexpected side-effects might happen.
         /// </summary>
-        public float StartingAngle
+        public float StartingAngleGauges
         {
-            get => _StartingAngle;
+            get => _StartingAngleGauges;
             set
             {
-                _StartingAngle = value;
+                _StartingAngleGauges = (float)ReduceAngle(value);
                 ComputeAngularData();
             }
         }
-        private float _StartingAngle = 270f;
-        
+        private float _StartingAngleGauges = 270f;
+
+        /// <summary>
+        /// The initial angle (in degrees) where the background gauges begin. Default value is 270° the same as <see cref="StartingAngleGauges"/>.
+        /// </summary>
+        public float StartingAngleBackGauges
+        {
+            get => _StartingAngleBackGauges;
+            set
+            {
+                _StartingAngleBackGauges = (float)ReduceAngle(value);
+                ComputeAngularData();
+            }
+        }
+        private float _StartingAngleBackGauges = 270f;
+
         /// <summary>
         /// The empty space between gauges as a percentage of the gauge width.
         /// Values in the range [0-100], default value is 50 [percent]. Other values might produce unexpected side-effects.
@@ -257,13 +271,16 @@ namespace ScottPlot.Plottable
             Array.Copy(values, 0, DataRaw, 0, values.Length);
 
             // Sets MaxScale value and triggers ComputeAngularData
-            Compute_MaxScale();
+            ComputeMaxMin();
             //ComputeAngularData();
         }
 
+        public double[] GetData() => DataRaw;
+        public double[,] GetAngularData() => DataAngular;
+
         /// <summary>
         /// Converts <see cref="DataRaw"/> into <see cref="DataAngular"/>.
-        /// Depends on <see cref="DataRaw"/>, <see cref="GaugeMode"/>, <see cref="GaugeDirection"/>, <see cref="StartingAngle"/>, <see cref="AngleRange"/>, and <see cref="MaxScale"/>
+        /// Depends on <see cref="DataRaw"/>, <see cref="GaugeMode"/>, <see cref="GaugeDirection"/>, <see cref="StartingAngleGauges"/>, <see cref="AngleRange"/>, and <see cref="MaxScale"/>
         /// </summary>
         private void ComputeAngularData()
         {
@@ -272,8 +289,8 @@ namespace ScottPlot.Plottable
             DataAngular = new double[DataRaw.Length, 2];
             
             // Internal variables
-            float AngleSumPos = _StartingAngle;
-            float AngleSumNeg = _StartingAngle;
+            float AngleSumPos = _StartingAngleGauges;
+            float AngleSumNeg = _StartingAngleGauges;
             float AngleSwept;
             float AngleInit;
             //System.Diagnostics.Debug.Print("ComputeAngularData init");
@@ -284,7 +301,7 @@ namespace ScottPlot.Plottable
                 AngleSwept = (_GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * (float)(_AngleRange * DataRaw[i] / (_MaxScale - _MinScale));
 
 
-                DataAngular[i, 0] = (_GaugeMode == RadialGaugeMode.Stacked ? _StartingAngle : AngleInit);
+                DataAngular[i, 0] = (_GaugeMode == RadialGaugeMode.Stacked ? _StartingAngleGauges : AngleInit);
                 DataAngular[i, 1] =  AngleSwept;
 
                 if (DataRaw[i] >= 0)
@@ -293,12 +310,16 @@ namespace ScottPlot.Plottable
                     AngleSumNeg += AngleSwept;
                 //System.Diagnostics.Debug.Print("AngleInit: {1}\tAngleSwept: {2}\tDataAngular[{0}, 0]: {3}\tDataAngular[{0}, 0]: {4}\tAngleSumPos: {5}\tAngleSumNeg: {6}", i, AngleInit, AngleSwept, DataAngular[i, 0], DataAngular[i, 1], AngleSumPos, AngleSumNeg);
             }
+
+            // Compute the initial angle for the background gauges
+            _StartingAngleBackGauges = _StartingAngleGauges;
+            _StartingAngleBackGauges += (_GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * (float)(_AngleRange * _MinScale / (_MaxScale - _MinScale));
         }
 
         /// <summary>
-        /// Sets the value of <see cref="MaxScale"/> property, which in turn triggers the <see cref="ComputeAngularData"/> routine
+        /// Sets the value of <see cref="MaxScale"/> and <see cref="MinScale"/> properties, which in turn triggers the <see cref="ComputeAngularData"/> routine
         /// </summary>
-        private void Compute_MaxScale()
+        private void ComputeMaxMin()
         {
             if (GaugeMode == RadialGaugeMode.Sequential || GaugeMode == RadialGaugeMode.SingleGauge)
             {
@@ -313,13 +334,15 @@ namespace ScottPlot.Plottable
             }
         }
 
+        /// <summary>
+        /// Needed as part of IPlottable in ScottPlot.ScottForm
+        /// </summary>
+        /// <param name="deep"></param>
         public void ValidateData(bool deep = false)
         {
             if (GaugeLabels != null && GaugeLabels.Length != DataRaw.Length)
                 throw new InvalidOperationException("Gauge labels must match size of data values");
         }
-
-        public double[] GetData() => DataRaw;
 
         /// <summary>
         /// Needed as part of IPlottable in ScottPlot.ScottForm
@@ -350,14 +373,14 @@ namespace ScottPlot.Plottable
         /// Needed as part of IPlottable in ScottPlot.ScottForm
         /// </summary>
         /// <returns></returns>
-        public AxisLimits GetAxisLimits() =>
+        public AxisLimits GetAxisLimits() => 
             (GaugeLabels != null) ? new AxisLimits(-3.5, 3.5, -3.5, 3.5) : new AxisLimits(-2.5, 2.5, -2.5, 2.5);
 
         /// <summary>
-        /// Reduces an angle to the range [0-360]
+        /// Reduces an angle into the range [0°-360°]
         /// </summary>
         /// <param name="angle">Angle value</param>
-        /// <returns>Return the angle whithin [0-360]</returns>
+        /// <returns>Return the angle whithin [0°-360°]</returns>
         private double ReduceAngle(double angle)
         {
             double reduced = angle;
@@ -391,7 +414,6 @@ namespace ScottPlot.Plottable
             float radiusSpace = lineWidth * (GaugeSpacePercentage + 100) / 100;
             float gaugeRadius = numGroups * radiusSpace;  // By default, the outer-most radius is computed
             float maxBackAngle = (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * (NormBackGauge ? (float)AngleRange : 360) ;
-            float StartingAngleAdd = (_GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * (float)(_AngleRange * _MinScale / (_MaxScale - _MinScale));
 
             pen.Width = (float)lineWidth;
             pen.StartCap = StartCap;
@@ -401,7 +423,7 @@ namespace ScottPlot.Plottable
             penCircle.EndCap = System.Drawing.Drawing2D.LineCap.Round;
 
             using System.Drawing.Font fontGauge = new(Font.Name, lineWidth * GaugeLabelsFontPct / 100, FontStyle.Bold);
-            //System.Diagnostics.Debug.Print("Render");
+
             lock (this)
             {
                 int index;
@@ -425,12 +447,10 @@ namespace ScottPlot.Plottable
 
                     // Draw gauge background
                     if (GaugeMode != RadialGaugeMode.SingleGauge)
-                        gfx.DrawArc(penCircle, (origin.X - gaugeRadius), (origin.Y - gaugeRadius), (gaugeRadius * 2), (gaugeRadius * 2), _StartingAngle + StartingAngleAdd, maxBackAngle);
+                        gfx.DrawArc(penCircle, (origin.X - gaugeRadius), (origin.Y - gaugeRadius), (gaugeRadius * 2), (gaugeRadius * 2), _StartingAngleBackGauges, maxBackAngle);
 
                     // Draw gauge
                     gfx.DrawArc(pen, (origin.X - gaugeRadius), (origin.Y - gaugeRadius), (gaugeRadius * 2), (gaugeRadius * 2), (float)DataAngular[index, 0], (float)DataAngular[index, 1]);
-
-                    //System.Diagnostics.Debug.Print("DataRaw[{0}]: {1}\tsweepAngle: {2}\tangleStart: {3}\tangleStartNeg: {4}", index, DataRaw[index], sweepAngle, gaugeAngleStart, gaugeAngleStartNeg);
 
                     // Draw gauge labels
                     if (ShowGaugeValues)
