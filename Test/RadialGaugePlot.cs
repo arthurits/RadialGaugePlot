@@ -717,6 +717,13 @@ namespace ScottPlot
         Sequential,
         SingleGauge
     }
+
+    public enum RadialGaugeLabelPos
+    {
+        Beginning,
+        Middle,
+        End
+    }
 }
 
 
