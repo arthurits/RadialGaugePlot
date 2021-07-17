@@ -155,6 +155,13 @@ namespace ScottPlot.Plottable
         }
         private RadialGaugeMode _GaugeMode = RadialGaugeMode.Stacked;
 
+        public RadialGaugeLabelPos GaugeLabelPos
+        {
+            get => _GaugeLabelPos;
+            set => _GaugeLabelPos = value;
+        }
+        private RadialGaugeLabelPos _GaugeLabelPos = RadialGaugeLabelPos.End;
+
         /// <summary>
         /// Determines whether the gauges are drawn starting from the inside (default value) or from the outside.
         /// </summary>
@@ -460,7 +467,7 @@ namespace ScottPlot.Plottable
                             labelBrush,
                             new RectangleF(dims.DataOffsetX, dims.DataOffsetY, dims.DataWidth, dims.DataHeight),
                             gaugeRadius,
-                            (float)DataAngular[index, 0] + (float)DataAngular[index, 1],
+                            (float)DataAngular[index, 0] + (float)((int)_GaugeLabelPos * DataAngular[index, 1] / 2),
                             origin.X,
                             origin.Y,
                             DataRaw[index].ToString("0.##"),
@@ -720,9 +727,9 @@ namespace ScottPlot
 
     public enum RadialGaugeLabelPos
     {
-        Beginning,
-        Middle,
-        End
+        Beginning = 0,
+        Middle = 1,
+        End = 2
     }
 }
 
