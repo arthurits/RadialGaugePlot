@@ -612,14 +612,34 @@ namespace ScottPlot.Plottable
         }
 
         /// <summary>
-        /// Measure the characters in a string with no more than 32 characters.
+        /// Simplify method
         /// </summary>
         /// <param name="gfx"></param>
         /// <param name="font"></param>
+        /// <param name="brush"></param>
         /// <param name="clientRectangle"></param>
+        /// <param name="radius"></param>
+        /// <param name="anglePos"></param>
+        /// <param name="cx"></param>
+        /// <param name="cy"></param>
         /// <param name="text"></param>
-        /// <returns></returns>
-        private List<RectangleF> MeasureCharactersInWord(Graphics gfx, System.Drawing.Font font, RectangleF clientRectangle, string text)
+        /// <param name="direction"></param>
+        protected virtual void DrawTextOnCircle2(Graphics gfx, System.Drawing.Font font,
+            Brush brush, RectangleF clientRectangle, float radius, float anglePos, float cx, float cy,
+            string text, RadialGaugeDirection direction)
+        {
+
+        }
+
+            /// <summary>
+            /// Measure the characters in a string with no more than 32 characters.
+            /// </summary>
+            /// <param name="gfx"></param>
+            /// <param name="font"></param>
+            /// <param name="clientRectangle"></param>
+            /// <param name="text"></param>
+            /// <returns></returns>
+            private List<RectangleF> MeasureCharactersInWord(Graphics gfx, System.Drawing.Font font, RectangleF clientRectangle, string text)
         {
             List<RectangleF> result = new();
 
