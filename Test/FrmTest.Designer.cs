@@ -56,6 +56,7 @@ namespace Test
             this.tipDim = new System.Windows.Forms.ToolTip(this.components);
             this.tipSpace = new System.Windows.Forms.ToolTip(this.components);
             this.tipStarting = new System.Windows.Forms.ToolTip(this.components);
+            this.comboBox4 = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.trackStart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackSpace)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackDim)).BeginInit();
@@ -111,11 +112,11 @@ namespace Test
             this.checkBox1.AutoSize = true;
             this.checkBox1.Checked = true;
             this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox1.Location = new System.Drawing.Point(16, 501);
+            this.checkBox1.Location = new System.Drawing.Point(16, 506);
             this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(127, 19);
+            this.checkBox1.Size = new System.Drawing.Size(88, 19);
             this.checkBox1.TabIndex = 3;
-            this.checkBox1.Text = "Show gauge values";
+            this.checkBox1.Text = "Show labels";
             this.checkBox1.UseVisualStyleBackColor = true;
             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
@@ -125,7 +126,7 @@ namespace Test
             this.checkBox2.AutoSize = true;
             this.checkBox2.Checked = true;
             this.checkBox2.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox2.Location = new System.Drawing.Point(16, 526);
+            this.checkBox2.Location = new System.Drawing.Point(16, 531);
             this.checkBox2.Name = "checkBox2";
             this.checkBox2.Size = new System.Drawing.Size(183, 19);
             this.checkBox2.TabIndex = 4;
@@ -326,11 +327,26 @@ namespace Test
         "fects might happen.");
             this.numRange.ValueChanged += new System.EventHandler(this.numMax_ValueChanged);
             // 
+            // comboBox4
+            // 
+            this.comboBox4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.comboBox4.FormattingEnabled = true;
+            this.comboBox4.Items.AddRange(new object[] {
+            "Beginning",
+            "Middle",
+            "Ending"});
+            this.comboBox4.Location = new System.Drawing.Point(113, 504);
+            this.comboBox4.Name = "comboBox4";
+            this.comboBox4.Size = new System.Drawing.Size(114, 23);
+            this.comboBox4.TabIndex = 21;
+            this.comboBox4.SelectedIndexChanged += new System.EventHandler(this.comboBox4_SelectedIndexChanged);
+            // 
             // FrmTest
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(688, 556);
+            this.Controls.Add(this.comboBox4);
             this.Controls.Add(this.numRange);
             this.Controls.Add(this.numDim);
             this.Controls.Add(this.numSpace);
@@ -395,5 +411,6 @@ namespace Test
         private System.Windows.Forms.ToolTip tipDim;
         private System.Windows.Forms.ToolTip tipSpace;
         private System.Windows.Forms.ToolTip tipStarting;
+        private System.Windows.Forms.ComboBox comboBox4;
     }
 }

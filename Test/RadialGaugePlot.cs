@@ -155,6 +155,7 @@ namespace ScottPlot.Plottable
         }
         private RadialGaugeMode _GaugeMode = RadialGaugeMode.Stacked;
 
+        // Determines the gauge label position: beginning, middle, ending (default value)
         public RadialGaugeLabelPos GaugeLabelPos
         {
             get => _GaugeLabelPos;
@@ -565,16 +566,17 @@ namespace ScottPlot.Plottable
 
             // Find the starting angle.
             double width_to_angle = 1 / radius;
-            //double start_angle = -Math.PI / 2 - text_width / 2 * width_to_angle;
-            //double theta = start_angle + (anglePos * Math.PI / 180);
             double theta = anglePos * Math.PI / 180;
+            theta += (direction == RadialGaugeDirection.AntiClockwise ? -1 : 1) * (2-(int)_GaugeLabelPos) * text_width * width_to_angle/ 2;
+            double initPos = theta;
+
             int charPos;
 
             // Draw the characters.
             for (int i = 0; i < text.Length; i++)
             {
                 // Get the char index position
-                if (anglePos < 180 && anglePos > 0)
+                if (initPos < Math.PI && initPos > 0)
                     charPos = i;
                 else
                     charPos = text.Length - 1 - i;
@@ -591,7 +593,7 @@ namespace ScottPlot.Plottable
                 double y = cy + radius * Math.Sin(theta);
 
                 // Transform to position the character.
-                if (anglePos < 180 && anglePos > 0)
+                if (initPos < Math.PI && initPos > 0)
                     gfx.RotateTransform((float)(RadToDeg * (theta - Math.PI / 2)));
                 else
                     gfx.RotateTransform((float)(RadToDeg * (theta + Math.PI / 2)));

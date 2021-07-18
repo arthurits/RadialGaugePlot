@@ -17,7 +17,7 @@ namespace Test
         {
             InitializeComponent();
 
-            double[] values = {100, 80, 65, 42, -20 };
+            double[] values = {100, 80, 65, -45, 20 };
             formsPlot1.Plot.Palette = ScottPlot.Drawing.Palette.Nord;
             Color[] colors = Enumerable.Range(0, values.Length)
                                        .Select(i => formsPlot1.Plot.GetSettings(false).PlottablePalette.GetColor(i))   // modify later
@@ -52,6 +52,7 @@ namespace Test
             comboBox1.SelectedIndex = 0;
             comboBox2.SelectedIndex = 0;
             comboBox3.SelectedIndex = 0;
+            comboBox4.SelectedIndex = 2;
 
             // Check boxes
             checkBox1.Checked = plottable.ShowGaugeValues;
@@ -82,9 +83,16 @@ namespace Test
             formsPlot1.Render();
         }
 
+        private void comboBox4_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            plottable.GaugeLabelPos = (ScottPlot.RadialGaugeLabelPos)comboBox4.SelectedIndex;
+            formsPlot1.Render();
+        }
+
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             plottable.ShowGaugeValues = checkBox1.Checked;
+            comboBox4.Enabled = checkBox1.Checked;
             formsPlot1.Render();
         }
 
