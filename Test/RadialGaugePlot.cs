@@ -625,21 +625,38 @@ namespace ScottPlot.Plottable
         /// <param name="text"></param>
         /// <param name="direction"></param>
         protected virtual void DrawTextOnCircle2(Graphics gfx, System.Drawing.Font font,
-            Brush brush, RectangleF clientRectangle, float radius, float anglePos, float cx, float cy,
+            Brush brush, RectangleF clientRectangle, float radius, float angleInit, float angleSwept, float cx, float cy,
             string text, RadialGaugeDirection direction)
         {
+            // Modify anglePos to be in the range [0, 360]
+            if (angleInit >= 0)
+                angleInit -= 360f * (int)(angleInit / 360);
+            else
+                angleInit += 360f;
+
+            // Use a StringFormat to draw the middle top of each character at (0, 0).
+            using StringFormat string_format = new StringFormat();
+            string_format.Alignment = StringAlignment.Center;
+            string_format.LineAlignment = StringAlignment.Center;
+
+            // Used to scale from radians to degrees.
+            double RadToDeg = 180.0 / Math.PI;
+
+            // Measure the characters.
+            List<RectangleF> rects = MeasureCharacters(gfx, font, clientRectangle, text);
 
         }
 
-            /// <summary>
-            /// Measure the characters in a string with no more than 32 characters.
-            /// </summary>
-            /// <param name="gfx"></param>
-            /// <param name="font"></param>
-            /// <param name="clientRectangle"></param>
-            /// <param name="text"></param>
-            /// <returns></returns>
-            private List<RectangleF> MeasureCharactersInWord(Graphics gfx, System.Drawing.Font font, RectangleF clientRectangle, string text)
+
+        /// <summary>
+        /// Measure the characters in a string with no more than 32 characters.
+        /// </summary>
+        /// <param name="gfx"></param>
+        /// <param name="font"></param>
+        /// <param name="clientRectangle"></param>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        private List<RectangleF> MeasureCharactersInWord(Graphics gfx, System.Drawing.Font font, RectangleF clientRectangle, string text)
         {
             List<RectangleF> result = new();
 
