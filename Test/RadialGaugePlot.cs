@@ -619,14 +619,16 @@ namespace ScottPlot.Plottable
         /// <param name="brush"></param>
         /// <param name="clientRectangle"></param>
         /// <param name="radius"></param>
-        /// <param name="anglePos"></param>
+        /// <param name="angleInit"></param>
+        /// <param name="angleSwept"></param>
         /// <param name="cx"></param>
         /// <param name="cy"></param>
         /// <param name="text"></param>
+        /// <param name="posPct"></param>
         /// <param name="direction"></param>
         protected virtual void DrawTextOnCircle2(Graphics gfx, System.Drawing.Font font,
             Brush brush, RectangleF clientRectangle, float radius, float angleInit, float angleSwept, float cx, float cy,
-            string text, RadialGaugeDirection direction)
+            string text, float posPct, RadialGaugeDirection direction)
         {
             // Modify anglePos to be in the range [0, 360]
             if (angleInit >= 0)
@@ -645,6 +647,16 @@ namespace ScottPlot.Plottable
             // Measure the characters.
             List<RectangleF> rects = MeasureCharacters(gfx, font, clientRectangle, text);
 
+            // Use LINQ to add up the character widths.
+            var width_query = from RectangleF rect in rects select rect.Width;
+            float text_width = width_query.Sum();
+
+
+            // Draw the characters.
+            for (int i = 0; i < text.Length; i++)
+            {
+
+            }
         }
 
 

@@ -17,7 +17,7 @@ namespace Test
         {
             InitializeComponent();
 
-            double[] values = {100, 80, 65, -45, 20 };
+            double[] values = {100, 80, 65, 45, -20 };
             formsPlot1.Plot.Palette = ScottPlot.Drawing.Palette.Nord;
             Color[] colors = Enumerable.Range(0, values.Length)
                                        .Select(i => formsPlot1.Plot.GetSettings(false).PlottablePalette.GetColor(i))   // modify later
@@ -41,6 +41,7 @@ namespace Test
             //ScottPlot.Plottable.RadialGaugePlot plottable = new(values, colors, false, new double []{ values.Max() * 4 / 3 });
             plottable = new(values, colors);
             plottable.GaugeLabels = new string[] { "Data #1", "Data #2", "Data #3", "Data #4", "Data #5" };
+            //plottable.EndCap = System.Drawing.Drawing2D.LineCap.Round;
             formsPlot1.Plot.Add(plottable);
             formsPlot1.Plot.Frameless();
             formsPlot1.Plot.Grid(enable: false);

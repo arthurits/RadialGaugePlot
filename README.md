@@ -1,7 +1,7 @@
 # Radial gauge plot
 A customizable radial gauge control for plotting simple data. Built using C# (WinForms) in .NET 5.
 
-The goal is two-fold:
+The goal is two-fold (work in progress):
 * Integrate this plot into the [ScottPlot](https://github.com/ScottPlot/ScottPlot)
 * Create a stand alone control (probably as a nuget packet) that's easy to mantain and update
 
@@ -20,6 +20,7 @@ The Test project is functional and shows what functionally is supported by the p
 ## Screenshots
 ![Screenshot](https://github.com/arthurits/RadialGaugePlot/blob/master/Test/images/Screenshot01.png?raw=true "Radial gauge example 1")
 ![Screenshot](https://github.com/arthurits/RadialGaugePlot/blob/master/Test/images/Screenshot02.png?raw=true "Radial gauge example 2")
+![Screenshot](https://github.com/arthurits/RadialGaugePlot/blob/master/Test/images/Screenshot03.png?raw=true "Radial gauge example 2")
 
 ## External dependencies
 This project uses controls and routines from the following Gits:
