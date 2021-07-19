@@ -20,7 +20,7 @@ The Test project is functional and shows what functionally is supported by the p
 ## Screenshots
 ![Screenshot](https://github.com/arthurits/RadialGaugePlot/blob/master/Test/images/Screenshot01.png?raw=true "Radial gauge example 1")
 ![Screenshot](https://github.com/arthurits/RadialGaugePlot/blob/master/Test/images/Screenshot02.png?raw=true "Radial gauge example 2")
-![Screenshot](https://github.com/arthurits/RadialGaugePlot/blob/master/Test/images/Screenshot03.png?raw=true "Radial gauge example 2")
+![Screenshot](https://github.com/arthurits/RadialGaugePlot/blob/master/Test/images/Screenshot03.png?raw=true "Radial gauge example 3")
 
 ## External dependencies
 This project uses controls and routines from the following Gits:
