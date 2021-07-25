@@ -473,6 +473,19 @@ namespace ScottPlot.Plottable
                             origin.Y,
                             DataRaw[index].ToString("0.##"),
                             DataRaw[index] >= 0 ? GaugeDirection : (RadialGaugeDirection.Clockwise | RadialGaugeDirection.AntiClockwise) & ~GaugeDirection);
+
+                        //DrawTextOnCircle2(gfx,
+                        //    fontGauge,
+                        //    labelBrush,
+                        //    new RectangleF(dims.DataOffsetX, dims.DataOffsetY, dims.DataWidth, dims.DataHeight),
+                        //    gaugeRadius,
+                        //    (float)DataAngular[index, 0],
+                        //    (float)DataAngular[index, 1],
+                        //    origin.X,
+                        //    origin.Y,
+                        //    DataRaw[index].ToString("0.##"),
+                        //    100,
+                        //    GaugeDirection);
                     }
     
                 }
@@ -644,18 +657,54 @@ namespace ScottPlot.Plottable
             // Used to scale from radians to degrees.
             double RadToDeg = 180.0 / Math.PI;
 
-            // Measure the characters.
+            // Measure the characters. Use LINQ to add up the character widths.
             List<RectangleF> rects = MeasureCharacters(gfx, font, clientRectangle, text);
-
-            // Use LINQ to add up the character widths.
             var width_query = from RectangleF rect in rects select rect.Width;
-            float text_width = width_query.Sum();
+            double text_width = width_query.Sum() / radius;
 
+            
+            double angleStart = 0.0;
+            double angleEnd = 0.0;
+            double angle = 0.0;
+
+            //angleStart = angleInit + Math.Sign(angleSwept) * text_width * RadToDeg / 2;
+            //angleEnd = angleSwept - Math.Sign(angleSwept) * text_width * RadToDeg / 2;
+            //angle = angleStart + angleEnd * (posPct / 100);
+            angle = angleInit + angleSwept * (posPct / 100);
+            //if (angle > 180 && angle < 360)
+            //    angle -= text_width * RadToDeg / 2;
+            //else
+            //    angle += text_width * RadToDeg / 2;
+
+            angle = ReduceAngle(angle);
+
+            double theta = angle * Math.PI / 180;
+            double width_to_angle = 1 / radius;
+
+            System.Diagnostics.Debug.Print("Angle initial: {0}\tAngle swept: {1}\tAngleStart: {2:0.00}\tAngleEnd: {3:0.00}\tAngle: {4:0.00}", angleInit, angleSwept, angleStart,angleEnd, angle);
 
             // Draw the characters.
             for (int i = 0; i < text.Length; i++)
             {
+                // Increment theta half the angular width of the current character
+                theta -= (direction == RadialGaugeDirection.AntiClockwise ? -1 : 1) * rects[i].Width / 2 * width_to_angle;
 
+                // Calculate the position of the upper-left corner
+                double x = cx + radius * Math.Cos(theta);
+                double y = cy + radius * Math.Sin(theta);
+
+                // Transform to position the character.
+                if (angle < 180 && angle > 0)
+                    gfx.RotateTransform((float)(RadToDeg * (theta - Math.PI / 2)));
+                else
+                    gfx.RotateTransform((float)(RadToDeg * (theta + Math.PI / 2)));
+
+                gfx.TranslateTransform((float)x, (float)y, System.Drawing.Drawing2D.MatrixOrder.Append);
+                gfx.DrawString(text[i].ToString(), font, brush, 0, 0, string_format);
+                gfx.ResetTransform();
+
+                // Increment theta the remaining half character.
+                theta -= (direction == RadialGaugeDirection.AntiClockwise ? -1 : 1) * rects[i].Width / 2 * width_to_angle;
             }
         }
 
