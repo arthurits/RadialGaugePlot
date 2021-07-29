@@ -156,12 +156,12 @@ namespace ScottPlot.Plottable
         private RadialGaugeMode _GaugeMode = RadialGaugeMode.Stacked;
 
         // Determines the gauge label position: beginning, middle, ending (default value)
-        public RadialGaugeLabelPos GaugeLabelPos
+        public float GaugeLabelPos
         {
             get => _GaugeLabelPos;
             set => _GaugeLabelPos = value;
         }
-        private RadialGaugeLabelPos _GaugeLabelPos = RadialGaugeLabelPos.End;
+        private float _GaugeLabelPos = 100;
 
         /// <summary>
         /// Determines whether the gauges are drawn starting from the inside (default value) or from the outside.
@@ -484,7 +484,7 @@ namespace ScottPlot.Plottable
                             origin.X,
                             origin.Y,
                             DataRaw[index].ToString("0.##"),
-                            100);
+                            _GaugeLabelPos);
                     }
     
                 }
@@ -655,6 +655,7 @@ namespace ScottPlot.Plottable
 
             // Used to scale from radians to degrees.
             double RadToDeg = 180.0 / Math.PI;
+            double width_to_angle = 1 / radius;
 
             // Measure the characters. Use LINQ to add up the character widths.
             List<RectangleF> rects = MeasureCharacters(gfx, font, clientRectangle, text);
@@ -664,19 +665,13 @@ namespace ScottPlot.Plottable
             // Angular data
             bool isPositive = angleSwept >= 0;
             double angle = ReduceAngle(angleInit + angleSwept * (posPct / 100));
+            double theta = angle * Math.PI / 180;
+
+            // Set the positition to the middle of the text, and determine in which hemisphere we are at
+            angle += (1 - 2 * (posPct / 100)) * (isPositive ? 1 : -1) * text_width * RadToDeg / 2;
             bool isBelow = angle < 180 && angle > 0;
             
-            double theta = angle * Math.PI / 180;
-            double width_to_angle = 1 / radius;
-            
-            // Determine if the mid text is above or below the equator
-            if (isBelow)
-                angle += Math.Sign(angleSwept) * text_width * RadToDeg / 2;
-            else
-                angle -= Math.Sign(angleSwept) * text_width * RadToDeg / 2;
-            isBelow = angle < 180 && angle > 0;
-            
-            //System.Diagnostics.Debug.Print("Angle initial: {0}\tAngle swept: {1}\tAngleStart: {2:0.00}\tAngleEnd: {3:0.00}\tAngle: {4:0.00}", angleInit, angleSwept, angle,angle, angle);
+            //System.Diagnostics.Debug.Print("Angle initial: {0}\tAngle swept: {1}\tAngle: {2:0.00}\tIsBelow: {3}\tIsPositive: {4}", angleInit, angleSwept, angle, isBelow, isPositive);
 
             int charPos;
             // Draw the characters.

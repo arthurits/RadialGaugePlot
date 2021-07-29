@@ -53,13 +53,13 @@ namespace Test
             comboBox1.SelectedIndex = 0;
             comboBox2.SelectedIndex = 0;
             comboBox3.SelectedIndex = 0;
-            comboBox4.SelectedIndex = 2;
 
             // Check boxes
             checkBox1.Checked = plottable.ShowGaugeValues;
             checkBox2.Checked = plottable.NormBackGauge;
 
             // Other numeric controls
+            numLabelPct.Value = (decimal)plottable.GaugeLabelPos;
             numStart.Value = (decimal)plottable.StartingAngleGauges;
             numSpace.Value = (decimal)plottable.GaugeSpacePercentage;
             numDim.Value = (decimal)plottable.DimPercentage;
@@ -84,16 +84,15 @@ namespace Test
             formsPlot1.Render();
         }
 
-        private void comboBox4_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            plottable.GaugeLabelPos = (ScottPlot.RadialGaugeLabelPos)comboBox4.SelectedIndex;
-            formsPlot1.Render();
-        }
-
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             plottable.ShowGaugeValues = checkBox1.Checked;
-            comboBox4.Enabled = checkBox1.Checked;
+            numLabelPct.Enabled = checkBox1.Checked;
+            formsPlot1.Render();
+        }
+        private void numLabelPct_ValueChanged(object sender, EventArgs e)
+        {
+            plottable.GaugeLabelPos = Convert.ToSingle(numLabelPct.Value);
             formsPlot1.Render();
         }
 
@@ -162,5 +161,6 @@ namespace Test
             int ratio = trackRange.Value;
             if (numRange.Value != ratio) numRange.Value = ratio;
         }
+
     }
 }

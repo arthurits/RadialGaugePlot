@@ -56,7 +56,7 @@ namespace Test
             this.tipDim = new System.Windows.Forms.ToolTip(this.components);
             this.tipSpace = new System.Windows.Forms.ToolTip(this.components);
             this.tipStarting = new System.Windows.Forms.ToolTip(this.components);
-            this.comboBox4 = new System.Windows.Forms.ComboBox();
+            this.numLabelPct = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.trackStart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackSpace)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackDim)).BeginInit();
@@ -65,6 +65,7 @@ namespace Test
             ((System.ComponentModel.ISupportInitialize)(this.numSpace)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numDim)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numRange)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numLabelPct)).BeginInit();
             this.SuspendLayout();
             // 
             // formsPlot1
@@ -327,26 +328,20 @@ namespace Test
         "fects might happen.");
             this.numRange.ValueChanged += new System.EventHandler(this.numMax_ValueChanged);
             // 
-            // comboBox4
+            // numLabelPct
             // 
-            this.comboBox4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.comboBox4.FormattingEnabled = true;
-            this.comboBox4.Items.AddRange(new object[] {
-            "Beginning",
-            "Middle",
-            "Ending"});
-            this.comboBox4.Location = new System.Drawing.Point(113, 504);
-            this.comboBox4.Name = "comboBox4";
-            this.comboBox4.Size = new System.Drawing.Size(114, 23);
-            this.comboBox4.TabIndex = 21;
-            this.comboBox4.SelectedIndexChanged += new System.EventHandler(this.comboBox4_SelectedIndexChanged);
+            this.numLabelPct.Location = new System.Drawing.Point(113, 503);
+            this.numLabelPct.Name = "numLabelPct";
+            this.numLabelPct.Size = new System.Drawing.Size(44, 23);
+            this.numLabelPct.TabIndex = 21;
+            this.numLabelPct.ValueChanged += new System.EventHandler(this.numLabelPct_ValueChanged);
             // 
             // FrmTest
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(688, 556);
-            this.Controls.Add(this.comboBox4);
+            this.Controls.Add(this.numLabelPct);
             this.Controls.Add(this.numRange);
             this.Controls.Add(this.numDim);
             this.Controls.Add(this.numSpace);
@@ -379,6 +374,7 @@ namespace Test
             ((System.ComponentModel.ISupportInitialize)(this.numSpace)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numDim)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numRange)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numLabelPct)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -411,6 +407,6 @@ namespace Test
         private System.Windows.Forms.ToolTip tipDim;
         private System.Windows.Forms.ToolTip tipSpace;
         private System.Windows.Forms.ToolTip tipStarting;
-        private System.Windows.Forms.ComboBox comboBox4;
+        private System.Windows.Forms.NumericUpDown numLabelPct;
     }
 }
