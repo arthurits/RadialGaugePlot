@@ -665,25 +665,17 @@ namespace ScottPlot.Plottable
             // Angular data
             bool isPositive = angleSwept >= 0;
             double angle = ReduceAngle(angleInit + angleSwept * (posPct / 100));
-            double theta = angle * Math.PI / 180;
+            angle += (1 - 2 * (posPct / 100)) * (isPositive ? 1 : -1) * RadToDeg * text_width / 2; // Set the position to the middle of the text
 
-            // Set the positition to the middle of the text, and determine in which hemisphere we are at
-            angle += (1 - 2 * (posPct / 100)) * (isPositive ? 1 : -1) * text_width * RadToDeg / 2;
             bool isBelow = angle < 180 && angle > 0;
-            
-            //System.Diagnostics.Debug.Print("Angle initial: {0}\tAngle swept: {1}\tAngle: {2:0.00}\tIsBelow: {3}\tIsPositive: {4}", angleInit, angleSwept, angle, isBelow, isPositive);
+            double theta = angle * Math.PI / 180;
+            theta += (isBelow ? 1 : -1) * text_width / 2;   // Set the position to the beginning of the text
 
-            int charPos;
             // Draw the characters.
             for (int i = 0; i < text.Length; i++)
             {
-                // Get the char index position
-                charPos = isBelow ? i : text.Length - 1 - i;
-                if (!isPositive) charPos = text.Length - 1 - charPos;
-
                 // Increment theta half the angular width of the current character
-                //theta -= (direction == RadialGaugeDirection.AntiClockwise ? -1 : 1) * rects[charPos].Width / 2 * width_to_angle;
-                theta -= (isPositive ? 1 : -1) * rects[charPos].Width / 2 * width_to_angle;
+                theta -= (isBelow ? 1 : -1) * rects[i].Width / 2 * width_to_angle;
 
                 // Calculate the position of the upper-left corner
                 double x = cx + radius * Math.Cos(theta);
@@ -696,12 +688,11 @@ namespace ScottPlot.Plottable
                     gfx.RotateTransform((float)(RadToDeg * (theta + Math.PI / 2)));
 
                 gfx.TranslateTransform((float)x, (float)y, System.Drawing.Drawing2D.MatrixOrder.Append);
-                gfx.DrawString(text[charPos].ToString(), font, brush, 0, 0, string_format);
+                gfx.DrawString(text[i].ToString(), font, brush, 0, 0, string_format);
                 gfx.ResetTransform();
 
                 // Increment theta the remaining half character.
-                //theta -= (direction == RadialGaugeDirection.AntiClockwise ? -1 : 1) * rects[charPos].Width / 2 * width_to_angle;
-                theta -= (isPositive ? 1 : -1) * rects[charPos].Width / 2 * width_to_angle;
+                theta -= (isBelow ? 1 : -1) * rects[i].Width / 2 * width_to_angle;
             }
         }
 
