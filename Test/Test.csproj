@@ -10,4 +10,8 @@
     <PackageReference Include="ScottPlot.WinForms" Version="4.1.16" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="NewFolder\" />
+  </ItemGroup>
+
 </Project>
