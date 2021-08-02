@@ -40,7 +40,7 @@ namespace RadialGaugeControl
                 oldBmp.Dispose();
         }
 
-        protected virtual void Render(Bitmap bmp, bool lowQuality = false)
+        public virtual void Render(Bitmap bmp, bool lowQuality = false)
         {
             using Graphics newGraphics = Graphics.FromImage(bmp);
             newGraphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;

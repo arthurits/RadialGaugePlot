@@ -30,7 +30,7 @@ namespace TestControl
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmTestControl));
-            this.plot1 = new RadialGaugeControl.Plot();
+            this.plot1 = new RadialGaugeControl.RadialGaugePlot();
             this.SuspendLayout();
             // 
             // plot1
@@ -59,7 +59,7 @@ namespace TestControl
 
         #endregion
 
-        private RadialGaugeControl.Plot plot1;
+        private RadialGaugeControl.RadialGaugePlot plot1;
     }
 }
 
