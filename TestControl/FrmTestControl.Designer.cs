@@ -35,14 +35,31 @@ namespace TestControl
             // 
             // plot1
             // 
+            this.plot1.AngleRange = 360D;
             this.plot1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.plot1.Center = ((System.Drawing.PointF)(resources.GetObject("plot1.Center")));
+            this.plot1.DimPercentage = 90F;
             this.plot1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.plot1.EndCap = System.Drawing.Drawing2D.LineCap.Triangle;
+            this.plot1.GaugeDirection = RadialGaugeControl.RadialGaugePlot.RadialGaugeDirection.Clockwise;
+            this.plot1.GaugeLabelPos = 100F;
+            this.plot1.GaugeLabelsColor = System.Drawing.Color.White;
+            this.plot1.GaugeLabelsFontPct = 75F;
+            this.plot1.GaugeMode = RadialGaugeControl.RadialGaugePlot.RadialGaugeMode.Stacked;
+            this.plot1.GaugeSpacePercentage = 50F;
+            this.plot1.GaugeStart = RadialGaugeControl.RadialGaugePlot.RadialGaugeStart.InsideToOutside;
+            this.plot1.LineWidth = -1F;
             this.plot1.Location = new System.Drawing.Point(0, 0);
             this.plot1.Name = "plot1";
+            this.plot1.NormBackGauge = false;
             this.plot1.RectTitle = ((System.Drawing.RectangleF)(resources.GetObject("plot1.RectTitle")));
+            this.plot1.ShowGaugeValues = true;
             this.plot1.Size = new System.Drawing.Size(784, 461);
+            this.plot1.StartCap = System.Drawing.Drawing2D.LineCap.Round;
+            this.plot1.StartingAngleBackGauges = 210F;
+            this.plot1.StartingAngleGauges = 270F;
             this.plot1.TabIndex = 0;
+            this.plot1.WebColor = System.Drawing.Color.Gray;
             // 
             // FrmTestControl
             // 

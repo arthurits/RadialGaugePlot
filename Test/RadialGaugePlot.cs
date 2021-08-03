@@ -41,12 +41,12 @@ namespace ScottPlot.Plottable
         protected double[] DataRaw;
 
         /// <summary>
-        /// Angular data (first column: initial angle; second column: swept angle) computed from <see cref="DataRaw"/>
+        /// Angular data (first column: initial angle; second column: swept angle) computed from <see cref="DataRaw"/>.
         /// </summary>
         protected double[,] DataAngular;
 
         /// <summary>
-        /// Tha maximum value for scaling the gauges.
+        /// The maximum value for scaling the gauges.
         /// This value is associated to <see cref="StartingAngleGauges"/> + <see cref="AngleRange"/>.
         /// </summary>
         protected double MaxScale
@@ -61,7 +61,7 @@ namespace ScottPlot.Plottable
         private double _MaxScale;
 
         /// <summary>
-        /// Tha minimum value for scaling the gauges.
+        /// The minimum value for scaling the gauges.
         /// This value is associated to <see cref="StartingAngleGauges"/> + <see cref="AngleRange"/>.
         /// </summary>
         protected double MinScale
@@ -141,7 +141,7 @@ namespace ScottPlot.Plottable
         private RadialGaugeDirection _GaugeDirection = RadialGaugeDirection.Clockwise;
         
         /// <summary>
-        /// Determins whether the gauges are drawn stacked (dafault value), sequentially, or as a single gauge (ressembling a pie plot).
+        /// Determines whether the gauges are drawn stacked (dafault value), sequentially, or as a single gauge (ressembling a pie plot).
         /// </summary>
         public RadialGaugeMode GaugeMode
         {
@@ -155,7 +155,9 @@ namespace ScottPlot.Plottable
         }
         private RadialGaugeMode _GaugeMode = RadialGaugeMode.Stacked;
 
-        // Determines the gauge label position: beginning, middle, ending (default value)
+        /// <summary>
+        /// Determines the gauge label position: beginning, middle, ending (default value).
+        /// </summary>        
         public float GaugeLabelPos
         {
             get => _GaugeLabelPos;

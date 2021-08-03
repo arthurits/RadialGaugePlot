@@ -39,6 +39,8 @@ namespace RadialGaugeControl
         /// The maximum angular interval that the gauges will consist of.
         /// It takes values in the range [0-360], default value is 360. Outside this range, unexpected side-effects might happen.
         /// </summary>
+        [System.ComponentModel.Category("Radial gauge"),
+        System.ComponentModel.Description("The maximum angular interval that the gauges will consist of.\nIt takes values in the range [0-360], default value is 360. Outside this range, unexpected side-effects might happen.")]
         public double AngleRange
         {
             set
@@ -67,6 +69,8 @@ namespace RadialGaugeControl
         /// Dimmed percentage used to draw the gauges' background.
         /// Values in the range [0-100], default value is 90 [percent]. Outside this range, unexpected side-effects might happen.
         /// </summary>
+        [System.ComponentModel.Category("Radial gauge"),
+        System.ComponentModel.Description("Dimmed percentage used to draw the gauges' background.\nValues in the range [0-100], default value is 90 [percent]. Outside this range, unexpected side-effects might happen.")]
         public float DimPercentage
         {
             get => _DimPercentage;
@@ -83,6 +87,8 @@ namespace RadialGaugeControl
         /// <summary>
         /// Determines whether the gauges are drawn clockwise (default value) or anti-clockwise (counter clockwise).
         /// </summary>
+        [System.ComponentModel.Category("Radial gauge"),
+        System.ComponentModel.Description("Determines whether the gauges are drawn clockwise (default value) or anti-clockwise (counter clockwise).")]
         public RadialGaugeDirection GaugeDirection
         {
             get => _GaugeDirection;
@@ -95,8 +101,10 @@ namespace RadialGaugeControl
         private RadialGaugeDirection _GaugeDirection = RadialGaugeDirection.Clockwise;
 
         /// <summary>
-        /// Determines the gauge label position: beginning, middle, ending (default value)
+        /// Determines the gauge label position: beginning, middle, ending (default value).
         /// </summary>
+        [System.ComponentModel.Category("Radial gauge"),
+        System.ComponentModel.Description("Determines the gauge label position: beginning, middle, ending (default value).")]
         public float GaugeLabelPos
         {
             get => _GaugeLabelPos;
@@ -113,12 +121,16 @@ namespace RadialGaugeControl
         /// <summary>
         /// <see langword="Color"/> of the value labels drawn inside the gauges.
         /// </summary>
+        [System.ComponentModel.Category("Radial gauge"),
+        System.ComponentModel.Description("Color of the value labels drawn inside the gauges.")]
         public Color GaugeLabelsColor { get; set; } = Color.White;
 
         /// <summary>
         /// Size of the gague label text as a percentage of the gauge width.
         /// Values in the range [0-100], default value is 75 [percent]. Other values might produce unexpected side-effects.
         /// </summary>
+        [System.ComponentModel.Category("Radial gauge"),
+        System.ComponentModel.Description("Size of the gague label text as a percentage of the gauge width.\nValues in the range [0-100], default value is 75 [percent]. Other values might produce unexpected side-effects.")]
         public float GaugeLabelsFontPct
         {
             get => _GaugeLabelsFontPct;
@@ -127,8 +139,10 @@ namespace RadialGaugeControl
         private float _GaugeLabelsFontPct = 75f;
 
         /// <summary>
-        /// Determins whether the gauges are drawn stacked (dafault value), sequentially, or as a single gauge (ressembling a pie plot).
+        /// Determines whether the gauges are drawn stacked (dafault value), sequentially, or as a single gauge (ressembling a pie plot).
         /// </summary>
+        [System.ComponentModel.Category("Radial gauge"),
+        System.ComponentModel.Description("Determines whether the gauges are drawn stacked (dafault value), sequentially, or as a single gauge (ressembling a pie plot).")]
         public RadialGaugeMode GaugeMode
         {
             get => _GaugeMode;
@@ -145,6 +159,8 @@ namespace RadialGaugeControl
         /// The empty space between gauges as a percentage of the gauge width.
         /// Values in the range [0-100], default value is 50 [percent]. Other values might produce unexpected side-effects.
         /// </summary>
+        [System.ComponentModel.Category("Radial gauge"),
+        System.ComponentModel.Description("The empty space between gauges as a percentage of the gauge width.\nValues in the range [0-100], default value is 50 [percent]. Other values might produce unexpected side-effects.")]
         public float GaugeSpacePercentage
         {
             get => _GaugeSpacePercentage;
@@ -155,18 +171,24 @@ namespace RadialGaugeControl
         /// <summary>
         /// Determines whether the gauges are drawn starting from the inside (default value) or from the outside.
         /// </summary>
+        [System.ComponentModel.Category("Radial gauge"),
+        System.ComponentModel.Description("Determines whether the gauges are drawn starting from the inside (default value) or from the outside.")]
         public RadialGaugeStart GaugeStart { get; set; } = RadialGaugeStart.InsideToOutside;
-        
+
         /// <summary>
         /// Gets or sets the size (in pixels) of each gauge.
         /// If <0, then it will be calculated from the available space.
         /// </summary>
+        [System.ComponentModel.Category("Radial gauge"),
+        System.ComponentModel.Description("Gets or sets the size (in pixels) of each gauge.\nIf <0, then it will be calculated from the available space.")]
         public float LineWidth { get; set; } = -1;
 
         /// <summary>
-        /// Tha maximum value for scaling the gauges.
-        /// This value is associated to <see cref="StartingAngleGauges"/> + <see cref="AngleRange"/>.
+        /// The maximum value for scaling the gauges.
+        /// This value is associated to <see cref="StartingAngleGauges"/> and to <see cref="AngleRange"/>.
         /// </summary>
+        [System.ComponentModel.Category("Radial gauge"),
+        System.ComponentModel.Description("Tha maximum value for scaling the gauges.\nThis value is associated to StartingAngleGauges and to AngleRange.")]
         protected double MaxScale
         {
             get => _MaxScale;
@@ -179,9 +201,11 @@ namespace RadialGaugeControl
         private double _MaxScale;
 
         /// <summary>
-        /// Tha minimum value for scaling the gauges.
-        /// This value is associated to <see cref="StartingAngleGauges"/> + <see cref="AngleRange"/>.
+        /// The minimum value for scaling the gauges.
+        /// This value is associated to <see cref="StartingAngleGauges"/> and to <see cref="AngleRange"/>.
         /// </summary>
+        [System.ComponentModel.Category("Radial gauge"),
+        System.ComponentModel.Description("The minimum value for scaling the gauges.\nThis value is associated to StartingAngleGauges and to AngleRange.")]
         protected double MinScale
         {
             get => _MinScale;
@@ -197,11 +221,15 @@ namespace RadialGaugeControl
         /// <see langword="True"/> if the gauges' background is adjusted to <see cref="StartingAngleGauges"/>.
         /// Default value is set to <see langword="False"/>.
         /// </summary>
+        [System.ComponentModel.Category("Radial gauge"),
+        System.ComponentModel.Description("True if the gauges' background is adjusted to StartingAngleGauges.\nDefault value is set to False.")]
         public bool NormBackGauge { get; set; } = false;
 
         /// <summary>
         /// The initial angle (in degrees) where the background gauges begin. Default value is 270° the same as <see cref="StartingAngleGauges"/>.
         /// </summary>
+        [System.ComponentModel.Category("Radial gauge"),
+        System.ComponentModel.Description("The initial angle (in degrees) where the background gauges begin.\nDefault value is 270° the same as StartingAngleGauges.")]
         public float StartingAngleBackGauges
         {
             get => _StartingAngleBackGauges;
@@ -217,6 +245,8 @@ namespace RadialGaugeControl
         /// Angle (in degrees) at which the gauges start: 270° for North (default value), 0° for East, 90° for South, 180° for West, and so on.
         /// Expected values in the range [0°-360°], otherwise unexpected side-effects might happen.
         /// </summary>
+        [System.ComponentModel.Category("Radial gauge"),
+        System.ComponentModel.Description("Angle (in degrees) at which the gauges start: 270° for North (default value), 0° for East, 90° for South, 180° for West, and so on.\nExpected values in the range [0°-360°], otherwise unexpected side-effects might happen.")]
         public float StartingAngleGauges
         {
             get => _StartingAngleGauges;
@@ -229,9 +259,11 @@ namespace RadialGaugeControl
         private float _StartingAngleGauges = 270f;
 
         /// <summary>
-        /// Color of the axis lines and concentric circles representing ticks
+        /// Color of the axis lines and concentric circles representing ticks.
         /// </summary>
-        public Color WebColor { get; set; } = Color.Gray;       
+        [System.ComponentModel.Category("Radial gauge"),
+        System.ComponentModel.Description("Color of the axis lines and concentric circles representing ticks.")]
+        public Color WebColor { get; set; } = Color.Gray;
 
         /// <summary>
         /// <see langword="Font"/> used for labeling values on the plot
@@ -242,10 +274,16 @@ namespace RadialGaugeControl
         /// <see langword="True"/> if value labels are shown inside the gauges.
         /// Size of the text is set by <see cref="GaugeLabelsFontPct"/> and color by <see cref="GaugeLabelsColor"/>.
         /// </summary>
+        [System.ComponentModel.Category("Radial gauge"),
+        System.ComponentModel.Description("True if value labels are shown inside the gauges.\nSize of the text is set by GaugeLabelsFontPct and color by GaugeLabelsColor.")]
         public bool ShowGaugeValues { get; set; } = true;
 
+        [System.ComponentModel.Category("Radial gauge"),
+        System.ComponentModel.Description("End cap line style.")]
         public System.Drawing.Drawing2D.LineCap EndCap { get; set; } = System.Drawing.Drawing2D.LineCap.Triangle;
 
+        [System.ComponentModel.Category("Radial gauge"),
+        System.ComponentModel.Description("Start cap line style.")]
         public System.Drawing.Drawing2D.LineCap StartCap { get; set; } = System.Drawing.Drawing2D.LineCap.Round;
 
         /// <summary>
@@ -466,7 +504,7 @@ namespace RadialGaugeControl
         public override void Render(Bitmap bmp, bool lowQuality = false)
         {
             int numGroups = DataRaw.Length;
-            double minScale = new double[] { base.RectData.Width, base.RectData.Height }.Min();
+            double minScale = new double[] { base.RectData.Width, base.RectData.Height }.Min() / 2;
             //double minScale = new double[] { dims.GetPixelX(1), dims.GetPixelY(1) }.Min();
             //PointF origin = new PointF(dims.GetPixelX(0), dims.GetPixelY(0));
 
@@ -477,7 +515,7 @@ namespace RadialGaugeControl
             using Pen penCircle = new(WebColor);
             using Brush labelBrush = new SolidBrush(GaugeLabelsColor);
 
-            float lineWidth = (LineWidth < 0) ? (float)(minScale / ((numGroups) * (GaugeSpacePercentage + 100) / 100)) : LineWidth;
+            float lineWidth = (LineWidth < 0) ? (float)(minScale / ((numGroups+0.33) * (GaugeSpacePercentage + 100) / 100)) : LineWidth;
             float radiusSpace = lineWidth * (GaugeSpacePercentage + 100) / 100;
             float gaugeRadius = numGroups * radiusSpace;  // By default, the outer-most radius is computed
             float maxBackAngle = (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * (NormBackGauge ? (float)AngleRange : 360);
@@ -547,7 +585,7 @@ namespace RadialGaugeControl
                     }
 
                 }
-
+                //gfx.DrawRectangle(new Pen(Color.Black,2), RectData.X, RectData.Y, RectData.Width, RectData.Height);
             }
 
         }
