@@ -4,22 +4,25 @@ using System.Drawing;
 using System.Linq;
 using ScottPlot.Drawing;
 
+// Credits:
+//
 // Inspired (and expanding) by https://github.com/dotnet-ad/Microcharts/blob/main/Sources/Microcharts/Charts/RadialGaugeChart.cs
-
+//
 // Lighten or darken color
 // https://stackoverflow.com/questions/801406/c-create-a-lighter-darker-color-based-on-a-system-color
 // https://www.pvladov.com/2012/09/make-color-lighter-or-darker.html
 // https://gist.github.com/zihotki/09fc41d52981fb6f93a81ebf20b35cd5
-
+//
 // Circular Segment
 // https://github.com/falahati/CircularProgressBar/blob/master/CircularProgressBar/CircularProgressBar.cs
 // https://github.com/aalitor/AltoControls/blob/on-development/AltoControls/Controls/Circular%20Progress%20Bar.cs
-
+//
 // http://csharphelper.com/blog/2015/02/draw-lines-with-custom-end-caps-in-c/
-
+//
 // Text on path
 // http://csharphelper.com/blog/2018/02/draw-text-on-a-circle-in-c/
 // http://csharphelper.com/blog/2016/01/draw-text-on-a-curve-in-c/
+
 
 // This file should be placed in this address
 // https://github.com/ScottPlot/ScottPlot/tree/master/src/ScottPlot/Plottable
@@ -33,10 +36,10 @@ namespace ScottPlot.Plottable
     /// Data is managed using a single array where each element is asigned to each gauge.
     /// Internally this data is stored in a single array and is converted to angular paramters,
     /// through ComputeAngularData(), which are more suitable for drawing purposes and stored in a 2D array.
-    ///
     /// </summary>
     public class RadialGaugePlot : IPlottable
     {
+        #region Properties & fields
         /// <summary>
         /// Data to be plotted.
         /// It's copied from of the data passed to either the constructor or the <see cref="Update(double[], bool)"/> method.
@@ -261,10 +264,12 @@ namespace ScottPlot.Plottable
         public int XAxisIndex { get; set; } = 0;
         public int YAxisIndex { get; set; } = 0;
 
+        #endregion Properties & fields
+
         /// <summary>
-        /// Initializes the instance.
+        /// Initializes the plot instance.
         /// </summary>
-        /// <param name="values">Array of (positive) values to be plotted as gauges.</param>
+        /// <param name="values">Array of values to be plotted as gauges.</param>
         /// <param name="lineColors">Array colors for the gauges.</param>
         public RadialGaugePlot(double[] values, Color[] lineColors)
         {
@@ -276,16 +281,17 @@ namespace ScottPlot.Plottable
             $"RadialGauge with {DataRaw.Length} points.";
 
         /// <summary>
-        /// Replace the data values with new ones. This data is copied and stored in <see cref="DataRaw"/>.
+        /// Replace the data values with new ones. This passed data is copied and stored in <see cref="DataRaw"/>.
+        /// Implicitly calls the <see cref="ComputeAngularData"/> routine
         /// </summary>
-        /// <param name="values">Array of (positive) values to be plotted as gauges.</param>
+        /// <param name="values">Array of values to be plotted as gauges.</param>
         public void Update(double[] values)
         {
             DataRaw = new double[values.Length];
             Array.Copy(values, 0, DataRaw, 0, values.Length);
 
             // Sets MaxScale value and triggers ComputeAngularData
-            ComputeMaxMin();
+            ComputeMaxMin();    // This implicitly calls the ComputeAngularData() routine
             //ComputeAngularData();
         }
 
@@ -308,7 +314,7 @@ namespace ScottPlot.Plottable
             float AngleSumNeg = _StartingAngleGauges;
             float AngleSwept;
             float AngleInit;
-            //System.Diagnostics.Debug.Print("ComputeAngularData init");
+            
             // Loop through DataRaw and compute DataAngular
             for (int i=0; i<DataRaw.Length; i++)
             {
@@ -322,8 +328,7 @@ namespace ScottPlot.Plottable
                 if (DataRaw[i] >= 0)
                     AngleSumPos += AngleSwept;
                 else
-                    AngleSumNeg += AngleSwept;
-                //System.Diagnostics.Debug.Print("AngleInit: {1}\tAngleSwept: {2}\tDataAngular[{0}, 0]: {3}\tDataAngular[{0}, 0]: {4}\tAngleSumPos: {5}\tAngleSumNeg: {6}", i, AngleInit, AngleSwept, DataAngular[i, 0], DataAngular[i, 1], AngleSumPos, AngleSumNeg);
+                    AngleSumNeg += AngleSwept;                
             }
 
             // Compute the initial angle for the background gauges
@@ -411,9 +416,9 @@ namespace ScottPlot.Plottable
         /// <summary>
         /// This is where the drawing of the plot is done
         /// </summary>
-        /// <param name="dims"></param>
-        /// <param name="bmp"></param>
-        /// <param name="lowQuality"></param>
+        /// <param name="dims">Plot dimensions</param>
+        /// <param name="bmp">Bitmap where the drawing is done</param>
+        /// <param name="lowQuality">Image quality</param>
         public virtual void Render(PlotDimensions dims, Bitmap bmp, bool lowQuality = false)
         {
             int numGroups = DataRaw.Length;

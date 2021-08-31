@@ -4,33 +4,35 @@ using System.Drawing;
 using System.Linq;
 //using ScottPlot.Drawing;
 
+// Credits:
+//
 // Inspired (and expanding) by https://github.com/dotnet-ad/Microcharts/blob/main/Sources/Microcharts/Charts/RadialGaugeChart.cs
-
+//
 // Lighten or darken color
 // https://stackoverflow.com/questions/801406/c-create-a-lighter-darker-color-based-on-a-system-color
 // https://www.pvladov.com/2012/09/make-color-lighter-or-darker.html
 // https://gist.github.com/zihotki/09fc41d52981fb6f93a81ebf20b35cd5
-
+//
 // Circular Segment
 // https://github.com/falahati/CircularProgressBar/blob/master/CircularProgressBar/CircularProgressBar.cs
 // https://github.com/aalitor/AltoControls/blob/on-development/AltoControls/Controls/Circular%20Progress%20Bar.cs
-
+//
 // http://csharphelper.com/blog/2015/02/draw-lines-with-custom-end-caps-in-c/
-
+//
 // Text on path
 // http://csharphelper.com/blog/2018/02/draw-text-on-a-circle-in-c/
 // http://csharphelper.com/blog/2016/01/draw-text-on-a-curve-in-c/
 
-// https://github.com/ScottPlot/ScottPlot/tree/master/src/ScottPlot/Plottable
-// under RadialGaugePlot.cs
+
 namespace RadialGaugeControl
 {
     /// <summary>
-    /// A radial gauge chart is a graphical method of displaying multivariate data in the form of 
-    /// a two-dimensional chart of three or more quantitative variables represented on axes 
-    /// starting from the same point.
+    /// A radial gauge chart is a graphical method of displaying scalar data in the form of 
+    /// a chart made of circular gauges so that each scalar is represented by each gauge.
     /// 
-    /// Data is managed using 2D arrays where groups (colored shapes) are rows and categories (arms of the web) are columns.
+    /// Data is managed using a single array where each element is asigned to each gauge.
+    /// Internally this data is stored in a single array and is converted to angular paramters,
+    /// through ComputeAngularData(), which are more suitable for drawing purposes and stored in a 2D array.
     /// </summary>
     public class RadialGaugePlot : Plot
     {
@@ -101,14 +103,15 @@ namespace RadialGaugeControl
         private RadialGaugeDirection _GaugeDirection = RadialGaugeDirection.Clockwise;
 
         /// <summary>
-        /// Determines the gauge label position: beginning, middle, ending (default value).
+        /// Determines the gauge label position as a percentage of the gauge length
+        /// 0 being the beginning and 100 (default value) the ending of the gauge.
         /// </summary>
         [System.ComponentModel.Category("Radial gauge"),
-        System.ComponentModel.Description("Determines the gauge label position: beginning, middle, ending (default value).")]
+        System.ComponentModel.Description("Determines the gauge label position as a percentage of the gauge length: 0 is the beginning and 100 the ending (default value).")]
         public float GaugeLabelPos
         {
             get => _GaugeLabelPos;
-            set => _GaugeLabelPos = value;
+            set => _GaugeLabelPos = value > 100 ? 100 : (value < 0 ? 0 : value);
         }
         private float _GaugeLabelPos = 100;
 
@@ -352,32 +355,34 @@ namespace RadialGaugeControl
         /// <summary>
         /// Initializes the instance.
         /// </summary>
-        /// <param name="values">Array of (positive) values to be plotted as gauges.</param>
+        /// <param name="values">Array of values to be plotted as gauges.</param>
         /// <param name="lineColors">Array colors for the gauges.</param>
         public RadialGaugePlot(double[] values, Color[] lineColors)
         {
             GaugeColors = lineColors;
             Update(values);
-            ComputeAngularData();
+            //ComputeAngularData();
         }
 
         public override string ToString() =>
             $"RadialGauge with {DataRaw.Length} points.";
 
         /// <summary>
-        /// Replace the data values with new ones. This data is copied and stored in <see cref="DataRaw"/>.
+        /// Replace the data values with new ones. This passed data is copied and stored in <see cref="DataRaw"/>.
+        /// Implicitly calls the <see cref="ComputeAngularData"/> routine
         /// </summary>
-        /// <param name="values">Array of (positive) values to be plotted as gauges.</param>
+        /// <param name="values">Array of values to be plotted as gauges.</param>
         public void Update(double[] values)
         {
             DataRaw = new double[values.Length];
             Array.Copy(values, 0, DataRaw, 0, values.Length);
 
             // Sets MaxScale value and triggers ComputeAngularData
-            ComputeMaxMin();
+            ComputeMaxMin();    // This implicitly calls the ComputeAngularData() routine
             //ComputeAngularData();
         }
 
+        // Should data be needed from a caller.
         public double[] GetData() => DataRaw;
         public double[,] GetAngularData() => DataAngular;
 
@@ -498,9 +503,9 @@ namespace RadialGaugeControl
         /// <summary>
         /// This is where the drawing of the plot is done
         /// </summary>
-        /// <param name="dims"></param>
-        /// <param name="bmp"></param>
-        /// <param name="lowQuality"></param>
+        /// <param name="dims">Plot dimensions</param>
+        /// <param name="bmp">Bitmap where the drawing is done</param>
+        /// <param name="lowQuality">Image quality</param>
         public override void Render(Bitmap bmp, bool lowQuality = false)
         {
             int numGroups = DataRaw.Length;
