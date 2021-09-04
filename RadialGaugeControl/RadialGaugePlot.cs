@@ -457,10 +457,10 @@ namespace RadialGaugeControl
         }
 
         /// <summary>
-        /// Reduces an angle into the range [-360° - 360°]
+        /// Reduces an angle into the range [0° - 360°]
         /// </summary>
         /// <param name="angle">Angle value</param>
-        /// <returns>Return the angle whithin [-360° - 360°]</returns>
+        /// <returns>Return the angle whithin [0° - 360°]</returns>
         private double ReduceAngle(double angle)
         {
             //double reduced = angle;
@@ -470,7 +470,13 @@ namespace RadialGaugeControl
             //else if (angle < -360.0)
             //    reduced -= 360 * (int)(angle / 360);
 
-            return (angle - 360 * (int)(angle / 360));
+            // This reduces the angle to [-360 - 360]
+            double reduced = angle - 360 * (int)(angle / 360);
+            
+            // This reduces the angle to [0 - 360]
+            if (reduced < 0) reduced += 360.0;
+
+            return reduced;
         }
 
         /// <summary>
@@ -720,10 +726,6 @@ namespace RadialGaugeControl
         {
             // Modify anglePos to be in the range [0, 360]
             angleInit = (float)ReduceAngle(angleInit);
-            //if (angleInit >= 0)
-            //    angleInit -= 360f * (int)(angleInit / 360);
-            //else
-            //    angleInit += 360f;
 
             // Use a StringFormat to draw the middle top of each character at (0, 0).
             using StringFormat string_format = new StringFormat();

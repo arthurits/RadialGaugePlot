@@ -403,12 +403,18 @@ namespace ScottPlot.Plottable
         /// <returns>Return the angle whithin [0°-360°]</returns>
         private double ReduceAngle(double angle)
         {
-            double reduced = angle;
+            //double reduced = angle;
             
-            if (angle > 360.0)
-                reduced -= 360 * (int)(angle / 360);
-            else if (angle < -360.0)
-                reduced -= 360 * (int)(angle / 360);
+            //if (angle > 360.0)
+            //    reduced -= 360 * (int)(angle / 360);
+            //else if (angle < -360.0)
+            //    reduced -= 360 * (int)(angle / 360);
+
+            // This reduces the angle to [-360 - 360]
+            double reduced = angle - 360 * (int)(angle / 360);
+
+            // This reduces the angle to [0 - 360]
+            if (reduced < 0) reduced += 360.0;
 
             return reduced;
         }
@@ -422,7 +428,7 @@ namespace ScottPlot.Plottable
         public virtual void Render(PlotDimensions dims, Bitmap bmp, bool lowQuality = false)
         {
             int numGroups = DataRaw.Length;
-            double minScale = new double[] { dims.PxPerUnitX, dims.PxPerUnitX }.Min();  // Not sure why, but GetPixelX(1) returns a reasonable dimension to draw the plot
+            double minScale = new double[] { dims.GetPixelX(1), dims.GetPixelY(1) }.Min();  // Not sure why, but GetPixelX(1) returns a reasonable dimension to draw the plot
             PointF origin = new PointF(dims.GetPixelX(0), dims.GetPixelY(0));
 
             using Graphics gfx = GDI.Graphics(bmp, dims, lowQuality);
@@ -521,13 +527,14 @@ namespace ScottPlot.Plottable
 
             if (correctionFactor < 0)
             {
-                correctionFactor = 1 + correctionFactor;
+                correctionFactor = correctionFactor < -1 ? 0 : 1 + correctionFactor;
                 red *= correctionFactor;
                 green *= correctionFactor;
                 blue *= correctionFactor;
             }
             else
             {
+                if (correctionFactor > 1) correctionFactor = 1;
                 red = (255 - red) * correctionFactor + red;
                 green = (255 - green) * correctionFactor + green;
                 blue = (255 - blue) * correctionFactor + blue;
@@ -655,10 +662,7 @@ namespace ScottPlot.Plottable
             string text, float posPct)
         {
             // Modify anglePos to be in the range [0, 360]
-            if (angleInit >= 0)
-                angleInit -= 360f * (int)(angleInit / 360);
-            else
-                angleInit += 360f;
+            angleInit = (float)ReduceAngle(angleInit);
 
             // Use a StringFormat to draw the middle top of each character at (0, 0).
             using StringFormat string_format = new StringFormat();
