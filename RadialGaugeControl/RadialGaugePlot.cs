@@ -40,7 +40,7 @@ namespace RadialGaugeControl
         /// It takes values in the range [0-360], default value is 360. Outside this range, unexpected side-effects might happen.
         /// </summary>
         [System.ComponentModel.Category("Radial gauge"),
-        System.ComponentModel.Description("The maximum angular interval that the gauges will consist of.\nIt takes values in the range [0-360], default value is 360. Outside this range, unexpected side-effects might happen.")]
+        System.ComponentModel.Description("The maximum angular interval that the gauges will consist of.\nIt takes values in the range [0°-360°], default value is 360°. Outside this range, unexpected side-effects might happen.")]
         public double AngleRange
         {
             set
@@ -286,10 +286,6 @@ namespace RadialGaugeControl
         System.ComponentModel.Description("Start cap line style.")]
         public System.Drawing.Drawing2D.LineCap StartCap { get; set; } = System.Drawing.Drawing2D.LineCap.Round;
 
-        /// <summary>
-        /// Controls rendering style of the concentric circles (ticks) of the web
-        /// </summary>
-        //public RadarAxis AxisType { get; set; } = RadarAxis.None;
 
         // These 3 properties are needed as part of IPlottable
         //public bool IsVisible { get; set; } = true;
@@ -373,12 +369,21 @@ namespace RadialGaugeControl
             DataRaw = new double[values.Length];
             Array.Copy(values, 0, DataRaw, 0, values.Length);
 
-            // Sets MaxScale value and triggers ComputeAngularData
+            // Sets MaxScale and MinScale values and calls ComputeAngularData
             ComputeMaxMin();
-            //ComputeAngularData();
+            ComputeAngularData();
         }
 
+        /// <summary>
+        /// In case the original data should be needed from a caller
+        /// </summary>
+        /// <returns>The original data</returns>
         public double[] GetData() => DataRaw;
+        
+        /// <summary>
+        /// In case the angular data should be needed from a caller
+        /// </summary>
+        /// <returns>The angular data</returns>
         public double[,] GetAngularData() => DataAngular;
 
         /// <summary>
@@ -448,51 +453,20 @@ namespace RadialGaugeControl
         }
 
         /// <summary>
-        /// Needed as part of IPlottable in ScottPlot.ScottForm
-        /// </summary>
-        /// <returns></returns>
-        //public LegendItem[] GetLegendItems()
-        //{
-        //    if (GaugeLabels is null)
-        //        return null;
-
-        //    List<LegendItem> legendItems = new List<LegendItem>();
-        //    for (int i = 0; i < GaugeLabels.Length; i++)
-        //    {
-        //        var item = new LegendItem()
-        //        {
-        //            label = GaugeLabels[i],
-        //            color = GaugeColors[i],
-        //            lineWidth = 10,
-        //            markerShape = MarkerShape.none
-        //        };
-        //        legendItems.Add(item);
-        //    }
-
-        //    return legendItems.ToArray();
-        //}
-
-        /// <summary>
-        /// Needed as part of IPlottable in ScottPlot.ScottForm
-        /// </summary>
-        /// <returns></returns>
-        //public AxisLimits GetAxisLimits() => (GaugeLabels != null) ? new AxisLimits(-3.5, 3.5, -3.5, 3.5) : new AxisLimits(-2.5, 2.5, -2.5, 2.5);
-
-        /// <summary>
-        /// Reduces an angle into the range [0°-360°]
+        /// Reduces an angle into the range [-360° - 360°]
         /// </summary>
         /// <param name="angle">Angle value</param>
-        /// <returns>Return the angle whithin [0°-360°]</returns>
+        /// <returns>Return the angle whithin [-360° - 360°]</returns>
         private double ReduceAngle(double angle)
         {
-            double reduced = angle;
+            //double reduced = angle;
+            //
+            //if (angle > 360.0)
+            //    reduced -= 360 * (int)(angle / 360);
+            //else if (angle < -360.0)
+            //    reduced -= 360 * (int)(angle / 360);
 
-            if (angle > 360.0)
-                reduced -= 360 * (int)(angle / 360);
-            else if (angle < -360.0)
-                reduced += 360 * (int)(angle / 360);
-
-            return reduced;
+            return (angle - 360 * (int)(angle / 360));
         }
 
         /// <summary>
@@ -606,13 +580,14 @@ namespace RadialGaugeControl
 
             if (correctionFactor < 0)
             {
-                correctionFactor = 1 + correctionFactor;
+                correctionFactor = correctionFactor < -1 ? 0 : 1 + correctionFactor;
                 red *= correctionFactor;
                 green *= correctionFactor;
                 blue *= correctionFactor;
             }
             else
             {
+                if (correctionFactor > 1) correctionFactor = 1;
                 red = (255 - red) * correctionFactor + red;
                 green = (255 - green) * correctionFactor + green;
                 blue = (255 - blue) * correctionFactor + blue;
@@ -740,10 +715,11 @@ namespace RadialGaugeControl
             string text, float posPct)
         {
             // Modify anglePos to be in the range [0, 360]
-            if (angleInit >= 0)
-                angleInit -= 360f * (int)(angleInit / 360);
-            else
-                angleInit += 360f;
+            angleInit = (float)ReduceAngle(angleInit);
+            //if (angleInit >= 0)
+            //    angleInit -= 360f * (int)(angleInit / 360);
+            //else
+            //    angleInit += 360f;
 
             // Use a StringFormat to draw the middle top of each character at (0, 0).
             using StringFormat string_format = new StringFormat();

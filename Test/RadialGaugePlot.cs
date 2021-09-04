@@ -398,7 +398,7 @@ namespace ScottPlot.Plottable
             if (angle > 360.0)
                 reduced -= 360 * (int)(angle / 360);
             else if (angle < -360.0)
-                reduced += 360 * (int)(angle / 360);
+                reduced -= 360 * (int)(angle / 360);
 
             return reduced;
         }
@@ -412,7 +412,7 @@ namespace ScottPlot.Plottable
         public virtual void Render(PlotDimensions dims, Bitmap bmp, bool lowQuality = false)
         {
             int numGroups = DataRaw.Length;
-            double minScale = new double[] { dims.GetPixelX(1), dims.GetPixelY(1) }.Min();  // Not sure why, but GetPixelX(1) returns a reasonable dimension to draw the plot
+            double minScale = new double[] { dims.PxPerUnitX, dims.PxPerUnitX }.Min();  // Not sure why, but GetPixelX(1) returns a reasonable dimension to draw the plot
             PointF origin = new PointF(dims.GetPixelX(0), dims.GetPixelY(0));
 
             using Graphics gfx = GDI.Graphics(bmp, dims, lowQuality);
