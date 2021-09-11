@@ -12,6 +12,8 @@ namespace RadialGaugeControl
 
         public string Title => "Radial gauge plot";
 
+        public Image GetImage => this.pictureBox1.Image;
+
         public Plot()
         {
             InitializeComponent();
@@ -33,7 +35,7 @@ namespace RadialGaugeControl
             Bitmap newBmp = new((int)Width, (int)Height);
             Render(newBmp);
 
-            // Set the new bitmap into the control and dispone any previous one
+            // Set the new bitmap into the control and dispose any previous one
             var oldBmp = pictureBox1.Image;
             pictureBox1.Image = newBmp;
             if (oldBmp != null)

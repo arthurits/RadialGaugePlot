@@ -463,20 +463,18 @@ namespace RadialGaugeControl
         /// <returns>Return the angle whithin [0° - 360°]</returns>
         private double ReduceAngle(double angle)
         {
-            //double reduced = angle;
-            //
-            //if (angle > 360.0)
-            //    reduced -= 360 * (int)(angle / 360);
-            //else if (angle < -360.0)
-            //    reduced -= 360 * (int)(angle / 360);
-
             // This reduces the angle to [-360 - 360]
             double reduced = angle - 360 * (int)(angle / 360);
-            
+
             // This reduces the angle to [0 - 360]
             if (reduced < 0) reduced += 360.0;
 
             return reduced;
+        }
+
+        public void Render()
+        {
+            Render((Bitmap)GetImage);
         }
 
         /// <summary>
@@ -489,8 +487,6 @@ namespace RadialGaugeControl
         {
             int numGroups = DataRaw.Length;
             double minScale = new double[] { base.RectData.Width, base.RectData.Height }.Min() / 2;
-            //double minScale = new double[] { dims.GetPixelX(1), dims.GetPixelY(1) }.Min();
-            //PointF origin = new PointF(dims.GetPixelX(0), dims.GetPixelY(0));
 
             using Graphics gfx = Graphics.FromImage(bmp);   // https://github.com/ScottPlot/ScottPlot/blob/master/src/ScottPlot/Drawing/GDI.cs;
             gfx.SmoothingMode = lowQuality ? System.Drawing.Drawing2D.SmoothingMode.HighSpeed : System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
