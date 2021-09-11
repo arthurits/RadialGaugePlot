@@ -17,9 +17,12 @@ namespace TestControl
             InitializeComponent();
 
             // Combo boxes
-            //comboBox1.SelectedIndex = 0;
-            //comboBox2.SelectedIndex = 0;
-            //comboBox3.SelectedIndex = 0;
+            comboBox1.DataSource = Enum.GetValues(typeof(RadialGaugeControl.RadialGaugePlot.RadialGaugeDirection));
+            comboBox2.DataSource = Enum.GetValues(typeof(RadialGaugeControl.RadialGaugePlot.RadialGaugeMode));
+            comboBox3.DataSource = Enum.GetValues(typeof(RadialGaugeControl.RadialGaugePlot.RadialGaugeStart));
+            comboBox1.SelectedIndex = 0;
+            comboBox2.SelectedIndex = 0;
+            comboBox3.SelectedIndex = 0;
 
             // Check boxes
             checkBox1.Checked = plot1.ShowGaugeValues;

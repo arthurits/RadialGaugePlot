@@ -262,18 +262,6 @@ namespace RadialGaugeControl
         private float _StartingAngleGauges = 270f;
 
         /// <summary>
-        /// Color of the axis lines and concentric circles representing ticks.
-        /// </summary>
-        [System.ComponentModel.Category("Radial gauge"),
-        System.ComponentModel.Description("Color of the axis lines and concentric circles representing ticks.")]
-        public Color WebColor { get; set; } = Color.Gray;
-
-        /// <summary>
-        /// <see langword="Font"/> used for labeling values on the plot
-        /// </summary>
-        //public System.Drawing.Font Font { get; set; } = new();
-
-        /// <summary>
         /// <see langword="True"/> if value labels are shown inside the gauges.
         /// Size of the text is set by <see cref="GaugeLabelsFontPct"/> and color by <see cref="GaugeLabelsColor"/>.
         /// </summary>
@@ -288,12 +276,6 @@ namespace RadialGaugeControl
         [System.ComponentModel.Category("Radial gauge"),
         System.ComponentModel.Description("Start cap line style.")]
         public System.Drawing.Drawing2D.LineCap StartCap { get; set; } = System.Drawing.Drawing2D.LineCap.Round;
-
-
-        // These 3 properties are needed as part of IPlottable
-        //public bool IsVisible { get; set; } = true;
-        //public int XAxisIndex { get; set; } = 0;
-        //public int YAxisIndex { get; set; } = 0;
         
         #endregion Properties
 
@@ -357,7 +339,7 @@ namespace RadialGaugeControl
         {
             GaugeColors = lineColors;
             Update(values);
-            //ComputeAngularData();
+            ComputeAngularData();
         }
 
         public override string ToString() =>
@@ -472,11 +454,6 @@ namespace RadialGaugeControl
             return reduced;
         }
 
-        public void Render()
-        {
-            Render((Bitmap)GetImage);
-        }
-
         /// <summary>
         /// This is where the drawing of the plot is done
         /// </summary>
@@ -491,8 +468,8 @@ namespace RadialGaugeControl
             using Graphics gfx = Graphics.FromImage(bmp);   // https://github.com/ScottPlot/ScottPlot/blob/master/src/ScottPlot/Drawing/GDI.cs;
             gfx.SmoothingMode = lowQuality ? System.Drawing.Drawing2D.SmoothingMode.HighSpeed : System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             gfx.TextRenderingHint = lowQuality ? System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit : System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
-            using Pen pen = new Pen(WebColor);
-            using Pen penCircle = new(WebColor);
+            using Pen pen = new Pen(Color.Black);
+            using Pen penCircle = new(Color.Black);
             using Brush labelBrush = new SolidBrush(GaugeLabelsColor);
 
             float lineWidth = (LineWidth < 0) ? (float)(minScale / ((numGroups+0.33) * (GaugeSpacePercentage + 100) / 100)) : LineWidth;
@@ -509,64 +486,51 @@ namespace RadialGaugeControl
 
             using System.Drawing.Font fontGauge = new(Font.Name, lineWidth * GaugeLabelsFontPct / 100, FontStyle.Bold);
 
-            lock (this)
+            int index;
+            for (int i = 0; i < numGroups; i++)
             {
-                int index;
-                for (int i = 0; i < numGroups; i++)
+                // Data is reversed in case SingleGauge is selected
+                // If OutsideToInside is selected, radius is reversed
+                if (GaugeMode != RadialGaugeMode.SingleGauge)
                 {
-                    // Data is reversed in case SingleGauge is selected
-                    // If OutsideToInside is selected, radius is reversed
-                    if (GaugeMode != RadialGaugeMode.SingleGauge)
-                    {
-                        index = i;
-                        gaugeRadius = (GaugeStart == RadialGaugeStart.InsideToOutside ? i + 1 : (numGroups - i)) * radiusSpace;
-                    }
-                    else
-                    {
-                        index = numGroups - i - 1;
-                    }
-
-                    // Set color values
-                    pen.Color = GaugeColors[index];
-                    penCircle.Color = LightenBy(GaugeColors[index], DimPercentage);
-
-                    // Draw gauge background
-                    if (GaugeMode != RadialGaugeMode.SingleGauge)
-                        gfx.DrawArc(penCircle, (base.Center.X - gaugeRadius), (base.Center.Y - gaugeRadius), (gaugeRadius * 2), (gaugeRadius * 2), _StartingAngleBackGauges, maxBackAngle);
-
-                    // Draw gauge
-                    gfx.DrawArc(pen, (base.Center.X - gaugeRadius), (base.Center.Y - gaugeRadius), (gaugeRadius * 2), (gaugeRadius * 2), (float)DataAngular[index, 0], (float)DataAngular[index, 1]);
-
-                    // Draw gauge labels
-                    if (ShowGaugeValues)
-                    {
-                        //DrawTextOnCircle(gfx,
-                        //    fontGauge,
-                        //    labelBrush,
-                        //    new RectangleF(dims.DataOffsetX, dims.DataOffsetY, dims.DataWidth, dims.DataHeight),
-                        //    gaugeRadius,
-                        //    (float)DataAngular[index, 0] + (float)((int)_GaugeLabelPos * DataAngular[index, 1] / 2),
-                        //    origin.X,
-                        //    origin.Y,
-                        //    DataRaw[index].ToString("0.##"),
-                        //    DataRaw[index] >= 0 ? GaugeDirection : (RadialGaugeDirection.Clockwise | RadialGaugeDirection.AntiClockwise) & ~GaugeDirection);
-
-                        DrawTextOnCircle2(gfx,
-                            fontGauge,
-                            labelBrush,
-                            new RectangleF(base.RectData.X, base.RectData.Y, base.RectData.Width, base.RectData.Height),
-                            gaugeRadius,
-                            (float)DataAngular[index, 0],
-                            (float)DataAngular[index, 1],
-                            base.Center.X,
-                            base.Center.Y,
-                            DataRaw[index].ToString("0.##"),
-                            _GaugeLabelPos);
-                    }
-
+                    index = i;
+                    gaugeRadius = (GaugeStart == RadialGaugeStart.InsideToOutside ? i + 1 : (numGroups - i)) * radiusSpace;
                 }
-                //gfx.DrawRectangle(new Pen(Color.Black,2), RectData.X, RectData.Y, RectData.Width, RectData.Height);
+                else
+                {
+                    index = numGroups - i - 1;
+                }
+
+                // Set color values
+                pen.Color = GaugeColors[index];
+                penCircle.Color = LightenBy(GaugeColors[index], DimPercentage);
+
+                // Draw gauge background
+                if (GaugeMode != RadialGaugeMode.SingleGauge)
+                    gfx.DrawArc(penCircle, (base.Center.X - gaugeRadius), (base.Center.Y - gaugeRadius), (gaugeRadius * 2), (gaugeRadius * 2), _StartingAngleBackGauges, maxBackAngle);
+
+                // Draw gauge
+                gfx.DrawArc(pen, (base.Center.X - gaugeRadius), (base.Center.Y - gaugeRadius), (gaugeRadius * 2), (gaugeRadius * 2), (float)DataAngular[index, 0], (float)DataAngular[index, 1]);
+
+                // Draw gauge labels
+                if (ShowGaugeValues)
+                {
+                    DrawTextOnCircle(gfx,
+                        fontGauge,
+                        labelBrush,
+                        new RectangleF(base.RectData.X, base.RectData.Y, base.RectData.Width, base.RectData.Height),
+                        gaugeRadius,
+                        (float)DataAngular[index, 0],
+                        (float)DataAngular[index, 1],
+                        base.Center.X,
+                        base.Center.Y,
+                        DataRaw[index].ToString("0.##"),
+                        _GaugeLabelPos);
+                }
+
             }
+            //gfx.DrawRectangle(new Pen(Color.Black,2), RectData.X, RectData.Y, RectData.Width, RectData.Height);
+
 
         }
 
@@ -615,6 +579,7 @@ namespace RadialGaugeControl
         #endregion Color routines
 
         #region DrawText routines
+
         /// <summary>
         /// Draw text centered on the top and bottom of the circle.
         /// </summary>
@@ -622,101 +587,15 @@ namespace RadialGaugeControl
         /// <param name="font"><see langword="keyword">Font</see> used to draw the text</param>
         /// <param name="brush"><see langword="keyword">Brush</see> used to draw the text</param>
         /// <param name="clientRectangle"><see langword="keyword">Rectangle</see> of the ScottPlot control</param>
-        /// <param name="anglePos">Angle (in degrees) where the text will be drawn</param>
         /// <param name="radius">Radius of the circle in pixels</param>
-        /// <param name="cx">The x-coordinate of the circle centre</param>
-        /// <param name="cy">The y-coordinate of the circle centre</param>
-        /// <param name="text">String to be drawn</param>
-        /// <seealso cref="http://csharphelper.com/blog/2018/02/draw-text-on-a-circle-in-c/"/>
-        protected virtual void DrawTextOnCircle(Graphics gfx, System.Drawing.Font font,
-            Brush brush, RectangleF clientRectangle, float radius, float anglePos, float cx, float cy,
-            string text, RadialGaugeDirection direction)
-        {
-            // Modify anglePos to be in the range [0, 360]
-            if (anglePos >= 0)
-                anglePos -= 360f * (int)(anglePos / 360);
-            else
-                anglePos += 360f;
-
-
-            // Use a StringFormat to draw the middle top of each character at (0, 0).
-            using StringFormat string_format = new StringFormat();
-            string_format.Alignment = StringAlignment.Center;
-            string_format.LineAlignment = StringAlignment.Center;
-
-            // Used to scale from radians to degrees.
-            double RadToDeg = 180.0 / Math.PI;
-
-            // Measure the characters.
-            List<RectangleF> rects = MeasureCharacters(gfx, font, clientRectangle, text);
-
-            // Use LINQ to add up the character widths.
-            var width_query = from RectangleF rect in rects select rect.Width;
-            float text_width = width_query.Sum();
-
-            // Find the starting angle.
-            double width_to_angle = 1 / radius;
-            double theta = anglePos * Math.PI / 180;
-            theta += (direction == RadialGaugeDirection.AntiClockwise ? -1 : 1) * (2 - (int)_GaugeLabelPos) * text_width * width_to_angle / 2;
-            double initPos = theta;
-
-            int charPos;
-
-            // Draw the characters.
-            for (int i = 0; i < text.Length; i++)
-            {
-                // Get the char index position
-                if (initPos < Math.PI && initPos > 0)
-                    charPos = i;
-                else
-                    charPos = text.Length - 1 - i;
-
-                if (direction == RadialGaugeDirection.AntiClockwise)
-                    charPos = text.Length - 1 - charPos;
-
-
-                // Increment theta half the angular width of the current character
-                theta -= (direction == RadialGaugeDirection.AntiClockwise ? -1 : 1) * rects[charPos].Width / 2 * width_to_angle;
-
-                // Calculate the position of the upper-left corner
-                double x = cx + radius * Math.Cos(theta);
-                double y = cy + radius * Math.Sin(theta);
-
-                // Transform to position the character.
-                if (initPos < Math.PI && initPos > 0)
-                    gfx.RotateTransform((float)(RadToDeg * (theta - Math.PI / 2)));
-                else
-                    gfx.RotateTransform((float)(RadToDeg * (theta + Math.PI / 2)));
-
-                gfx.TranslateTransform((float)x, (float)y, System.Drawing.Drawing2D.MatrixOrder.Append);
-                gfx.DrawString(text[charPos].ToString(), font, brush, 0, 0, string_format);
-                gfx.ResetTransform();
-
-                // Increment theta the remaining half character.
-                theta -= (direction == RadialGaugeDirection.AntiClockwise ? -1 : 1) * rects[charPos].Width / 2 * width_to_angle;
-
-            }
-
-
-
-        }
-
-        /// <summary>
-        /// Simplify method
-        /// </summary>
-        /// <param name="gfx"></param>
-        /// <param name="font"></param>
-        /// <param name="brush"></param>
-        /// <param name="clientRectangle"></param>
-        /// <param name="radius"></param>
         /// <param name="angleInit"></param>
         /// <param name="angleSwept"></param>
-        /// <param name="cx"></param>
-        /// <param name="cy"></param>
+        /// <param name="cx">The x-coordinate of the circle centre</param>
+        /// <param name="cy">The y-coordinate of the circle centre</param>
         /// <param name="text"></param>
-        /// <param name="posPct"></param>
-        /// <param name="direction"></param>
-        protected virtual void DrawTextOnCircle2(Graphics gfx, System.Drawing.Font font,
+        /// <param name="posPct">String to be drawn</param>
+        /// /// <seealso cref="http://csharphelper.com/blog/2018/02/draw-text-on-a-circle-in-c/"/>
+        protected virtual void DrawTextOnCircle(Graphics gfx, System.Drawing.Font font,
             Brush brush, RectangleF clientRectangle, float radius, float angleInit, float angleSwept, float cx, float cy,
             string text, float posPct)
         {

@@ -32,14 +32,27 @@ namespace RadialGaugeControl
             ComputeRects();
 
             // Create the bitmap and make the corresponding drawing into it
-            Bitmap newBmp = new((int)Width, (int)Height);
-            Render(newBmp);
+            Render();
+        }
 
-            // Set the new bitmap into the control and dispose any previous one
+        /// <summary>
+        /// Set the new bitmap into the control and dispose any previous one
+        /// </summary>
+        /// <param name="newBmp"></param>
+        private void SetImage(Bitmap newBmp)
+        {
             var oldBmp = pictureBox1.Image;
             pictureBox1.Image = newBmp;
-            if (oldBmp != null)
+            if (oldBmp != null && oldBmp != newBmp)
                 oldBmp.Dispose();
+        }
+
+
+        public void Render(bool lowQuality = false)
+        {
+            Bitmap bmp = new((int)Width, (int)Height);
+            Render(bmp, lowQuality);
+            SetImage(bmp);
         }
 
         public virtual void Render(Bitmap bmp, bool lowQuality = false)

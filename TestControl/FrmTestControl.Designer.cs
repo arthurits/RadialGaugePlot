@@ -91,7 +91,6 @@ namespace TestControl
             this.plot1.StartingAngleBackGauges = 210F;
             this.plot1.StartingAngleGauges = 270F;
             this.plot1.TabIndex = 0;
-            this.plot1.WebColor = System.Drawing.Color.Gray;
             // 
             // comboBox1
             // 
