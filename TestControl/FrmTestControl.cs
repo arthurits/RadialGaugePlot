@@ -17,9 +17,9 @@ namespace TestControl
             InitializeComponent();
 
             // Combo boxes
-            comboBox1.DataSource = Enum.GetValues(typeof(RadialGaugeControl.RadialGaugePlot.RadialGaugeDirection));
-            comboBox2.DataSource = Enum.GetValues(typeof(RadialGaugeControl.RadialGaugePlot.RadialGaugeMode));
-            comboBox3.DataSource = Enum.GetValues(typeof(RadialGaugeControl.RadialGaugePlot.RadialGaugeStart));
+            comboBox1.DataSource = Enum.GetValues(typeof(RadialGaugePlot.RadialGaugeDirection));
+            comboBox2.DataSource = Enum.GetValues(typeof(RadialGaugePlot.RadialGaugeMode));
+            comboBox3.DataSource = Enum.GetValues(typeof(RadialGaugePlot.RadialGaugeStart));
             comboBox1.SelectedIndex = 0;
             comboBox2.SelectedIndex = 0;
             comboBox3.SelectedIndex = 0;
@@ -39,19 +39,19 @@ namespace TestControl
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            plot1.GaugeDirection = (RadialGaugeControl.RadialGaugePlot.RadialGaugeDirection)comboBox1.SelectedIndex;
+            plot1.GaugeDirection = (RadialGaugePlot.RadialGaugeDirection)comboBox1.SelectedIndex;
             plot1.Render();
         }
 
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
-            plot1.GaugeMode = (RadialGaugeControl.RadialGaugePlot.RadialGaugeMode)comboBox2.SelectedIndex;
+            plot1.GaugeMode = (RadialGaugePlot.RadialGaugeMode)comboBox2.SelectedIndex;
             plot1.Render();
         }
 
         private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
         {
-            plot1.GaugeStart = (RadialGaugeControl.RadialGaugePlot.RadialGaugeStart)comboBox3.SelectedIndex;
+            plot1.GaugeStart = (RadialGaugePlot.RadialGaugeStart)comboBox3.SelectedIndex;
             plot1.Render();
         }
 

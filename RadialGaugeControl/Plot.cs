@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace RadialGaugeControl
+namespace RadialGaugePlot
 {
     public partial class Plot : UserControl
     {

@@ -30,7 +30,7 @@ namespace TestControl
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmTestControl));
-            this.plot1 = new RadialGaugeControl.RadialGaugePlot();
+            this.plot1 = new RadialGaugePlot.RadialGaugePlot();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
             this.comboBox3 = new System.Windows.Forms.ComboBox();
@@ -73,13 +73,13 @@ namespace TestControl
             this.plot1.Center = ((System.Drawing.PointF)(resources.GetObject("plot1.Center")));
             this.plot1.DimPercentage = 90F;
             this.plot1.EndCap = System.Drawing.Drawing2D.LineCap.Triangle;
-            this.plot1.GaugeDirection = RadialGaugeControl.RadialGaugePlot.RadialGaugeDirection.Clockwise;
+            this.plot1.GaugeDirection = RadialGaugePlot.RadialGaugeDirection.Clockwise;
             this.plot1.GaugeLabelPos = 100F;
             this.plot1.GaugeLabelsColor = System.Drawing.Color.White;
             this.plot1.GaugeLabelsFontPct = 75F;
-            this.plot1.GaugeMode = RadialGaugeControl.RadialGaugePlot.RadialGaugeMode.Stacked;
+            this.plot1.GaugeMode = RadialGaugePlot.RadialGaugeMode.Stacked;
             this.plot1.GaugeSpacePercentage = 50F;
-            this.plot1.GaugeStart = RadialGaugeControl.RadialGaugePlot.RadialGaugeStart.InsideToOutside;
+            this.plot1.GaugeStart = RadialGaugePlot.RadialGaugeStart.InsideToOutside;
             this.plot1.LineWidth = -1F;
             this.plot1.Location = new System.Drawing.Point(0, 0);
             this.plot1.Name = "plot1";
@@ -361,7 +361,7 @@ namespace TestControl
 
         #endregion
 
-        private RadialGaugeControl.RadialGaugePlot plot1;
+        private RadialGaugePlot.RadialGaugePlot plot1;
         private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.ComboBox comboBox2;
         private System.Windows.Forms.ComboBox comboBox3;

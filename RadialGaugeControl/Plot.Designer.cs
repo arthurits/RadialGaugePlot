@@ -1,5 +1,5 @@
 ﻿
-namespace RadialGaugeControl
+namespace RadialGaugePlot
 {
     partial class Plot
     {

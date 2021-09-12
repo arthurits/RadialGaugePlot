@@ -24,7 +24,7 @@ using System.Linq;
 // http://csharphelper.com/blog/2016/01/draw-text-on-a-curve-in-c/
 
 
-namespace RadialGaugeControl
+namespace RadialGaugePlot
 {
     /// <summary>
     /// A radial gauge chart is a graphical method of displaying scalar data in the form of 
@@ -279,34 +279,6 @@ namespace RadialGaugeControl
         
         #endregion Properties
 
-        #region Enums
-        public enum RadialGaugeDirection
-        {
-            Clockwise,
-            AntiClockwise
-        }
-
-        public enum RadialGaugeStart
-        {
-            InsideToOutside,
-            OutsideToInside
-        }
-
-        public enum RadialGaugeMode
-        {
-            Stacked,
-            Sequential,
-            SingleGauge
-        }
-
-        public enum RadialGaugeLabelPos
-        {
-            Beginning = 0,
-            Middle = 1,
-            End = 2
-        }
-        #endregion Enums
-
         public RadialGaugePlot()
         {
             double[] values = { 100, 80, 65, 45, -20 };
@@ -463,7 +435,8 @@ namespace RadialGaugeControl
         public override void Render(Bitmap bmp, bool lowQuality = false)
         {
             int numGroups = DataRaw.Length;
-            double minScale = new double[] { base.RectData.Width, base.RectData.Height }.Min() / 2;
+            double minScale = Math.Min(base.RectData.Width, base.RectData.Height) / 2;
+            //double minScale = new double[] { base.RectData.Width, base.RectData.Height }.Min() / 2;
 
             using Graphics gfx = Graphics.FromImage(bmp);   // https://github.com/ScottPlot/ScottPlot/blob/master/src/ScottPlot/Drawing/GDI.cs;
             gfx.SmoothingMode = lowQuality ? System.Drawing.Drawing2D.SmoothingMode.HighSpeed : System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
@@ -472,7 +445,7 @@ namespace RadialGaugeControl
             using Pen penCircle = new(Color.Black);
             using Brush labelBrush = new SolidBrush(GaugeLabelsColor);
 
-            float lineWidth = (LineWidth < 0) ? (float)(minScale / ((numGroups+0.33) * (GaugeSpacePercentage + 100) / 100)) : LineWidth;
+            float lineWidth = (LineWidth < 0) ? (float)(minScale / ((numGroups + 0.33) * (GaugeSpacePercentage + 100) / 100)) : LineWidth;
             float radiusSpace = lineWidth * (GaugeSpacePercentage + 100) / 100;
             float gaugeRadius = numGroups * radiusSpace;  // By default, the outer-most radius is computed
             float maxBackAngle = (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * (NormBackGauge ? (float)AngleRange : 360);
