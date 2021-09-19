@@ -34,6 +34,8 @@ namespace TestControl
             numSpace.Value = (decimal)plot1.GaugeSpacePercentage;
             numDim.Value = (decimal)plot1.DimPercentage;
             numRange.Value = (decimal)plot1.AngleRange;
+
+            plot1.GaugeLabels = new string[] { "alpha", "beta", "gamma", "delta", "epsilon" };
         }
 
 

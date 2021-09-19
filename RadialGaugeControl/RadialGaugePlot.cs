@@ -567,7 +567,7 @@ namespace RadialGaugePlot
         /// <param name="cy">The y-coordinate of the circle centre</param>
         /// <param name="text"></param>
         /// <param name="posPct">String to be drawn</param>
-        /// /// <seealso cref="http://csharphelper.com/blog/2018/02/draw-text-on-a-circle-in-c/"/>
+        /// <seealso cref="http://csharphelper.com/blog/2018/02/draw-text-on-a-circle-in-c/"/>
         protected virtual void DrawTextOnCircle(Graphics gfx, System.Drawing.Font font,
             Brush brush, RectangleF clientRectangle, float radius, float angleInit, float angleSwept, float cx, float cy,
             string text, float posPct)
@@ -585,9 +585,13 @@ namespace RadialGaugePlot
             double width_to_angle = 1 / radius;
 
             // Measure the characters. Use LINQ to add up the character widths.
-            List<RectangleF> rects = MeasureCharacters(gfx, font, clientRectangle, text);
-            var width_query = from RectangleF rect in rects select rect.Width;
-            double text_width = width_query.Sum() / radius;
+            //List<RectangleF> rects = MeasureCharacters(gfx, font, clientRectangle, text);
+            //var width_query = from RectangleF rect in rects select rect.Width;
+            //double text_width = width_query.Sum() / radius;
+
+            RectangleF[] letterRectangles = MeasureCharacters(gfx, font, text, clientRectangle);
+            double totalLetterWidths = letterRectangles.Select(rect => rect.Width).Sum();
+            double text_width = totalLetterWidths / radius;
 
             // Angular data
             bool isPositive = angleSwept >= 0;
@@ -595,73 +599,28 @@ namespace RadialGaugePlot
             angle += (1 - 2 * (posPct / 100)) * (isPositive ? 1 : -1) * RadToDeg * text_width / 2; // Set the position to the middle of the text
 
             bool isBelow = angle < 180 && angle > 0;
+            int sign = isBelow ? 1 : -1;
             double theta = angle * Math.PI / 180;
-            theta += (isBelow ? 1 : -1) * text_width / 2;   // Set the position to the beginning of the text
+            theta += sign * text_width / 2;   // Set the position to the beginning of the text
 
             // Draw the characters.
             for (int i = 0; i < text.Length; i++)
             {
                 // Increment theta half the angular width of the current character
-                theta -= (isBelow ? 1 : -1) * rects[i].Width / 2 * width_to_angle;
+                theta -= sign * letterRectangles[i].Width / 2 * width_to_angle;
 
                 // Calculate the position of the upper-left corner
                 double x = cx + radius * Math.Cos(theta);
                 double y = cy + radius * Math.Sin(theta);
 
-                // Transform to position the character.
-                if (isBelow)
-                    gfx.RotateTransform((float)(RadToDeg * (theta - Math.PI / 2)));
-                else
-                    gfx.RotateTransform((float)(RadToDeg * (theta + Math.PI / 2)));
-
+                gfx.RotateTransform((float)(RadToDeg * (theta - sign * Math.PI / 2)));
                 gfx.TranslateTransform((float)x, (float)y, System.Drawing.Drawing2D.MatrixOrder.Append);
                 gfx.DrawString(text[i].ToString(), font, brush, 0, 0, string_format);
                 gfx.ResetTransform();
 
                 // Increment theta the remaining half character.
-                theta -= (isBelow ? 1 : -1) * rects[i].Width / 2 * width_to_angle;
+                theta -= sign * letterRectangles[i].Width / 2 * width_to_angle;
             }
-        }
-
-
-        /// <summary>
-        /// Measure the characters in a string with no more than 32 characters.
-        /// </summary>
-        /// <param name="gfx"></param>
-        /// <param name="font"></param>
-        /// <param name="clientRectangle"></param>
-        /// <param name="text"></param>
-        /// <returns></returns>
-        private List<RectangleF> MeasureCharactersInWord(Graphics gfx, System.Drawing.Font font, RectangleF clientRectangle, string text)
-        {
-            List<RectangleF> result = new();
-
-            using StringFormat string_format = new();
-
-            string_format.Alignment = StringAlignment.Center;
-            string_format.LineAlignment = StringAlignment.Center;
-            string_format.Trimming = StringTrimming.None;
-            string_format.FormatFlags = StringFormatFlags.MeasureTrailingSpaces;
-
-            CharacterRange[] ranges = new CharacterRange[text.Length];
-            for (int i = 0; i < text.Length; i++)
-            {
-                ranges[i] = new CharacterRange(i, 1);
-            }
-            string_format.SetMeasurableCharacterRanges(ranges);
-
-            // Find the character ranges.
-            RectangleF rect = new RectangleF(0, 0, 10000, 100);
-            Region[] regions =
-                gfx.MeasureCharacterRanges(
-                    text, font, clientRectangle,
-                    string_format);
-
-            // Convert the regions into rectangles.
-            foreach (Region region in regions)
-                result.Add(region.GetBounds(gfx));
-
-            return result;
         }
 
         /// <summary>
@@ -711,8 +670,78 @@ namespace RadialGaugePlot
             return results;
         }
 
-        #endregion DrawText routines
 
+        /// <summary>
+        /// Measure the characters in a string with no more than 32 characters.
+        /// </summary>
+        /// <param name="gfx"></param>
+        /// <param name="font"></param>
+        /// <param name="clientRectangle"></param>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        private List<RectangleF> MeasureCharactersInWord(Graphics gfx, System.Drawing.Font font, RectangleF clientRectangle, string text)
+        {
+            List<RectangleF> result = new();
+
+            using StringFormat string_format = new();
+
+            string_format.Alignment = StringAlignment.Center;
+            string_format.LineAlignment = StringAlignment.Center;
+            string_format.Trimming = StringTrimming.None;
+            string_format.FormatFlags = StringFormatFlags.MeasureTrailingSpaces;
+
+            CharacterRange[] ranges = new CharacterRange[text.Length];
+            for (int i = 0; i < text.Length; i++)
+            {
+                ranges[i] = new CharacterRange(i, 1);
+            }
+            string_format.SetMeasurableCharacterRanges(ranges);
+
+            // Find the character ranges.
+            RectangleF rect = new RectangleF(0, 0, 10000, 100);
+            Region[] regions =
+                gfx.MeasureCharacterRanges(
+                    text, font, clientRectangle,
+                    string_format);
+
+            // Convert the regions into rectangles.
+            foreach (Region region in regions)
+                result.Add(region.GetBounds(gfx));
+
+            return result;
+        }
+
+        
+
+        /// <summary>
+        /// Return an array indicating the size of each character in a string.
+        /// Specifiy the maximum expected size to avoid issues associated with text wrapping.
+        /// </summary>
+        private static RectangleF[] MeasureCharacters(Graphics gfx, System.Drawing.Font font, string text, RectangleF clientRect)
+        {
+            using StringFormat stringFormat = new()
+            {
+                Alignment = StringAlignment.Center,
+                LineAlignment = StringAlignment.Center,
+                Trimming = StringTrimming.None,
+                FormatFlags = StringFormatFlags.MeasureTrailingSpaces,
+            };
+
+            CharacterRange[] charRanges = Enumerable.Range(0, text.Length)
+                .Select(x => new CharacterRange(x, 1))
+                .ToArray();
+
+            stringFormat.SetMeasurableCharacterRanges(charRanges);
+
+            //RectangleF imageRectangle = new(0, 0, maxWidth, maxHeight);
+            Region[] characterRegions = gfx.MeasureCharacterRanges(text, font, clientRect, stringFormat);
+            RectangleF[] characterRectangles = characterRegions.Select(x => x.GetBounds(gfx)).ToArray();
+
+            return characterRectangles;
+
+        }
+
+        #endregion DrawText routines
     }
 }
 
