@@ -306,10 +306,19 @@ namespace RadialGaugePlot
         /// Initializes the instance.
         /// </summary>
         /// <param name="values">Array of values to be plotted as gauges.</param>
+        /// <param name="labels">Legend labels.</param>
         /// <param name="lineColors">Array colors for the gauges.</param>
-        public RadialGaugePlot(double[] values, Color[] lineColors)
+        public RadialGaugePlot(double[] values, string[] labels = null, Color[] lineColors = null)
         {
-            GaugeColors = lineColors;
+            if (labels != null && labels.Length > 0)
+            {
+                base.LegendLabels = labels;
+                base.Legend.IsVisible = true;
+            }
+
+            if (lineColors != null && lineColors.Length > 0)
+                GaugeColors = lineColors;
+
             Update(values);
             ComputeAngularData();
         }
@@ -330,6 +339,27 @@ namespace RadialGaugePlot
             // Sets MaxScale and MinScale values and calls ComputeAngularData
             ComputeMaxMin();
             ComputeAngularData();
+        }
+
+        public override LegendItem[] GetLegendItems()
+        {
+            if (GaugeLabels is null)
+                return null;
+
+            List<LegendItem> legendItems = new();
+            for (int i = 0; i < GaugeLabels.Length; i++)
+            {
+                var item = new LegendItem()
+                {
+                    label = GaugeLabels[i],
+                    color = GaugeColors[i],
+                    lineWidth = 10,
+                    markerShape = MarkerShape.none
+                };
+                legendItems.Add(item);
+            }
+
+            return legendItems.ToArray();
         }
 
         /// <summary>
@@ -556,17 +586,17 @@ namespace RadialGaugePlot
         /// <summary>
         /// Draw text centered on the top and bottom of the circle.
         /// </summary>
-        /// <param name="gfx"><see langword="keyword">Graphic</see> object used to draw</param>
-        /// <param name="font"><see langword="keyword">Font</see> used to draw the text</param>
-        /// <param name="brush"><see langword="keyword">Brush</see> used to draw the text</param>
-        /// <param name="clientRectangle"><see langword="keyword">Rectangle</see> of the ScottPlot control</param>
-        /// <param name="radius">Radius of the circle in pixels</param>
-        /// <param name="angleInit"></param>
-        /// <param name="angleSwept"></param>
-        /// <param name="cx">The x-coordinate of the circle centre</param>
-        /// <param name="cy">The y-coordinate of the circle centre</param>
-        /// <param name="text"></param>
-        /// <param name="posPct">String to be drawn</param>
+        /// <param name="gfx"><see langword="keyword">Graphic</see> object used to draw.</param>
+        /// <param name="font"><see langword="keyword">Font</see> used to draw the text.</param>
+        /// <param name="brush"><see langword="keyword">Brush</see> used to draw the text.</param>
+        /// <param name="clientRectangle">Clipping <see langword="keyword">RectangleF</see> holding the text. Normally, the maximum of the drawing area.</param>
+        /// <param name="radius">Radius of the circle in pixels.</param>
+        /// <param name="angleInit">Gauge's starting angle.</param>
+        /// <param name="angleSwept">Gauge's angular range (span).</param>
+        /// <param name="cx">The x-coordinate of the circle centre.</param>
+        /// <param name="cy">The y-coordinate of the circle centre.</param>
+        /// <param name="text">String of text to be drawn.</param>
+        /// <param name="posPct">Label's position as a percentage of the gauge's angular range.</param>
         /// <seealso cref="http://csharphelper.com/blog/2018/02/draw-text-on-a-circle-in-c/"/>
         protected virtual void DrawTextOnCircle(Graphics gfx, System.Drawing.Font font,
             Brush brush, RectangleF clientRectangle, float radius, float angleInit, float angleSwept, float cx, float cy,
@@ -711,12 +741,17 @@ namespace RadialGaugePlot
             return result;
         }
 
-        
+
 
         /// <summary>
         /// Return an array indicating the size of each character in a string.
         /// Specifiy the maximum expected size to avoid issues associated with text wrapping.
         /// </summary>
+        /// <param name="gfx"><see langword="keyword">Graphic</see> object used to draw.</param>
+        /// <param name="font"><see langword="keyword">Font</see> used to draw the text.</param>
+        /// <param name="text">String of text to be drawn.</param>
+        /// <param name="clientRect">Clipping <see langword="keyword">RectangleF</see> holding the text. Normally, the maximum of the drawing area.</param>
+        /// <returns></returns>
         private static RectangleF[] MeasureCharacters(Graphics gfx, System.Drawing.Font font, string text, RectangleF clientRect)
         {
             using StringFormat stringFormat = new()

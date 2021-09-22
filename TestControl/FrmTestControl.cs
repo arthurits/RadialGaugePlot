@@ -36,6 +36,8 @@ namespace TestControl
             numRange.Value = (decimal)plot1.AngleRange;
 
             plot1.GaugeLabels = new string[] { "alpha", "beta", "gamma", "delta", "epsilon" };
+            plot1.Legend.Location = RadialGaugePlot.Alignment.UpperRight;
+            plot1.Render();
         }
 
 

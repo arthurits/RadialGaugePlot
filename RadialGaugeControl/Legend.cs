@@ -36,7 +36,22 @@ namespace RadialGaugePlot
         private float SymbolPad { get { return Font.Size / 3; } }
         private float MarkerWidth { get { return Font.Size / 2; } }
 
-        private LegendItem[] LegendItems;
+        public LegendItem[] LegendItems { get; set; }
+
+        public Legend()
+        {
+        
+        }
+
+        public Legend(LegendItem[] items)
+            :base()
+        {
+            if (items != null && items.Length > 0)
+            {
+                LegendItems = items;
+                IsVisible = true;
+            }
+        }
 
         public void Render(RectangleF dims, Bitmap bmp, bool lowQuality = false)
         {

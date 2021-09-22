@@ -12,11 +12,16 @@ namespace RadialGaugePlot
 
         public string Title => "Radial gauge plot";
 
+        public string[] LegendLabels { get; set; }
+
+        public Legend Legend { get; set; }
+
         public Image GetImage => this.pictureBox1.Image;
 
         public Plot()
         {
             InitializeComponent();
+            Legend = new();
         }
 
 
@@ -52,6 +57,17 @@ namespace RadialGaugePlot
         {
             Bitmap bmp = new((int)Width, (int)Height);
             Render(bmp, lowQuality);
+
+            // Draw the legend onto the bitmap
+            var legendItems = GetLegendItems();
+            if (legendItems != null && legendItems.Length > 0)
+            {
+                Legend.LegendItems = legendItems;
+                Legend.IsVisible = true;
+                Legend.Render(new Rectangle(0, 0, Width, Height), bmp, lowQuality);
+            }
+
+            // Set the image into the picture box control
             SetImage(bmp);
         }
 
@@ -64,6 +80,12 @@ namespace RadialGaugePlot
             newGraphics.DrawRectangle(new Pen(Color.Black), RectTitle.X, RectTitle.Y, RectTitle.Width, RectTitle.Height);
             newGraphics.DrawString(Title, Font, new SolidBrush(Color.Black), RectTitle);
         }
+
+        public virtual LegendItem[] GetLegendItems()
+        {
+            return null;
+        }
+
 
         /// <summary>
         /// Compute geometric data
