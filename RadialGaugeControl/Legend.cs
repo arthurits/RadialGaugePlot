@@ -9,7 +9,6 @@ using System.Diagnostics;
 
 namespace RadialGaugePlot
 {
-    
     public class Legend
     {
         public Alignment Location = Alignment.LowerRight;
@@ -49,7 +48,7 @@ namespace RadialGaugePlot
             if (items != null && items.Length > 0)
             {
                 LegendItems = items;
-                IsVisible = true;
+                //IsVisible = true;
             }
         }
 
@@ -126,69 +125,67 @@ namespace RadialGaugePlot
             using var fillBrush = new SolidBrush(FillColor);
             using var shadowBrush = new SolidBrush(ShadowColor);
             using var textBrush = new SolidBrush(FontColor);
-            using (var outlinePen = new Pen(OutlineColor))
+            using var outlinePen = new Pen(OutlineColor);
+            
+            RectangleF rectShadow = new (locationX + ShadowOffsetX, locationY + ShadowOffsetY, width, height);
+            RectangleF rectFill = new (locationX, locationY, width, height);
+
+            if (shadow)
+                gfx.FillRectangle(shadowBrush, rectShadow);
+
+            gfx.FillRectangle(fillBrush, rectFill);
+
+            if (outline)
+                gfx.DrawRectangle(outlinePen, Rectangle.Round(rectFill));
+
+            for (int i = 0; i < items.Length; i++)
             {
-                RectangleF rectShadow = new RectangleF(locationX + ShadowOffsetX, locationY + ShadowOffsetY, width, height);
-                RectangleF rectFill = new RectangleF(locationX, locationY, width, height);
+                var item = items[i];
+                float verticalOffset = i * maxLabelHeight;
 
-                if (shadow)
-                    gfx.FillRectangle(shadowBrush, rectShadow);
+                // draw text
+                gfx.DrawString(item.label, font, textBrush, locationX + SymbolWidth, locationY + verticalOffset);
 
-                gfx.FillRectangle(fillBrush, rectFill);
+                // prepare values for drawing a line
+                outlinePen.Color = item.color;
+                outlinePen.Width = 1;
+                float lineY = locationY + verticalOffset + maxLabelHeight / 2;
+                float lineX1 = locationX + SymbolPad;
+                float lineX2 = lineX1 + SymbolWidth - SymbolPad * 2;
 
-                if (outline)
-                    gfx.DrawRectangle(outlinePen, Rectangle.Round(rectFill));
+                // prepare values for drawing a rectangle
+                PointF rectOrigin = new (lineX1, (float)(lineY - item.lineWidth / 2));
+                SizeF rectSize = new (lineX2 - lineX1, (float)item.lineWidth);
+                RectangleF rect = new (rectOrigin, rectSize);
 
-                for (int i = 0; i < items.Length; i++)
+                if (item.IsRectangle)
                 {
-                    var item = items[i];
-                    float verticalOffset = i * maxLabelHeight;
-
-                    // draw text
-                    gfx.DrawString(item.label, font, textBrush, locationX + SymbolWidth, locationY + verticalOffset);
-
-                    // prepare values for drawing a line
-                    outlinePen.Color = item.color;
-                    outlinePen.Width = 1;
-                    float lineY = locationY + verticalOffset + maxLabelHeight / 2;
-                    float lineX1 = locationX + SymbolPad;
-                    float lineX2 = lineX1 + SymbolWidth - SymbolPad * 2;
-
-                    // prepare values for drawing a rectangle
-                    PointF rectOrigin = new PointF(lineX1, (float)(lineY - item.lineWidth / 2));
-                    SizeF rectSize = new SizeF(lineX2 - lineX1, (float)item.lineWidth);
-                    RectangleF rect = new RectangleF(rectOrigin, rectSize);
-
-                    if (item.IsRectangle)
+                    // draw a rectangle
+                    //using (var legendItemFillBrush = GDI.Brush(item.color, item.hatchColor, item.hatchStyle))
+                    using SolidBrush legendItemFillBrush = new (item.color);
+                    using Pen legendItemOutlinePen = new (item.borderColor, item.borderWith);
+                    
+                    gfx.FillRectangle(legendItemFillBrush, rect);
+                    gfx.DrawRectangle(legendItemOutlinePen, rect.X, rect.Y, rect.Width, rect.Height);
+                }
+                else
+                {
+                    // draw a line
+                    if (item.lineWidth > 0 && item.lineStyle != LineStyle.None)
                     {
-                        // draw a rectangle
-                        //using (var legendItemFillBrush = GDI.Brush(item.color, item.hatchColor, item.hatchStyle))
-                        using var legendItemFillBrush = new SolidBrush(item.color);
-                        using (var legendItemOutlinePen = new Pen(item.borderColor, item.borderWith))
-                        {
-                            gfx.FillRectangle(legendItemFillBrush, rect);
-                            gfx.DrawRectangle(legendItemOutlinePen, rect.X, rect.Y, rect.Width, rect.Height);
-                        }
+                        //using var linePen = GDI.Pen(item.color, item.lineWidth, item.lineStyle, false);
+                        using Pen linePen = new (item.color);
+                        linePen.Width = (float)item.lineWidth;
+                        linePen.DashStyle = (DashStyle)(item.lineStyle - 1);
+                        //, item.lineWidth, item.lineStyle, false);
+                        gfx.DrawLine(linePen, lineX1, lineY, lineX2, lineY);
                     }
-                    else
-                    {
-                        // draw a line
-                        if (item.lineWidth > 0 && item.lineStyle != LineStyle.None)
-                        {
-                            //using var linePen = GDI.Pen(item.color, item.lineWidth, item.lineStyle, false);
-                            using var linePen = new Pen(item.color);
-                            linePen.Width = (float)item.lineWidth;
-                            linePen.DashStyle = (DashStyle)(item.lineStyle - 1);
-                            //, item.lineWidth, item.lineStyle, false);
-                            gfx.DrawLine(linePen, lineX1, lineY, lineX2, lineY);
-                        }
 
-                        // and perhaps a marker in the middle of the line
-                        float lineXcenter = (lineX1 + lineX2) / 2;
-                        PointF markerPoint = new PointF(lineXcenter, lineY);
-                        if ((item.markerShape != MarkerShape.none) && (item.markerSize > 0))
-                            MarkerTools.DrawMarker(gfx, markerPoint, item.markerShape, MarkerWidth, item.color);
-                    }
+                    // and perhaps a marker in the middle of the line
+                    float lineXcenter = (lineX1 + lineX2) / 2;
+                    PointF markerPoint = new (lineXcenter, lineY);
+                    if ((item.markerShape != MarkerShape.none) && (item.markerSize > 0))
+                        MarkerTools.DrawMarker(gfx, markerPoint, item.markerShape, MarkerWidth, item.color);
                 }
             }
         }
@@ -214,29 +211,19 @@ namespace RadialGaugePlot
             float bottomY = dims.Y + dims.Height - Padding - height;
             float centerY = dims.Y + dims.Height / 2 - height / 2;
 
-            switch (Location)
+            return Location switch
             {
-                case Alignment.UpperLeft:
-                    return (leftX, topY);
-                case Alignment.UpperCenter:
-                    return (centerX, topY);
-                case Alignment.UpperRight:
-                    return (rightX, topY);
-                case Alignment.MiddleRight:
-                    return (rightX, centerY);
-                case Alignment.LowerRight:
-                    return (rightX, bottomY);
-                case Alignment.LowerCenter:
-                    return (centerX, bottomY);
-                case Alignment.LowerLeft:
-                    return (leftX, bottomY);
-                case Alignment.MiddleLeft:
-                    return (leftX, centerY);
-                case Alignment.MiddleCenter:
-                    return (centerX, centerY);
-                default:
-                    throw new NotImplementedException();
-            }
+                Alignment.UpperLeft => (leftX, topY),
+                Alignment.UpperCenter => (centerX, topY),
+                Alignment.UpperRight => (rightX, topY),
+                Alignment.MiddleRight => (rightX, centerY),
+                Alignment.LowerRight => (rightX, bottomY),
+                Alignment.LowerCenter => (centerX, bottomY),
+                Alignment.LowerLeft => (leftX, bottomY),
+                Alignment.MiddleLeft => (leftX, centerY),
+                Alignment.MiddleCenter => (centerX, centerY),
+                _ => throw new NotImplementedException(),
+            };
         }
     }
 
@@ -311,14 +298,14 @@ namespace RadialGaugePlot
             if (size == 0 || shape == MarkerShape.none)
                 return;
 
-            Pen pen = new Pen(color);
+            Pen pen = new (color);
 
             Brush brush = new SolidBrush(color);
 
-            PointF corner1 = new PointF(pixelLocation.X - size / 2, pixelLocation.Y - size / 2);
-            PointF corner2 = new PointF(pixelLocation.X + size / 2, pixelLocation.Y + size / 2);
-            SizeF bounds = new SizeF(size, size);
-            RectangleF rect = new RectangleF(corner1, bounds);
+            PointF corner1 = new (pixelLocation.X - size / 2, pixelLocation.Y - size / 2);
+            PointF corner2 = new (pixelLocation.X + size / 2, pixelLocation.Y + size / 2);
+            SizeF bounds = new (size, size);
+            RectangleF rect = new (corner1, bounds);
 
             switch (shape)
             {
@@ -337,10 +324,10 @@ namespace RadialGaugePlot
                 case MarkerShape.filledDiamond:
 
                     // Create points that define polygon.
-                    PointF point1 = new PointF(pixelLocation.X, pixelLocation.Y + size / 2);
-                    PointF point2 = new PointF(pixelLocation.X - size / 2, pixelLocation.Y);
-                    PointF point3 = new PointF(pixelLocation.X, pixelLocation.Y - size / 2);
-                    PointF point4 = new PointF(pixelLocation.X + size / 2, pixelLocation.Y);
+                    PointF point1 = new (pixelLocation.X, pixelLocation.Y + size / 2);
+                    PointF point2 = new (pixelLocation.X - size / 2, pixelLocation.Y);
+                    PointF point3 = new (pixelLocation.X, pixelLocation.Y - size / 2);
+                    PointF point4 = new (pixelLocation.X + size / 2, pixelLocation.Y);
 
                     PointF[] curvePoints = { point1, point2, point3, point4 };
 
@@ -350,10 +337,10 @@ namespace RadialGaugePlot
                 case MarkerShape.openDiamond:
 
                     // Create points that define polygon.
-                    PointF point5 = new PointF(pixelLocation.X, pixelLocation.Y + size / 2);
-                    PointF point6 = new PointF(pixelLocation.X - size / 2, pixelLocation.Y);
-                    PointF point7 = new PointF(pixelLocation.X, pixelLocation.Y - size / 2);
-                    PointF point8 = new PointF(pixelLocation.X + size / 2, pixelLocation.Y);
+                    PointF point5 = new (pixelLocation.X, pixelLocation.Y + size / 2);
+                    PointF point6 = new (pixelLocation.X - size / 2, pixelLocation.Y);
+                    PointF point7 = new (pixelLocation.X, pixelLocation.Y - size / 2);
+                    PointF point8 = new (pixelLocation.X + size / 2, pixelLocation.Y);
 
                     PointF[] curvePoints2 = { point5, point6, point7, point8 };
 
@@ -362,47 +349,47 @@ namespace RadialGaugePlot
 
                     break;
                 case MarkerShape.asterisk:
-                    Font drawFont = new Font("CourierNew", size * 3);
+                    Font drawFont = new ("CourierNew", size * 3);
                     SizeF textSize = MeasureString(gfx, "*", drawFont);
-                    PointF asteriskPoint = new PointF(pixelLocation.X - textSize.Width / 2, pixelLocation.Y - textSize.Height / 4);
+                    PointF asteriskPoint = new (pixelLocation.X - textSize.Width / 2, pixelLocation.Y - textSize.Height / 4);
                     gfx.DrawString("*", drawFont, brush, asteriskPoint);
 
                     break;
                 case MarkerShape.hashTag:
-                    Font drawFont2 = new Font("CourierNew", size * 2);
+                    Font drawFont2 = new ("CourierNew", size * 2);
                     SizeF textSize2 = MeasureString(gfx, "#", drawFont2);
-                    PointF asteriskPoint2 = new PointF(pixelLocation.X - textSize2.Width / 2, pixelLocation.Y - textSize2.Height / 3);
+                    PointF asteriskPoint2 = new (pixelLocation.X - textSize2.Width / 2, pixelLocation.Y - textSize2.Height / 3);
                     gfx.DrawString("#", drawFont2, brush, asteriskPoint2);
 
                     break;
                 case MarkerShape.cross:
-                    Font drawFont3 = new Font("CourierNew", size * 2);
+                    Font drawFont3 = new ("CourierNew", size * 2);
                     SizeF textSize3 = MeasureString(gfx, "+", drawFont3);
-                    PointF asteriskPoint3 = new PointF(pixelLocation.X - textSize3.Width / (5 / 2), pixelLocation.Y - textSize3.Height / 2);
+                    PointF asteriskPoint3 = new (pixelLocation.X - textSize3.Width / (5 / 2), pixelLocation.Y - textSize3.Height / 2);
                     gfx.DrawString("+", drawFont3, brush, asteriskPoint3);
 
                     break;
                 case MarkerShape.eks:
-                    Font drawFont4 = new Font("CourierNew", size * 2);
+                    Font drawFont4 = new ("CourierNew", size * 2);
                     SizeF textSize4 = MeasureString(gfx, "x", drawFont4);
-                    PointF asteriskPoint4 = new PointF(pixelLocation.X - textSize4.Width / (5 / 2), pixelLocation.Y - textSize4.Height / 2);
+                    PointF asteriskPoint4 = new (pixelLocation.X - textSize4.Width / (5 / 2), pixelLocation.Y - textSize4.Height / 2);
                     gfx.DrawString("x", drawFont4, brush, asteriskPoint4);
 
                     break;
                 case MarkerShape.verticalBar:
-                    Font drawFont5 = new Font("CourierNew", size * 2);
+                    Font drawFont5 = new ("CourierNew", size * 2);
                     SizeF textSize5 = MeasureString(gfx, "|", drawFont5);
-                    PointF asteriskPoint5 = new PointF(pixelLocation.X - textSize5.Width / (5 / 2), pixelLocation.Y - textSize5.Height / 2);
+                    PointF asteriskPoint5 = new (pixelLocation.X - textSize5.Width / (5 / 2), pixelLocation.Y - textSize5.Height / 2);
                     gfx.DrawString("|", drawFont5, brush, asteriskPoint5);
 
                     break;
                 case MarkerShape.triUp:
                     // Create points that define polygon.
-                    PointF point9 = new PointF(pixelLocation.X, pixelLocation.Y - size);
-                    PointF point10 = new PointF(pixelLocation.X, pixelLocation.Y);
-                    PointF point11 = new PointF(pixelLocation.X - size * (float)0.866, pixelLocation.Y + size * (float)0.5);
-                    PointF point12 = new PointF(pixelLocation.X, pixelLocation.Y);
-                    PointF point13 = new PointF(pixelLocation.X + size * (float)0.866, (pixelLocation.Y + size * (float)0.5));
+                    PointF point9 = new (pixelLocation.X, pixelLocation.Y - size);
+                    PointF point10 = new (pixelLocation.X, pixelLocation.Y);
+                    PointF point11 = new (pixelLocation.X - size * (float)0.866, pixelLocation.Y + size * (float)0.5);
+                    PointF point12 = new (pixelLocation.X, pixelLocation.Y);
+                    PointF point13 = new (pixelLocation.X + size * (float)0.866, (pixelLocation.Y + size * (float)0.5));
 
 
                     PointF[] curvePoints3 = { point12, point9, point10, point11, point12, point13 };
@@ -413,11 +400,11 @@ namespace RadialGaugePlot
                     break;
                 case MarkerShape.triDown:
                     // Create points that define polygon.
-                    PointF point14 = new PointF(pixelLocation.X, pixelLocation.Y + size);
-                    PointF point15 = new PointF(pixelLocation.X, pixelLocation.Y);
-                    PointF point16 = new PointF(pixelLocation.X - size * (float)0.866, pixelLocation.Y - size * (float)0.5);
-                    PointF point17 = new PointF(pixelLocation.X, pixelLocation.Y);
-                    PointF point18 = new PointF(pixelLocation.X + size * (float)0.866, (pixelLocation.Y - size * (float)0.5));
+                    PointF point14 = new (pixelLocation.X, pixelLocation.Y + size);
+                    PointF point15 = new (pixelLocation.X, pixelLocation.Y);
+                    PointF point16 = new (pixelLocation.X - size * (float)0.866, pixelLocation.Y - size * (float)0.5);
+                    PointF point17 = new (pixelLocation.X, pixelLocation.Y);
+                    PointF point18 = new (pixelLocation.X + size * (float)0.866, (pixelLocation.Y - size * (float)0.5));
 
 
                     PointF[] curvePoints4 = { point17, point14, point15, point16, point17, point18 };

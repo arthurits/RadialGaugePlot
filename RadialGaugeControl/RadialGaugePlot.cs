@@ -63,7 +63,7 @@ namespace RadialGaugePlot
         protected double[] DataRaw;
 
         /// <summary>
-        /// Angular data (first column: initial angle; second column: swept angle) computed from <see cref="DataRaw"/>
+        /// Angular data (rows: gauges; first column: initial angle; second column: swept angle) computed from <see cref="DataRaw"/>
         /// </summary>
         protected double[,] DataAngular;
 
@@ -276,7 +276,11 @@ namespace RadialGaugePlot
         [System.ComponentModel.Category("Radial gauge"),
         System.ComponentModel.Description("Start cap line style.")]
         public System.Drawing.Drawing2D.LineCap StartCap { get; set; } = System.Drawing.Drawing2D.LineCap.Round;
-        
+
+        [System.ComponentModel.Category("Radial gauge"),
+        System.ComponentModel.Description("Title string which is rendered at the top of the plot.")]
+        public override string Title { get => base.Title; set => base.Title = value; }
+
         #endregion Properties
 
         public RadialGaugePlot()
@@ -313,7 +317,7 @@ namespace RadialGaugePlot
             if (labels != null && labels.Length > 0)
             {
                 base.LegendLabels = labels;
-                base.Legend.IsVisible = true;
+                //base.Legend.IsVisible = true;
             }
 
             if (lineColors != null && lineColors.Length > 0)
@@ -389,13 +393,12 @@ namespace RadialGaugePlot
             float AngleSumNeg = _StartingAngleGauges;
             float AngleSwept;
             float AngleInit;
-            //System.Diagnostics.Debug.Print("ComputeAngularData init");
+            
             // Loop through DataRaw and compute DataAngular
             for (int i = 0; i < DataRaw.Length; i++)
             {
                 AngleInit = (DataRaw[i] >= 0 ? AngleSumPos : AngleSumNeg);
                 AngleSwept = (_GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * (float)(_AngleRange * DataRaw[i] / (_MaxScale - _MinScale));
-
 
                 DataAngular[i, 0] = (_GaugeMode == RadialGaugeMode.Stacked ? _StartingAngleGauges : AngleInit);
                 DataAngular[i, 1] = AngleSwept;
@@ -404,7 +407,6 @@ namespace RadialGaugePlot
                     AngleSumPos += AngleSwept;
                 else
                     AngleSumNeg += AngleSwept;
-                //System.Diagnostics.Debug.Print("AngleInit: {1}\tAngleSwept: {2}\tDataAngular[{0}, 0]: {3}\tDataAngular[{0}, 0]: {4}\tAngleSumPos: {5}\tAngleSumNeg: {6}", i, AngleInit, AngleSwept, DataAngular[i, 0], DataAngular[i, 1], AngleSumPos, AngleSumNeg);
             }
 
             // Compute the initial angle for the background gauges
@@ -466,12 +468,13 @@ namespace RadialGaugePlot
         {
             int numGroups = DataRaw.Length;
             double minScale = Math.Min(base.RectData.Width, base.RectData.Height) / 2;
-            //double minScale = new double[] { base.RectData.Width, base.RectData.Height }.Min() / 2;
+            //if (minScale == 0)
+            //    return;
 
             using Graphics gfx = Graphics.FromImage(bmp);   // https://github.com/ScottPlot/ScottPlot/blob/master/src/ScottPlot/Drawing/GDI.cs;
             gfx.SmoothingMode = lowQuality ? System.Drawing.Drawing2D.SmoothingMode.HighSpeed : System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             gfx.TextRenderingHint = lowQuality ? System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit : System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
-            using Pen pen = new Pen(Color.Black);
+            using Pen pen = new (Color.Black);
             using Pen penCircle = new(Color.Black);
             using Brush labelBrush = new SolidBrush(GaugeLabelsColor);
 
@@ -606,7 +609,7 @@ namespace RadialGaugePlot
             angleInit = (float)ReduceAngle(angleInit);
 
             // Use a StringFormat to draw the middle top of each character at (0, 0).
-            using StringFormat string_format = new StringFormat();
+            using StringFormat string_format = new ();
             string_format.Alignment = StringAlignment.Center;
             string_format.LineAlignment = StringAlignment.Center;
 
@@ -663,7 +666,7 @@ namespace RadialGaugePlot
         /// <returns></returns>
         private List<RectangleF> MeasureCharacters(Graphics gfx, System.Drawing.Font font, RectangleF clientRectangle, string text)
         {
-            List<RectangleF> results = new List<RectangleF>();
+            List<RectangleF> results = new ();
 
             // The X location for the next character.
             float x = 0;
@@ -686,9 +689,7 @@ namespace RadialGaugePlot
                 // Save all but the last rectangle.
                 for (int i = 0; i < rects.Count + 1 - 1; i++)
                 {
-                    RectangleF new_rect = new RectangleF(
-                        x, rects[i].Top,
-                        rects[i].Width, rects[i].Height);
+                    RectangleF new_rect = new (x, rects[i].Top, rects[i].Width, rects[i].Height);
                     results.Add(new_rect);
 
                     // Move to the next character's X position.
@@ -728,7 +729,7 @@ namespace RadialGaugePlot
             string_format.SetMeasurableCharacterRanges(ranges);
 
             // Find the character ranges.
-            RectangleF rect = new RectangleF(0, 0, 10000, 100);
+            RectangleF rect = new (0, 0, 10000, 100);
             Region[] regions =
                 gfx.MeasureCharacterRanges(
                     text, font, clientRectangle,

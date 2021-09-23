@@ -7,16 +7,28 @@ namespace RadialGaugePlot
     public partial class Plot : UserControl
     {
         public RectangleF RectTitle { get; set; }
-        public RectangleF RectData;
+        public RectangleF RectData { get; set; }
         public PointF Center { get; set; }
 
-        public string Title => "Radial gauge plot";
+        public virtual string Title
+        {
+            get => _strTitle;
+            set
+            {
+                if(!string.IsNullOrEmpty(value))
+                {
+                    _strTitle = value;
+                    ComputeRects();
+                }
+            }
+        }
+        private string _strTitle;
 
-        public string[] LegendLabels { get; set; }
+        public string[] LegendLabels { get; protected set; }
 
-        public Legend Legend { get; set; }
+        public Legend Legend { get; protected set; }
 
-        public Image GetImage => this.pictureBox1.Image;
+        
 
         public Plot()
         {
@@ -52,11 +64,22 @@ namespace RadialGaugePlot
                 oldBmp.Dispose();
         }
 
-
+        /// <summary>
+        /// Rendering function. This is the master function that calls all the elements whether they are overriden by a derived class or not.
+        /// </summary>
+        /// <param name="lowQuality">Quality of the rendering</param>
         public void Render(bool lowQuality = false)
         {
+            // First call the virtual Render() function (which can be overriden by a derived class)
             Bitmap bmp = new((int)Width, (int)Height);
             Render(bmp, lowQuality);
+
+            // Draw the title onto the bitmap
+            if (!string.IsNullOrEmpty(Title))
+            {
+                using Graphics newGraphics = Graphics.FromImage(bmp);
+                newGraphics.DrawString(Title, Font, new SolidBrush(Color.Black), RectTitle);
+            }
 
             // Draw the legend onto the bitmap
             var legendItems = GetLegendItems();
@@ -67,7 +90,7 @@ namespace RadialGaugePlot
                 Legend.Render(new Rectangle(0, 0, Width, Height), bmp, lowQuality);
             }
 
-            // Set the image into the picture box control
+            // Set the image into the picturebox control
             SetImage(bmp);
         }
 
@@ -78,14 +101,36 @@ namespace RadialGaugePlot
             newGraphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
             newGraphics.DrawRectangle(new Pen(Color.Black), RectData.X, RectData.Y, RectData.Width, RectData.Height);
             newGraphics.DrawRectangle(new Pen(Color.Black), RectTitle.X, RectTitle.Y, RectTitle.Width, RectTitle.Height);
-            newGraphics.DrawString(Title, Font, new SolidBrush(Color.Black), RectTitle);
+            if (!string.IsNullOrEmpty(Title))
+                newGraphics.DrawString(Title, Font, new SolidBrush(Color.Black), RectTitle);
         }
 
+        /// <summary>
+        /// Gets an array of LegenItem
+        /// </summary>
+        /// <returns></returns>
         public virtual LegendItem[] GetLegendItems()
         {
             return null;
         }
 
+        /// <summary>
+        /// Gets the legend bitmap
+        /// </summary>
+        /// <returns></returns>
+        public Bitmap GetLegendBitmap()
+        {
+            return Legend.GetBitmap();
+        }
+
+        /// <summary>
+        /// Gets the bitmap shown in the plot.
+        /// </summary>
+        /// <returns></returns>
+        public Image GetImage()
+        {
+            return this.pictureBox1.Image;
+        }
 
         /// <summary>
         /// Compute geometric data
@@ -95,7 +140,11 @@ namespace RadialGaugePlot
             // Compute the Title rect
             using Bitmap bmp = new (1, 1);
             using Graphics gfx = System.Drawing.Graphics.FromImage(bmp);
-            SizeF sizeText = gfx.MeasureString(Title, Font);
+
+            SizeF sizeText = new (0, 0);
+            if (!string.IsNullOrEmpty(Title))
+                sizeText = gfx.MeasureString(Title, Font);
+
             // compensate for OS-specific differences in font scaling
             if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux))
             {
@@ -116,10 +165,12 @@ namespace RadialGaugePlot
             // Compute the minimum dimension of the control and substract 2 times the space for the title
             float min = Math.Min(Width, Height);
             min /= 2;
-            min -= Title.Length > 0 ? 2 * RectTitle.Height : 0;
+            if (!string.IsNullOrEmpty(Title))
+                min -= 2 * RectTitle.Height;
             
+            //RectData = new RectangleF(Center.X - min, Center.Y - min, 2 * min, 2 * min);
             RectData = new RectangleF(Center.X, Center.Y, 0, 0);
-            RectData.Inflate(min, min);
+            RectData = RectangleF.Inflate(RectData, min, min);
         }
     }
 }
