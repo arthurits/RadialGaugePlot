@@ -28,7 +28,11 @@ namespace RadialGaugePlot
 
         public Legend Legend { get; protected set; }
 
-        
+        /// <summary>
+        /// The palette defines the default colors given to the plot
+        /// </summary>
+        public virtual plot.Colorsets.Palette Palette { get; set; }
+
 
         public Plot()
         {

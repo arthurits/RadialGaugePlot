@@ -35,6 +35,7 @@ namespace TestControl
             numDim.Value = (decimal)plot1.DimPercentage;
             numRange.Value = (decimal)plot1.AngleRange;
 
+            plot1.Palette = plot.Colorsets.Palette.OneHalf;
             plot1.Title = "Example title";
             plot1.GaugeLabels = new string[] { "alpha", "beta", "gamma", "delta", "epsilon" };
             plot1.Legend.IsVisible = true;

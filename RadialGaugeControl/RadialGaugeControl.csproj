@@ -8,6 +8,11 @@
     <Authors>Arthurits</Authors>
     <Company>Arthurits Ltd.</Company>
     <Product>RadialGauge plot</Product>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="NuGet\Readme.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
+  
 </Project>

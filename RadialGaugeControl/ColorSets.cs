@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RadialGaugePlot.Colorsets
+namespace plot.Colorsets
 {
     /// <summary>
     /// A color set is a collection of colors, like a color palette.
@@ -46,10 +46,52 @@ namespace RadialGaugePlot.Colorsets
         public abstract string[] hexColors { get; }
     }
 
+    public class Palette
+    {
+        // Matplotlib/D3/Vega/Tableau
+        public static Palette Category10 => new Palette(new Colorsets.Category10());
+        public static Palette Category20 => new Palette(new Colorsets.Category20());
+
+        // Nord
+        public static Palette Aurora => new Palette(new Colorsets.Aurora());
+        public static Palette Frost => new Palette(new Colorsets.Frost());
+        public static Palette Nord => new Palette(new Colorsets.Nord());
+        public static Palette PolarNight => new Palette(new Colorsets.PolarNight());
+        public static Palette SnowStorm => new Palette(new Colorsets.Snowstorm());
+
+        // Misc
+        public static Palette OneHalfDark => new Palette(new Colorsets.OneHalfDark());
+        public static Palette OneHalf => new Palette(new Colorsets.OneHalf());
+
+        private readonly IColorset cset;
+        public readonly string Name;
+        public Palette(IColorset colorset)
+        {
+            cset = colorset ?? new Colorsets.Category10();
+            Name = cset.GetType().Name;
+        }
+
+        public int GetInt32(int index)
+        {
+            var (r, g, b) = cset.GetRGB(index);
+            return 255 << 24 | r << 16 | g << 8 | b;
+        }
+
+        public Color GetColor(int index)
+        {
+            return Color.FromArgb(GetInt32(index));
+        }
+
+        public int Count()
+        {
+            return cset.Count();
+        }
+    }
+
     /// <summary>
     /// Sourced from Nord: https://github.com/arcticicestudio/nord https://www.nordtheme.com/docs/colors-and-palettes
     /// </summary>
-    public class Aurora : HexColorset
+    internal class Aurora : HexColorset
     {
         public override string[] hexColors => new string[]
         {
@@ -62,7 +104,7 @@ namespace RadialGaugePlot.Colorsets
     /// Vega obtained permission to release this color set under a BSD license: https://github.com/d3/d3-scale-chromatic/pull/16
     /// Vega placed these color values here under a BSD (3-clause) license: https://github.com/vega/vega/blob/af5cc1df42eb5aaf2f478d0bda69313643fe0532/docs/releases/v1.2.1/vega.js#L170-L205
     /// </summary>
-    public class Category10 : HexColorset
+    internal class Category10 : HexColorset
     {
         public override string[] hexColors => new string[]
         {
@@ -76,7 +118,7 @@ namespace RadialGaugePlot.Colorsets
     /// Vega obtained permission to release this color set under a BSD license: https://github.com/d3/d3-scale-chromatic/pull/16
     /// Vega placed these color values here under a BSD (3-clause) license: https://github.com/vega/vega/blob/af5cc1df42eb5aaf2f478d0bda69313643fe0532/docs/releases/v1.2.1/vega.js#L170-L205
     /// </summary>
-    public class Category20 : HexColorset
+    internal class Category20 : HexColorset
     {
         public override string[] hexColors => new string[]
         {
@@ -109,7 +151,7 @@ namespace RadialGaugePlot.Colorsets
     /// <summary>
     /// Sourced from Nord: https://github.com/arcticicestudio/nord https://www.nordtheme.com/docs/colors-and-palettes
     /// </summary>
-    public class Frost : HexColorset
+    internal class Frost : HexColorset
     {
         public override string[] hexColors => new string[]
         {
@@ -121,7 +163,7 @@ namespace RadialGaugePlot.Colorsets
     /// Sourced from the examples provided by Microcharts: https://github.com/microcharts-dotnet/Microcharts/blob/main/Sources/Microcharts.Samples/Data.cs.
     /// At the time the license file was accessed(2021-09-02) the original work was released under a MIT License, Copyright (c) 2017 Aloïs Deniel.
     /// </summary>
-    public class Microcharts : HexColorset
+    internal class Microcharts : HexColorset
     {
         public override string[] hexColors => new string[]
         {
@@ -135,7 +177,7 @@ namespace RadialGaugePlot.Colorsets
     /// Sourced from NordConEmu: https://github.com/arcticicestudio/nord-conemu.
     /// Seems to be an extended version of Aurora.
     /// </summary>
-    public class Nord : HexColorset
+    internal class Nord : HexColorset
     {
         // suggested background: #2e3440
         public override string[] hexColors => new string[]
@@ -147,7 +189,7 @@ namespace RadialGaugePlot.Colorsets
     /// <summary>
     /// Sourced from Son A. Pham's Sublime color scheme by the same name https://github.com/sonph/onehalf
     /// </summary>
-    public class OneHalf : HexColorset
+    internal class OneHalf : HexColorset
     {
         public override string[] hexColors => new string[]
         {
@@ -158,7 +200,7 @@ namespace RadialGaugePlot.Colorsets
     /// <summary>
     /// Sourced from Son A. Pham's Sublime color scheme by the same name https://github.com/sonph/onehalf
     /// </summary>
-    public class OneHalfDark : HexColorset
+    internal class OneHalfDark : HexColorset
     {
         // suggested background: #2e3440
         public override string[] hexColors => new string[]
@@ -170,7 +212,7 @@ namespace RadialGaugePlot.Colorsets
     /// <summary>
     /// Sourced from Nord: https://github.com/arcticicestudio/nord https://www.nordtheme.com/docs/colors-and-palettes
     /// </summary>
-    public class PolarNight : HexColorset
+    internal class PolarNight : HexColorset
     {
         public override string[] hexColors => new string[]
         {
@@ -181,7 +223,7 @@ namespace RadialGaugePlot.Colorsets
     /// <summary>
     /// Sourced from Nord: https://github.com/arcticicestudio/nord https://www.nordtheme.com/docs/colors-and-palettes
     /// </summary>
-    public class Snowstorm : HexColorset
+    internal class Snowstorm : HexColorset
     {
         public override string[] hexColors => new string[]
         {
