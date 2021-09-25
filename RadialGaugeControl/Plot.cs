@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
-
+// https://devblogs.microsoft.com/nuget/add-a-readme-to-your-nuget-package/
 namespace RadialGaugePlot
 {
     public partial class Plot : UserControl
