@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+
 // https://devblogs.microsoft.com/nuget/add-a-readme-to-your-nuget-package/
 namespace RadialGaugePlot
 {
@@ -9,6 +10,10 @@ namespace RadialGaugePlot
         public RectangleF RectTitle { get; set; }
         public RectangleF RectData { get; set; }
         public PointF Center { get; set; }
+
+        public virtual double[] DataRaw { get; set; }
+
+        public Color[] Colors { get; set; }
 
         public virtual string Title
         {
@@ -31,7 +36,9 @@ namespace RadialGaugePlot
         /// <summary>
         /// The palette defines the default colors given to the plot
         /// </summary>
-        public virtual plot.Colorsets.Palette Palette { get; set; }
+        public virtual Plotting.Colorsets.Palette Palette { get; set; }
+
+
 
 
         public Plot()
@@ -74,6 +81,14 @@ namespace RadialGaugePlot
         /// <param name="lowQuality">Quality of the rendering</param>
         public void Render(bool lowQuality = false)
         {
+            //// First compute the elements dimensions
+            //ComputeRects();
+
+            //// Then compute the colors
+            //Colors = System.Linq.Enumerable.Range(0, DataRaw.Length)
+            //                           .Select(i => Palette.GetColor(i))
+            //                           .ToArray();
+
             // First call the virtual Render() function (which can be overriden by a derived class)
             Bitmap bmp = new((int)Width, (int)Height);
             Render(bmp, lowQuality);

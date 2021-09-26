@@ -8,42 +8,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace plot.Colorsets
+namespace Plotting.Colorsets
 {
     /// <summary>
-    /// A color set is a collection of colors, like a color palette.
+    /// A color set is a collection of colors, like a color palette. Colors are stored as web-formatted colors (e.g., '#FFAA66') in a string array.
     /// System.Drawing.Color is intentionally avoided here to simplify porting to other rendering systems down the road.
     /// </summary>
     public interface IColorset
     {
-        (byte r, byte g, byte b) GetRGB(int index);
-        int Count();
-    }
-
-    /// <summary>
-    /// Hex colorsets store web-formatted colors (e.g., '#FFAA66') in a string array.
-    /// </summary>
-    public abstract class HexColorset : IColorset
-    {
-        public (byte r, byte g, byte b) GetRGB(int index)
-        {
-            index %= hexColors.Length;
-
-            string hexColor = hexColors[index];
-            if (!hexColor.StartsWith("#"))
-                hexColor = "#" + hexColor;
-
-            if (hexColor.Length != 7)
-                throw new InvalidOperationException("Invalid hex color string");
-
-            Color color = ColorTranslator.FromHtml(hexColor);
-
-            return (color.R, color.G, color.B);
-        }
-
-        public int Count() => hexColors.Length;
-
-        public abstract string[] hexColors { get; }
+        public string[] hexColors { get; }
     }
 
     public class Palette
@@ -63,18 +36,34 @@ namespace plot.Colorsets
         public static Palette OneHalfDark => new Palette(new Colorsets.OneHalfDark());
         public static Palette OneHalf => new Palette(new Colorsets.OneHalf());
 
-        private readonly IColorset cset;
+        private readonly IColorset ColorSet;
         public readonly string Name;
         public Palette(IColorset colorset)
         {
-            cset = colorset ?? new Colorsets.Category10();
-            Name = cset.GetType().Name;
+            ColorSet = colorset ?? new Colorsets.Category10();
+            Name = ColorSet.GetType().Name;
         }
 
         public int GetInt32(int index)
         {
-            var (r, g, b) = cset.GetRGB(index);
+            var (r, g, b) = GetRGB(index);
             return 255 << 24 | r << 16 | g << 8 | b;
+        }
+
+        public (byte r, byte g, byte b) GetRGB(int index)
+        {
+            index %= ColorSet.hexColors.Length;
+
+            string hexColor = ColorSet.hexColors[index];
+            if (!hexColor.StartsWith("#"))
+                hexColor = "#" + hexColor;
+
+            if (hexColor.Length != 7)
+                throw new InvalidOperationException("Invalid hex color string");
+
+            Color color = ColorTranslator.FromHtml(hexColor);
+
+            return (color.R, color.G, color.B);
         }
 
         public Color GetColor(int index)
@@ -84,16 +73,16 @@ namespace plot.Colorsets
 
         public int Count()
         {
-            return cset.Count();
+            return ColorSet.hexColors.Count();
         }
     }
 
     /// <summary>
     /// Sourced from Nord: https://github.com/arcticicestudio/nord https://www.nordtheme.com/docs/colors-and-palettes
     /// </summary>
-    internal class Aurora : HexColorset
+    internal class Aurora : IColorset
     {
-        public override string[] hexColors => new string[]
+        public string[] hexColors => new string[]
         {
             "#BF616A", "#D08770", "#EBCB8B", "#A3BE8C", "#B48EAD",
         };
@@ -104,9 +93,9 @@ namespace plot.Colorsets
     /// Vega obtained permission to release this color set under a BSD license: https://github.com/d3/d3-scale-chromatic/pull/16
     /// Vega placed these color values here under a BSD (3-clause) license: https://github.com/vega/vega/blob/af5cc1df42eb5aaf2f478d0bda69313643fe0532/docs/releases/v1.2.1/vega.js#L170-L205
     /// </summary>
-    internal class Category10 : HexColorset
+    internal class Category10 : IColorset
     {
-        public override string[] hexColors => new string[]
+        public string[] hexColors => new string[]
         {
             "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd",
             "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf",
@@ -118,9 +107,9 @@ namespace plot.Colorsets
     /// Vega obtained permission to release this color set under a BSD license: https://github.com/d3/d3-scale-chromatic/pull/16
     /// Vega placed these color values here under a BSD (3-clause) license: https://github.com/vega/vega/blob/af5cc1df42eb5aaf2f478d0bda69313643fe0532/docs/releases/v1.2.1/vega.js#L170-L205
     /// </summary>
-    internal class Category20 : HexColorset
+    internal class Category20 : IColorset
     {
-        public override string[] hexColors => new string[]
+        public string[] hexColors => new string[]
         {
             "#1f77b4", "#aec7e8", "#ff7f0e", "#ffbb78", "#2ca02c",
             "#98df8a", "#d62728", "#ff9896", "#9467bd", "#c5b0d5",
@@ -132,9 +121,9 @@ namespace plot.Colorsets
     /// <summary>
     /// Define a custom colorset
     /// </summary>
-    public class Custom : HexColorset
+    public class Custom : IColorset
     {
-        public override string[] hexColors { get; }
+        public string[] hexColors { get; }
 
         public Custom(string[] htmlColors)
         {
@@ -151,9 +140,9 @@ namespace plot.Colorsets
     /// <summary>
     /// Sourced from Nord: https://github.com/arcticicestudio/nord https://www.nordtheme.com/docs/colors-and-palettes
     /// </summary>
-    internal class Frost : HexColorset
+    internal class Frost : IColorset
     {
-        public override string[] hexColors => new string[]
+        public string[] hexColors => new string[]
         {
             "#8FBCBB", "#88C0D0", "#81A1C1", "#5E81AC",
         };
@@ -163,9 +152,9 @@ namespace plot.Colorsets
     /// Sourced from the examples provided by Microcharts: https://github.com/microcharts-dotnet/Microcharts/blob/main/Sources/Microcharts.Samples/Data.cs.
     /// At the time the license file was accessed(2021-09-02) the original work was released under a MIT License, Copyright (c) 2017 Aloïs Deniel.
     /// </summary>
-    internal class Microcharts : HexColorset
+    internal class Microcharts : IColorset
     {
-        public override string[] hexColors => new string[]
+        public string[] hexColors => new string[]
         {
             "#266489", "#68B9C0", "#90D585", "#F3C151", "#F37F64",
             "#424856", "#8F97A4", "#DAC096", "#76846E", "#DABFAF",
@@ -177,10 +166,10 @@ namespace plot.Colorsets
     /// Sourced from NordConEmu: https://github.com/arcticicestudio/nord-conemu.
     /// Seems to be an extended version of Aurora.
     /// </summary>
-    internal class Nord : HexColorset
+    internal class Nord : IColorset
     {
         // suggested background: #2e3440
-        public override string[] hexColors => new string[]
+        public string[] hexColors => new string[]
         {
             "#bf616a", "#a3be8c", "#ebcb8b", "#81a1c1", "#b48ead", "#88c0d0", "#e5e9f0",
         };
@@ -189,9 +178,9 @@ namespace plot.Colorsets
     /// <summary>
     /// Sourced from Son A. Pham's Sublime color scheme by the same name https://github.com/sonph/onehalf
     /// </summary>
-    internal class OneHalf : HexColorset
+    internal class OneHalf : IColorset
     {
-        public override string[] hexColors => new string[]
+        public string[] hexColors => new string[]
         {
             "#383a42", "#e4564a", "#50a14f", "#c18402", "#0084bc", "#a626a4", "#0897b3"
         };
@@ -200,10 +189,10 @@ namespace plot.Colorsets
     /// <summary>
     /// Sourced from Son A. Pham's Sublime color scheme by the same name https://github.com/sonph/onehalf
     /// </summary>
-    internal class OneHalfDark : HexColorset
+    internal class OneHalfDark : IColorset
     {
         // suggested background: #2e3440
-        public override string[] hexColors => new string[]
+        public string[] hexColors => new string[]
         {
             "#e06c75", "#98c379", "#e5c07b", "#61aff0", "#c678dd", "#56b6c2", "#dcdfe4"
         };
@@ -212,9 +201,9 @@ namespace plot.Colorsets
     /// <summary>
     /// Sourced from Nord: https://github.com/arcticicestudio/nord https://www.nordtheme.com/docs/colors-and-palettes
     /// </summary>
-    internal class PolarNight : HexColorset
+    internal class PolarNight : IColorset
     {
-        public override string[] hexColors => new string[]
+        public string[] hexColors => new string[]
         {
             "#2E3440", "#3B4252", "#434C5E", "#4C566A",
         };
@@ -223,9 +212,9 @@ namespace plot.Colorsets
     /// <summary>
     /// Sourced from Nord: https://github.com/arcticicestudio/nord https://www.nordtheme.com/docs/colors-and-palettes
     /// </summary>
-    internal class Snowstorm : HexColorset
+    internal class Snowstorm : IColorset
     {
-        public override string[] hexColors => new string[]
+        public string[] hexColors => new string[]
         {
             "#D8DEE9", "#E5E9F0", "#ECEFF4"
         };
