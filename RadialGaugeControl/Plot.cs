@@ -84,10 +84,17 @@ namespace RadialGaugePlot
             //// First compute the elements dimensions
             //ComputeRects();
 
-            //// Then compute the colors
+            // Then compute the colors
             //Colors = System.Linq.Enumerable.Range(0, DataRaw.Length)
             //                           .Select(i => Palette.GetColor(i))
             //                           .ToArray();
+
+            Colors = System.Linq.Enumerable.ToArray(
+                        System.Linq.Enumerable.Select(
+                            System.Linq.Enumerable.Range(0, DataRaw.Length),
+                            i => Palette.GetColor(i)
+                            )
+                        );
 
             // First call the virtual Render() function (which can be overriden by a derived class)
             Bitmap bmp = new((int)Width, (int)Height);
