@@ -39,11 +39,20 @@ namespace Plotting.Colorsets
 
         private readonly IColorset ColorSet;
         public readonly string Name;
+        
         public Palette(IColorset colorset)
         {
             ColorSet = colorset ?? new Colorsets.Category10();
             Name = ColorSet.GetType().Name;
         }
+
+        public Palette(string[] htmlColors, string name = "Custom")
+        {
+            ColorSet = new Colorsets.Custom(htmlColors);
+            Name = name;
+        }
+
+        public override string ToString() => $"{Name} palette ({Count()} colors)";
 
         public int GetInt32(int index)
         {
@@ -72,13 +81,29 @@ namespace Plotting.Colorsets
             return Color.FromArgb(GetInt32(index));
         }
 
-        public Color[] GetColors(int number)
+        public Color GetColor(int index, double alpha = 1)
         {
-            Color[] colors = new Color[number];
-            for (int i = 0; i < number; i++)
+            return Color.FromArgb(alpha: (int)(alpha * 255), baseColor: GetColor(index));
+        }
+
+        /// <summary>
+        /// Gets an array of Colors from the palette.
+        /// </summary>
+        /// <param name="count">Number of colors.</param>
+        /// <param name="offset">Starting color index of the palette.</param>
+        /// <param name="alpha">Value for the alpha channel of the returned colors.</param>
+        /// <returns></returns>
+        public Color[] GetColors(int count, int offset = 0, double alpha = 1)
+        {
+            Color[] colors = new Color[count];
+            for (int i = offset; i < count + offset; i++)
             {
-                colors[i] = GetColor(i);
+                colors[i] = GetColor(i, alpha);
             }
+
+            //return Enumerable.Range(offset, count)
+            //    .Select(x => GetColor(x, alpha))
+            //    .ToArray();
 
             return colors;
         }
@@ -131,9 +156,9 @@ namespace Plotting.Colorsets
     }
 
     /// <summary>
-    /// Define a custom colorset
+    /// Used to define a custom colorset when creating a palette.
     /// </summary>
-    public class Custom : IColorset
+    internal class Custom : IColorset
     {
         public string[] hexColors { get; }
 
