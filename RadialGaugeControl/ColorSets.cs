@@ -52,7 +52,7 @@ namespace Plotting.Colorsets
             Name = name;
         }
 
-        public override string ToString() => $"{Name} palette ({Count()} colors)";
+        public override string ToString() => $"{Name} palette with {Count()} colors.";
 
         public int GetInt32(int index)
         {
@@ -87,12 +87,12 @@ namespace Plotting.Colorsets
         }
 
         /// <summary>
-        /// Gets an array of Colors from the palette.
+        /// Gets an array of <see cref="Color">Colors</see> by cycling through the defined <see cref="Palette"/>.
         /// </summary>
         /// <param name="count">Number of colors.</param>
-        /// <param name="offset">Starting color index of the palette.</param>
+        /// <param name="offset">Starting index to cycle through the palette.</param>
         /// <param name="alpha">Value for the alpha channel of the returned colors.</param>
-        /// <returns></returns>
+        /// <returns>Array of colors</returns>
         public Color[] GetColors(int count, int offset = 0, double alpha = 1)
         {
             Color[] colors = new Color[count];
@@ -104,7 +104,7 @@ namespace Plotting.Colorsets
             //return Enumerable.Range(offset, count)
             //    .Select(x => GetColor(x, alpha))
             //    .ToArray();
-
+            
             return colors;
         }
 

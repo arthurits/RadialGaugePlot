@@ -313,8 +313,7 @@ namespace RadialGaugePlot
             ComputeAngularData();
         }
 
-        public override string ToString() =>
-            $"RadialGauge with {Data.Length} points.";
+        public override string ToString() => $"RadialGauge with {Data.Length} points.";
 
         /// <summary>
         /// Replace the data values with new ones. This passed data is copied and stored in <see cref="Data"/>.
