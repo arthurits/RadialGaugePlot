@@ -60,10 +60,12 @@ namespace RadialGaugePlot
         /// Data to be plotted.
         /// It's copied from of the data passed to either the constructor or the <see cref="Update(double[], bool)"/> method.
         /// </summary>
-        protected double[] DataRaw;
+        [System.ComponentModel.Category("Radial gauge"),
+        System.ComponentModel.Description("Data to be plotted.")]
+        public override double[] Data { get; set; }
 
         /// <summary>
-        /// Angular data (rows: gauges; first column: initial angle; second column: swept angle) computed from <see cref="DataRaw"/>
+        /// Angular data (rows: gauges; first column: initial angle; second column: swept angle) computed from <see cref="Data"/>
         /// </summary>
         protected double[,] DataAngular;
 
@@ -84,7 +86,7 @@ namespace RadialGaugePlot
         /// Colors for each gauge. These colors are dimmed according to <see cref="DimPercentage"/> to draw the gauges' background.
         /// Length must be equal to the length of data passed to either the constructor or the <see cref="Update(double[], bool)"/> method.
         /// </summary>
-        public Color[] GaugeColors;
+        public override Color[] Colors { get; set; }
 
         /// <summary>
         /// Determines whether the gauges are drawn clockwise (default value) or anti-clockwise (counter clockwise).
@@ -286,22 +288,6 @@ namespace RadialGaugePlot
         public RadialGaugePlot()
         {
             double[] values = { 100, 80, 65, 45, -20 };
-            Color[] colors = new Color[]
-            {
-                ColorTranslator.FromHtml("#266489"),
-                ColorTranslator.FromHtml("#68B9C0"),
-                ColorTranslator.FromHtml("#90D585"),
-                ColorTranslator.FromHtml("#F3C151"),
-                ColorTranslator.FromHtml("#F37F64"),
-                ColorTranslator.FromHtml("#424856"),
-                ColorTranslator.FromHtml("#8F97A4"),
-                ColorTranslator.FromHtml("#DAC096"),
-                ColorTranslator.FromHtml("#76846E"),
-                ColorTranslator.FromHtml("#DABFAF"),
-                ColorTranslator.FromHtml("#A65B69"),
-                ColorTranslator.FromHtml("#97A69D")
-            };
-            GaugeColors = colors;
             Update(values);
             ComputeAngularData();
         }
@@ -321,24 +307,24 @@ namespace RadialGaugePlot
             }
 
             if (lineColors != null && lineColors.Length > 0)
-                GaugeColors = lineColors;
+                Colors = lineColors;
 
             Update(values);
             ComputeAngularData();
         }
 
         public override string ToString() =>
-            $"RadialGauge with {DataRaw.Length} points.";
+            $"RadialGauge with {Data.Length} points.";
 
         /// <summary>
-        /// Replace the data values with new ones. This passed data is copied and stored in <see cref="DataRaw"/>.
+        /// Replace the data values with new ones. This passed data is copied and stored in <see cref="Data"/>.
         /// Implicitly calls the <see cref="ComputeAngularData"/> routine
         /// </summary>
         /// <param name="values">Array of values to be plotted as gauges.</param>
         public void Update(double[] values)
         {
-            DataRaw = new double[values.Length];
-            Array.Copy(values, 0, DataRaw, 0, values.Length);
+            Data = new double[values.Length];
+            Array.Copy(values, 0, Data, 0, values.Length);
 
             // Sets MaxScale and MinScale values and calls ComputeAngularData
             ComputeMaxMin();
@@ -356,7 +342,7 @@ namespace RadialGaugePlot
                 var item = new LegendItem()
                 {
                     label = GaugeLabels[i],
-                    color = GaugeColors[i],
+                    color = Colors[i],
                     lineWidth = 10,
                     markerShape = MarkerShape.none
                 };
@@ -370,7 +356,7 @@ namespace RadialGaugePlot
         /// In case the original data should be needed from a caller
         /// </summary>
         /// <returns>The original data</returns>
-        public double[] GetData() => DataRaw;
+        public double[] GetData() => Data;
         
         /// <summary>
         /// In case the angular data should be needed from a caller
@@ -379,14 +365,14 @@ namespace RadialGaugePlot
         public double[,] GetAngularData() => DataAngular;
 
         /// <summary>
-        /// Converts <see cref="DataRaw"/> into <see cref="DataAngular"/>.
-        /// Depends on <see cref="DataRaw"/>, <see cref="GaugeMode"/>, <see cref="GaugeDirection"/>, <see cref="StartingAngleGauges"/>, <see cref="AngleRange"/>, and <see cref="MaxScale"/>
+        /// Converts <see cref="Data"/> into <see cref="DataAngular"/>.
+        /// Depends on <see cref="Data"/>, <see cref="GaugeMode"/>, <see cref="GaugeDirection"/>, <see cref="StartingAngleGauges"/>, <see cref="AngleRange"/>, and <see cref="MaxScale"/>
         /// </summary>
         private void ComputeAngularData()
         {
             // Check if there's data
-            if (DataRaw == null) return;
-            DataAngular = new double[DataRaw.Length, 2];
+            if (Data == null) return;
+            DataAngular = new double[Data.Length, 2];
 
             // Internal variables
             float AngleSumPos = _StartingAngleGauges;
@@ -395,15 +381,15 @@ namespace RadialGaugePlot
             float AngleInit;
             
             // Loop through DataRaw and compute DataAngular
-            for (int i = 0; i < DataRaw.Length; i++)
+            for (int i = 0; i < Data.Length; i++)
             {
-                AngleInit = (DataRaw[i] >= 0 ? AngleSumPos : AngleSumNeg);
-                AngleSwept = (_GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * (float)(_AngleRange * DataRaw[i] / (_MaxScale - _MinScale));
+                AngleInit = (Data[i] >= 0 ? AngleSumPos : AngleSumNeg);
+                AngleSwept = (_GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * (float)(_AngleRange * Data[i] / (_MaxScale - _MinScale));
 
                 DataAngular[i, 0] = (_GaugeMode == RadialGaugeMode.Stacked ? _StartingAngleGauges : AngleInit);
                 DataAngular[i, 1] = AngleSwept;
 
-                if (DataRaw[i] >= 0)
+                if (Data[i] >= 0)
                     AngleSumPos += AngleSwept;
                 else
                     AngleSumNeg += AngleSwept;
@@ -421,13 +407,13 @@ namespace RadialGaugePlot
         {
             if (GaugeMode == RadialGaugeMode.Sequential || GaugeMode == RadialGaugeMode.SingleGauge)
             {
-                _MaxScale = DataRaw.Sum(x => Math.Abs(x));
+                _MaxScale = Data.Sum(x => Math.Abs(x));
                 _MinScale = 0;
             }
             else
             {
-                _MaxScale = DataRaw.Max(x => Math.Abs(x));
-                var min = DataRaw.Min();
+                _MaxScale = Data.Max(x => Math.Abs(x));
+                var min = Data.Min();
                 _MinScale = min < 0 ? min : 0;
             }
         }
@@ -438,7 +424,7 @@ namespace RadialGaugePlot
         /// <param name="deep"></param>
         public void ValidateData(bool deep = false)
         {
-            if (GaugeLabels != null && GaugeLabels.Length != DataRaw.Length)
+            if (GaugeLabels != null && GaugeLabels.Length != Data.Length)
                 throw new InvalidOperationException("Gauge labels must match size of data values");
         }
 
@@ -466,7 +452,7 @@ namespace RadialGaugePlot
         /// <param name="lowQuality">Image quality</param>
         public override void Render(Bitmap bmp, bool lowQuality = false)
         {
-            int numGroups = DataRaw.Length;
+            int numGroups = Data.Length;
             double minScale = Math.Min(base.RectData.Width, base.RectData.Height) / 2;
             //if (minScale == 0)
             //    return;
@@ -508,8 +494,8 @@ namespace RadialGaugePlot
                 }
 
                 // Set color values
-                pen.Color = GaugeColors[index];
-                penCircle.Color = LightenBy(GaugeColors[index], DimPercentage);
+                pen.Color = Colors[index];
+                penCircle.Color = LightenBy(Colors[index], DimPercentage);
 
                 // Draw gauge background
                 if (GaugeMode != RadialGaugeMode.SingleGauge)
@@ -530,7 +516,7 @@ namespace RadialGaugePlot
                         (float)DataAngular[index, 1],
                         base.Center.X,
                         base.Center.Y,
-                        DataRaw[index].ToString("0.##"),
+                        Data[index].ToString("0.##"),
                         _GaugeLabelPos);
                 }
 

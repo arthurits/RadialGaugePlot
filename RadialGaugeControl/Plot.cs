@@ -7,14 +7,37 @@ namespace RadialGaugePlot
 {
     public partial class Plot : UserControl
     {
+        [System.ComponentModel.Category("Plot"),
+        System.ComponentModel.Description("Rectangle of the plot title")]
         public RectangleF RectTitle { get; set; }
+
+        [System.ComponentModel.Category("Plot"),
+        System.ComponentModel.Description("Rectangle of the plot graph")]
         public RectangleF RectData { get; set; }
+
+        [System.ComponentModel.Category("Plot"),
+        System.ComponentModel.Description("Center coordinates of the control")]
         public PointF Center { get; set; }
 
-        public virtual double[] DataRaw { get; set; }
+        /// <summary>
+        /// Data to be plotted.
+        /// </summary>
+        [System.ComponentModel.Category("Plot"),
+        System.ComponentModel.Description("Data to be plotted")]
+        public virtual double[] Data { get; set; }
 
-        public Color[] Colors { get; set; }
+        /// <summary>
+        /// Colors for series.
+        /// </summary>
+        [System.ComponentModel.Category("Plot"),
+        System.ComponentModel.Description("Series colors")]
+        public virtual Color[] Colors { get; set; }
 
+        /// <summary>
+        /// Plot title. Leave empty if no title...
+        /// </summary>
+        [System.ComponentModel.Category("Plot"),
+        System.ComponentModel.Description("Title of the plot")]
         public virtual string Title
         {
             get => _strTitle;
@@ -29,14 +52,20 @@ namespace RadialGaugePlot
         }
         private string _strTitle;
 
+        [System.ComponentModel.Category("Plot"),
+        System.ComponentModel.Description("Plot legend labels.")]
         public string[] LegendLabels { get; protected set; }
 
+        [System.ComponentModel.Category("Plot"),
+        System.ComponentModel.Description("Plot legend.")]
         public Legend Legend { get; protected set; }
 
         /// <summary>
         /// The palette defines the default colors given to the plot
         /// </summary>
-        public virtual Plotting.Colorsets.Palette Palette { get; set; }
+        [System.ComponentModel.Category("Plot"),
+        System.ComponentModel.Description("Plot colorset defining the colors to be used each time the plot is rendered.")]
+        public virtual Plotting.Colorsets.Palette Palette { get; set; } = Plotting.Colorsets.Palette.Microcharts;
 
 
 
@@ -89,12 +118,14 @@ namespace RadialGaugePlot
             //                           .Select(i => Palette.GetColor(i))
             //                           .ToArray();
 
-            Colors = System.Linq.Enumerable.ToArray(
-                        System.Linq.Enumerable.Select(
-                            System.Linq.Enumerable.Range(0, DataRaw.Length),
-                            i => Palette.GetColor(i)
-                            )
-                        );
+            //Colors = System.Linq.Enumerable.ToArray(
+            //            System.Linq.Enumerable.Select(
+            //                System.Linq.Enumerable.Range(0, DataRaw.Length),
+            //                i => Palette.GetColor(i)
+            //                )
+            //            );
+
+            Colors = Palette.GetColors(Data.Length);
 
             // First call the virtual Render() function (which can be overriden by a derived class)
             Bitmap bmp = new((int)Width, (int)Height);

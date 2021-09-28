@@ -33,6 +33,7 @@ namespace Plotting.Colorsets
         public static Palette SnowStorm => new Palette(new Colorsets.Snowstorm());
 
         // Misc
+        public static Palette Microcharts => new Palette(new Colorsets.Microcharts());
         public static Palette OneHalfDark => new Palette(new Colorsets.OneHalfDark());
         public static Palette OneHalf => new Palette(new Colorsets.OneHalf());
 
@@ -69,6 +70,17 @@ namespace Plotting.Colorsets
         public Color GetColor(int index)
         {
             return Color.FromArgb(GetInt32(index));
+        }
+
+        public Color[] GetColors(int number)
+        {
+            Color[] colors = new Color[number];
+            for (int i = 0; i < number; i++)
+            {
+                colors[i] = GetColor(i);
+            }
+
+            return colors;
         }
 
         public int Count()
