@@ -84,10 +84,6 @@ namespace RadialGaugePlot
 
         private void OnSizeChanged(object sender, EventArgs e)
         {
-            // Compute dimensions before any drawing takes place
-            Center = new(Width / 2, Height / 2);
-            ComputeRects();
-
             // Create the bitmap and make the corresponding drawing into it
             Render();
         }
@@ -110,22 +106,12 @@ namespace RadialGaugePlot
         /// <param name="lowQuality">Quality of the rendering</param>
         public void Render(bool lowQuality = false)
         {
-            //// First compute the elements dimensions
-            //ComputeRects();
-
-            // Then compute the colors
-            //Colors = System.Linq.Enumerable.Range(0, DataRaw.Length)
-            //                           .Select(i => Palette.GetColor(i))
-            //                           .ToArray();
-
-            //Colors = System.Linq.Enumerable.ToArray(
-            //            System.Linq.Enumerable.Select(
-            //                System.Linq.Enumerable.Range(0, DataRaw.Length),
-            //                i => Palette.GetColor(i)
-            //                )
-            //            );
-
+            // Get the needed colors from the defined palette
             Colors = Palette.GetColors(Data.Length);
+
+            // Compute dimensions before any drawing takes place
+            //Center = new(Width / 2, Height / 2);
+            ComputeRects();
 
             // First call the virtual Render() function (which can be overriden by a derived class)
             Bitmap bmp = new((int)Width, (int)Height);
@@ -139,7 +125,7 @@ namespace RadialGaugePlot
             }
 
             // Draw the legend onto the bitmap
-            var legendItems = GetLegendItems();
+            LegendItem[] legendItems = GetLegendItems();
             if (legendItems != null && legendItems.Length > 0)
             {
                 Legend.LegendItems = legendItems;
@@ -194,15 +180,41 @@ namespace RadialGaugePlot
         /// </summary>
         protected virtual void ComputeRects()
         {
+            // Compute the center point of the control
+            Center = new(Width / 2, Height / 2);
+
             // Compute the Title rect
-            using Bitmap bmp = new (1, 1);
-            using Graphics gfx = System.Drawing.Graphics.FromImage(bmp);
+            //using Bitmap bmp = new (1, 1);
+            //using Graphics gfx = System.Drawing.Graphics.FromImage(bmp);
+            using Graphics gfx = this.pictureBox1.CreateGraphics();
 
             SizeF sizeText = new (0, 0);
             if (!string.IsNullOrEmpty(Title))
+            {
                 sizeText = gfx.MeasureString(Title, Font);
+                FontScaling(sizeText, Font.SizeInPoints);
+            }
 
-            // compensate for OS-specific differences in font scaling
+            RectTitle = new RectangleF(new PointF((Width - sizeText.Width) / 2, sizeText.Height * 0.5f), sizeText);
+
+            // Compute the minimum dimension of the control and substract 2 times the space for the title
+            float min = Math.Min(Width, Height);
+            min /= 2;
+            //if (!string.IsNullOrEmpty(Title))
+            //    min -= 2 * RectTitle.Height;
+
+            //RectData = new RectangleF(Center.X - min, Center.Y - min, 2 * min, 2 * min);
+            RectData = new RectangleF(Center.X, Center.Y+ RectTitle.Height/2, 0, 0);
+            RectData = RectangleF.Inflate(RectData, min * 0.95f, min * 0.95f - RectTitle.Height);
+            //RectData = RectangleF.Inflate(RectData, min, min);
+        }
+
+        /// <summary>
+        /// Compensate for OS-specific differences in font scaling.
+        /// </summary>
+        /// <param name="sizeText"><see cref="Size"/> struct containing the text.</param>
+        protected virtual void FontScaling(SizeF sizeText, float fontSize = 0)
+        {
             if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux))
             {
                 sizeText.Width *= 1;
@@ -214,20 +226,8 @@ namespace RadialGaugePlot
                 sizeText.Height *= 27.16f / 20;
             }
 
-            // ensure the measured height is at least the font size
-            sizeText.Height = Math.Max(Font.Size, sizeText.Height);
-
-            RectTitle = new RectangleF(new PointF((Width - sizeText.Width) / 2, sizeText.Height * 0.5f), sizeText);
-
-            // Compute the minimum dimension of the control and substract 2 times the space for the title
-            float min = Math.Min(Width, Height);
-            min /= 2;
-            if (!string.IsNullOrEmpty(Title))
-                min -= 2 * RectTitle.Height;
-            
-            //RectData = new RectangleF(Center.X - min, Center.Y - min, 2 * min, 2 * min);
-            RectData = new RectangleF(Center.X, Center.Y, 0, 0);
-            RectData = RectangleF.Inflate(RectData, min, min);
+            // Ensure the measured height is at least the font size
+            sizeText.Height = Math.Max(fontSize, sizeText.Height);
         }
     }
 }

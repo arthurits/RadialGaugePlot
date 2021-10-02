@@ -453,8 +453,6 @@ namespace RadialGaugePlot
         {
             int numGroups = Data.Length;
             double minScale = Math.Min(base.RectData.Width, base.RectData.Height) / 2;
-            //if (minScale == 0)
-            //    return;
 
             using Graphics gfx = Graphics.FromImage(bmp);   // https://github.com/ScottPlot/ScottPlot/blob/master/src/ScottPlot/Drawing/GDI.cs;
             gfx.SmoothingMode = lowQuality ? System.Drawing.Drawing2D.SmoothingMode.HighSpeed : System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
@@ -521,7 +519,7 @@ namespace RadialGaugePlot
 
             }
             //gfx.DrawRectangle(new Pen(Color.Black,2), RectData.X, RectData.Y, RectData.Width, RectData.Height);
-
+            base.Render(bmp);
 
         }
 
