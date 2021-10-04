@@ -33,9 +33,13 @@ namespace Plotting.Colorsets
         public static Palette SnowStorm => new Palette(new Colorsets.Snowstorm());
 
         // Misc
+        public static Palette ColorblindFriendly => new Palette(new Colorsets.ColorblindFriendly());
+        public static Palette Dark => new Palette(new Colorsets.Dark());
+        public static Palette DarkPastel => new Palette(new Colorsets.DarkPastel());
         public static Palette Microcharts => new Palette(new Colorsets.Microcharts());
         public static Palette OneHalfDark => new Palette(new Colorsets.OneHalfDark());
         public static Palette OneHalf => new Palette(new Colorsets.OneHalf());
+        public static Palette Tsitsulin => new Palette(new Colorsets.Tsitsulin());
 
         private readonly IColorset ColorSet;
         public readonly string Name;
@@ -156,6 +160,21 @@ namespace Plotting.Colorsets
     }
 
     /// <summary>
+    /// This color palette was sourced from the examples provided in:
+    /// Wong 2011, https://www.nature.com/articles/nmeth.1618.pdf
+    /// This 8-color palette has good overall variability and can be
+    /// differentiated by individuals with red-green color blindness.
+    /// </summary>
+    internal class ColorblindFriendly : IColorset
+    {
+        public string[] hexColors => new string[]
+        {
+            "#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442",
+            "#0072B2", "#D55E00", "#CC79A7",
+        };
+    }
+
+    /// <summary>
     /// Used to define a custom colorset when creating a palette.
     /// </summary>
     internal class Custom : IColorset
@@ -172,6 +191,34 @@ namespace Plotting.Colorsets
 
             hexColors = htmlColors;
         }
+    }
+
+    /// <summary>
+    /// This a qualitative 8-color palette generated using https://colorbrewer2.org
+    /// © Cynthia Brewer, Mark Harrower and The Pennsylvania State University
+    /// It is is both LCD and print friendly but not blind nor photocopy friendly
+    /// </summary>
+    internal class Dark : IColorset
+    {
+        public string[] hexColors => new string[]
+        {
+            "#1b9e77","#d95f02","#7570b3","#e7298a","#66a61e",
+            "#e6ab02","#a6761d","#666666",
+        };
+    }
+
+    /// <summary>
+    /// This a qualitative 8-color palette generated using https://colorbrewer2.org
+    /// © Cynthia Brewer, Mark Harrower and The Pennsylvania State University
+    /// This palette is the lighter-color version of the 'Dark' palette.
+    /// </summary>
+    internal class DarkPastel : IColorset
+    {
+        public string[] hexColors => new string[]
+        {
+            "#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854",
+            "#ffd92f", "#e5c494", "#b3b3b3",
+        };
     }
 
     /// <summary>
@@ -254,6 +301,25 @@ namespace Plotting.Colorsets
         public string[] hexColors => new string[]
         {
             "#D8DEE9", "#E5E9F0", "#ECEFF4"
+        };
+    }
+
+    /// <summary>
+    /// A 25-color palette based on Anton Tsitsulin's 12-color palette
+    /// http://tsitsul.in/blog/coloropt
+    /// https://github.com/xgfs/coloropt
+    /// </summary>
+    internal class Tsitsulin : IColorset
+    {
+        public string[] hexColors => new string[]
+        {
+            "#ebac23", "#b80058", "#008cf9", "#006e00", "#00bbad",
+            "#d163e6", "#b24502", "#ff9287", "#5954d6", "#00c6f8",
+            "#878500", "#00a76c",
+            "#f6da9c", "#ff5caa", "#8accff", "#4bff4b", "#6efff4",
+            "#edc1f5", "#feae7c", "#ffc8c3", "#bdbbef", "#bdf2ff",
+            "#fffc43", "#65ffc8",
+            "#aaaaaa",
         };
     }
 }
