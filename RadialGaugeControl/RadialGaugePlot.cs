@@ -496,10 +496,21 @@ namespace RadialGaugePlot
 
                 // Draw gauge background
                 if (GaugeMode != RadialGaugeMode.SingleGauge)
-                    gfx.DrawArc(penCircle, (base.Center.X - gaugeRadius), (base.Center.Y - gaugeRadius), (gaugeRadius * 2), (gaugeRadius * 2), _StartingAngleBackGauges, maxBackAngle);
+                    gfx.DrawArc(penCircle,
+                        (base.RectData.X + base.RectData.Width/2 - gaugeRadius),
+                        (base.RectData.Y + base.RectData.Height / 2 - gaugeRadius),
+                        (gaugeRadius * 2),
+                        (gaugeRadius * 2),
+                        _StartingAngleBackGauges, maxBackAngle);
 
                 // Draw gauge
-                gfx.DrawArc(pen, (base.Center.X - gaugeRadius), (base.Center.Y - gaugeRadius), (gaugeRadius * 2), (gaugeRadius * 2), (float)DataAngular[index, 0], (float)DataAngular[index, 1]);
+                gfx.DrawArc(pen,
+                    (base.RectData.X + base.RectData.Width / 2 - gaugeRadius),
+                    (base.RectData.Y + base.RectData.Height / 2 - gaugeRadius),
+                    (gaugeRadius * 2),
+                    (gaugeRadius * 2),
+                    (float)DataAngular[index, 0],
+                    (float)DataAngular[index, 1]);
 
                 // Draw gauge labels
                 if (ShowGaugeValues)
@@ -511,8 +522,8 @@ namespace RadialGaugePlot
                         gaugeRadius,
                         (float)DataAngular[index, 0],
                         (float)DataAngular[index, 1],
-                        base.Center.X,
-                        base.Center.Y,
+                        base.RectData.X + base.RectData.Width / 2,
+                        base.RectData.Y + base.RectData.Height / 2,
                         Data[index].ToString("0.##"),
                         _GaugeLabelPos);
                 }

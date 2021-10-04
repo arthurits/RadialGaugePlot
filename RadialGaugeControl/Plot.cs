@@ -208,8 +208,8 @@ namespace RadialGaugePlot
             //    min -= 2 * RectTitle.Height;
 
             //RectData = new RectangleF(Center.X - min, Center.Y - min, 2 * min, 2 * min);
-            RectData = new RectangleF(Center.X, Center.Y + RectTitle.Height / 2, 0, 0);
-            RectData = RectangleF.Inflate(RectData, min * (1 - MarginSpace), min * (1 - MarginSpace) - RectTitle.Height / 2);
+            RectData = new RectangleF(Center.X, Center.Y + 2 * RectTitle.Height / 2, 0, 0);
+            RectData = RectangleF.Inflate(RectData, min * (1 - MarginSpace) - RectTitle.Height/2, min * (1 - MarginSpace) - 2*RectTitle.Height/2);
             //RectData = RectangleF.Inflate(RectData, min, min);
         }
 
