@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -7,6 +7,10 @@ namespace RadialGaugePlot
 {
     public partial class Plot : UserControl
     {
+        [System.ComponentModel.Category("Plot"),
+        System.ComponentModel.Description("Defines the space to be used to separate all rectangle areas as a percentage of the minimum dimension")]
+        public float MarginSpace { get; set; } = 0.05f;
+        
         [System.ComponentModel.Category("Plot"),
         System.ComponentModel.Description("Rectangle of the plot title")]
         public RectangleF RectTitle { get; set; }
@@ -204,8 +208,8 @@ namespace RadialGaugePlot
             //    min -= 2 * RectTitle.Height;
 
             //RectData = new RectangleF(Center.X - min, Center.Y - min, 2 * min, 2 * min);
-            RectData = new RectangleF(Center.X, Center.Y+ RectTitle.Height/2, 0, 0);
-            RectData = RectangleF.Inflate(RectData, min * 0.95f, min * 0.95f - RectTitle.Height);
+            RectData = new RectangleF(Center.X, Center.Y + RectTitle.Height / 2, 0, 0);
+            RectData = RectangleF.Inflate(RectData, min * (1 - MarginSpace), min * (1 - MarginSpace) - RectTitle.Height / 2);
             //RectData = RectangleF.Inflate(RectData, min, min);
         }
 
