@@ -65,7 +65,9 @@ namespace RadialGaugePlot
         System.ComponentModel.Description("Plot legend.")]
         public Legend Legend { get; protected set; }
 
-        public PlotElement Title { get; set; } = new PlotElement();
+        public PlotElement Title { get; set; }
+
+        public PlotElement Xaxis { get; set; }
 
         /// <summary>
         /// The palette defines the default colors given to the plot
@@ -75,13 +77,19 @@ namespace RadialGaugePlot
         public virtual Plotting.Colorsets.Palette Palette { get; set; } = Plotting.Colorsets.Palette.Microcharts;
 
 
-
-
         public Plot()
         {
             InitializeComponent();
+            
+            // Initializes the plot elements
             Legend = new();
+            Title = new();
+            Title.Render = RenderText;
+            Xaxis = new();
+            Xaxis.Render = RenderAxis;
+            Xaxis.Visible = false;
         }
+
 
 
         private void OnLoad(object sender, EventArgs e)
@@ -235,6 +243,16 @@ namespace RadialGaugePlot
 
             // Ensure the measured height is at least the font size
             sizeText.Height = Math.Max(fontSize, sizeText.Height);
+        }
+
+        protected virtual void RenderText (Bitmap bmp, bool lowQuality = false)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected virtual void RenderAxis(Bitmap bmp, bool lowQuality = false)
+        {
+            throw new NotImplementedException();
         }
     }
 }
