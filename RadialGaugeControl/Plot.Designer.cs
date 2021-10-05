@@ -59,7 +59,6 @@ namespace RadialGaugePlot
             this.Controls.Add(this.pictureBox1);
             this.Name = "Plot";
             this.Size = new System.Drawing.Size(800, 450);
-            this.Load += new System.EventHandler(this.OnLoad);
             this.SizeChanged += new System.EventHandler(this.OnSizeChanged);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);

@@ -67,6 +67,8 @@ namespace RadialGaugePlot
 
         public PlotElement Title { get; set; }
 
+        public PlotElement Chart { get; set; }
+
         public PlotElement Xaxis { get; set; }
 
         /// <summary>
@@ -83,19 +85,19 @@ namespace RadialGaugePlot
             
             // Initializes the plot elements
             Legend = new();
+            
             Title = new();
             Title.Render = RenderText;
+            Title.Text = PlotTitle;
+            
+            Chart = new();
+            Chart.Render = Render;
+
             Xaxis = new();
             Xaxis.Render = RenderAxis;
             Xaxis.Visible = false;
         }
 
-
-
-        private void OnLoad(object sender, EventArgs e)
-        {
-
-        }
 
         private void OnSizeChanged(object sender, EventArgs e)
         {
@@ -135,8 +137,9 @@ namespace RadialGaugePlot
             // Draw the title onto the bitmap
             if (!string.IsNullOrEmpty(Title.Text))
             {
-                using Graphics newGraphics = Graphics.FromImage(bmp);
-                newGraphics.DrawString(Title.Text, Font, new SolidBrush(Color.Black), RectTitle);
+                //using Graphics newGraphics = Graphics.FromImage(bmp);
+                //newGraphics.DrawString(Title.Text, Font, new SolidBrush(Color.Black), RectTitle);
+                Title.Render(bmp, lowQuality);
             }
 
             // Draw the legend onto the bitmap
@@ -211,6 +214,7 @@ namespace RadialGaugePlot
             }
 
             RectTitle = new RectangleF(new PointF((Width - sizeText.Width) / 2, sizeText.Height * 0.5f), sizeText);
+            Title.Rectangle = new RectangleF(new PointF((Width - sizeText.Width) / 2, sizeText.Height * 0.5f), sizeText);
 
             // Compute the minimum dimension of the control and substract 2 times the space for the title
             float min = Math.Min(Width, Height);
@@ -245,11 +249,23 @@ namespace RadialGaugePlot
             sizeText.Height = Math.Max(fontSize, sizeText.Height);
         }
 
+        /// <summary>
+        /// Function for drawing text 
+        /// </summary>
+        /// <param name="bmp"><see cref="Bitmap"/> where the text is rendered</param>
+        /// <param name="lowQuality">Render quality</param>
         protected virtual void RenderText (Bitmap bmp, bool lowQuality = false)
         {
-            throw new NotImplementedException();
+            using Graphics newGraphics = Graphics.FromImage(bmp);
+            newGraphics.DrawString(Title.Text, Font, new SolidBrush(Color.Black), Title.GetRectangle());
+            //throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Function for drawing the axes
+        /// </summary>
+        /// <param name="bmp"><see cref="Bitmap"/> where the text is rendered</param>
+        /// <param name="lowQuality">Render quality</param>
         protected virtual void RenderAxis(Bitmap bmp, bool lowQuality = false)
         {
             throw new NotImplementedException();
