@@ -281,7 +281,7 @@ namespace RadialGaugePlot
 
         [System.ComponentModel.Category("Radial gauge"),
         System.ComponentModel.Description("Title string which is rendered at the top of the plot.")]
-        public override string Title { get => base.Title; set => base.Title = value; }
+        public override string PlotTitle { get => base.PlotTitle; set => base.PlotTitle = value; }
 
         #endregion Properties
 

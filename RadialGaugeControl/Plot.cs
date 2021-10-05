@@ -42,7 +42,7 @@ namespace RadialGaugePlot
         /// </summary>
         [System.ComponentModel.Category("Plot"),
         System.ComponentModel.Description("Title of the plot")]
-        public virtual string Title
+        public virtual string PlotTitle
         {
             get => _strTitle;
             set
@@ -50,6 +50,7 @@ namespace RadialGaugePlot
                 if(!string.IsNullOrEmpty(value))
                 {
                     _strTitle = value;
+                    Title.Text = value;
                     ComputeRects();
                 }
             }
@@ -63,6 +64,8 @@ namespace RadialGaugePlot
         [System.ComponentModel.Category("Plot"),
         System.ComponentModel.Description("Plot legend.")]
         public Legend Legend { get; protected set; }
+
+        public PlotElement Title { get; set; } = new PlotElement();
 
         /// <summary>
         /// The palette defines the default colors given to the plot
@@ -122,10 +125,10 @@ namespace RadialGaugePlot
             Render(bmp, lowQuality);
 
             // Draw the title onto the bitmap
-            if (!string.IsNullOrEmpty(Title))
+            if (!string.IsNullOrEmpty(Title.Text))
             {
                 using Graphics newGraphics = Graphics.FromImage(bmp);
-                newGraphics.DrawString(Title, Font, new SolidBrush(Color.Black), RectTitle);
+                newGraphics.DrawString(Title.Text, Font, new SolidBrush(Color.Black), RectTitle);
             }
 
             // Draw the legend onto the bitmap
@@ -148,8 +151,8 @@ namespace RadialGaugePlot
             newGraphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
             newGraphics.DrawRectangle(new Pen(Color.Black), RectData.X, RectData.Y, RectData.Width, RectData.Height);
             newGraphics.DrawRectangle(new Pen(Color.Black), RectTitle.X, RectTitle.Y, RectTitle.Width, RectTitle.Height);
-            if (!string.IsNullOrEmpty(Title))
-                newGraphics.DrawString(Title, Font, new SolidBrush(Color.Black), RectTitle);
+            if (!string.IsNullOrEmpty(Title.Text))
+                newGraphics.DrawString(Title.Text, Font, new SolidBrush(Color.Black), RectTitle);
         }
 
         /// <summary>
@@ -193,9 +196,9 @@ namespace RadialGaugePlot
             using Graphics gfx = this.pictureBox1.CreateGraphics();
 
             SizeF sizeText = new (0, 0);
-            if (!string.IsNullOrEmpty(Title))
+            if (!string.IsNullOrEmpty(Title.Text))
             {
-                sizeText = gfx.MeasureString(Title, Font);
+                sizeText = gfx.MeasureString(Title.Text, Font);
                 FontScaling(sizeText, Font.SizeInPoints);
             }
 
