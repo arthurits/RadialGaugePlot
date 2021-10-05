@@ -11,14 +11,17 @@ namespace RadialGaugePlot
         public Padding Padding { get; set; }
         public string Text { get; set; }
 
+        public bool Visible { get; set; } = true;
         public float X { get; set; }
         public float Y { get; set; }
         public float Width { get; set; }
         public float Height { get; set; }
         public PointF Center { get; set; }
 
-        public override string ToString() => $"Plot element with text: {Text}, center at ";
+        public override string ToString() => $"Plot element with text: {Text}, center at ({Center.ToString()})";
 
+        public Action<Bitmap, bool, void> Render { get; set;}
+        
         public PlotElement()
         {
             
