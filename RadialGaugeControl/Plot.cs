@@ -258,7 +258,6 @@ namespace RadialGaugePlot
         {
             using Graphics newGraphics = Graphics.FromImage(bmp);
             newGraphics.DrawString(Title.Text, Font, new SolidBrush(Color.Black), Title.GetRectangle());
-            //throw new NotImplementedException();
         }
 
         /// <summary>
