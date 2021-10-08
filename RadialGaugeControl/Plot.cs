@@ -200,6 +200,9 @@ namespace RadialGaugePlot
         {
             // Compute the center point of the control
             Center = new(Width / 2, Height / 2);
+            
+            // Compute the minimum dimension of the control
+            float min = Math.Min(Width, Height);
 
             // Compute the Title rect
             //using Bitmap bmp = new (1, 1);
@@ -215,9 +218,11 @@ namespace RadialGaugePlot
 
             RectTitle = new RectangleF(new PointF((Width - sizeText.Width) / 2, sizeText.Height * 0.5f), sizeText);
             Title.Rectangle = new RectangleF(new PointF((Width - sizeText.Width) / 2, sizeText.Height * 0.5f), sizeText);
+            Title.Padding = new Padding((int)(MarginSpace * min));
+
+            Chart.Rectangle = new RectangleF(Center.X, Center.Y + Title.GetRectangleEx().Height / 2, 0, 0);
 
             // Compute the minimum dimension of the control and substract 2 times the space for the title
-            float min = Math.Min(Width, Height);
             min /= 2;
             //if (!string.IsNullOrEmpty(Title))
             //    min -= 2 * RectTitle.Height;
