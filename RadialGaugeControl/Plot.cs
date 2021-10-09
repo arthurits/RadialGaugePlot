@@ -9,15 +9,19 @@ namespace RadialGaugePlot
     {
         [System.ComponentModel.Category("Plot"),
         System.ComponentModel.Description("Defines the space to be used to separate all rectangle areas as a percentage of the minimum dimension")]
-        public float MarginSpace { get; set; } = 0.05f;
-        
-        [System.ComponentModel.Category("Plot"),
-        System.ComponentModel.Description("Rectangle of the plot title")]
-        public RectangleF RectTitle { get; set; }
+        public float MarginFactor { get; set; } = 0.05f;
 
         [System.ComponentModel.Category("Plot"),
-        System.ComponentModel.Description("Rectangle of the plot graph")]
-        public RectangleF RectData { get; set; }
+        System.ComponentModel.Description("Defines the space inpixels to be used to separate all rectangle areas")]
+        public int MarginSpace { get; private set; } = 0;
+
+        //[System.ComponentModel.Category("Plot"),
+        //System.ComponentModel.Description("Rectangle of the plot title")]
+        //public RectangleF RectTitle { get; set; }
+
+        //[System.ComponentModel.Category("Plot"),
+        //System.ComponentModel.Description("Rectangle of the plot graph")]
+        //public RectangleF RectData { get; set; }
 
         [System.ComponentModel.Category("Plot"),
         System.ComponentModel.Description("Center coordinates of the control")]
@@ -89,6 +93,7 @@ namespace RadialGaugePlot
             Title = new();
             Title.Render = RenderText;
             Title.Text = PlotTitle;
+            Title.Font.Size = Math.Min(Width, Height) * 0.05f;
             
             Chart = new();
             Chart.Render = Render;
@@ -101,6 +106,9 @@ namespace RadialGaugePlot
 
         private void OnSizeChanged(object sender, EventArgs e)
         {
+            // Calculate the space between areas
+            MarginSpace = (int)(Math.Min(Width, Height) * MarginFactor);
+
             // Create the bitmap and make the corresponding drawing into it
             Render();
         }
@@ -160,10 +168,11 @@ namespace RadialGaugePlot
             using Graphics newGraphics = Graphics.FromImage(bmp);
             newGraphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
             newGraphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
-            newGraphics.DrawRectangle(new Pen(Color.Black), RectData.X, RectData.Y, RectData.Width, RectData.Height);
-            newGraphics.DrawRectangle(new Pen(Color.Black), RectTitle.X, RectTitle.Y, RectTitle.Width, RectTitle.Height);
-            if (!string.IsNullOrEmpty(Title.Text))
-                newGraphics.DrawString(Title.Text, Font, new SolidBrush(Color.Black), RectTitle);
+            //newGraphics.DrawRectangle(new Pen(Color.Black), RectData.X, RectData.Y, RectData.Width, RectData.Height);
+            newGraphics.DrawRectangle(new Pen(Color.Black), System.Drawing.Rectangle.Round(Chart.GetRectangle()));
+            newGraphics.DrawRectangle(new Pen(Color.Black), System.Drawing.Rectangle.Round(Title.GetRectangle()));
+            //if (!string.IsNullOrEmpty(Title.Text))
+            //    newGraphics.DrawString(Title.Text, Font, new SolidBrush(Color.Black), RectTitle);
         }
 
         /// <summary>
@@ -205,54 +214,30 @@ namespace RadialGaugePlot
             float min = Math.Min(Width, Height);
 
             // Compute the Title rect
-            //using Bitmap bmp = new (1, 1);
-            //using Graphics gfx = System.Drawing.Graphics.FromImage(bmp);
             using Graphics gfx = this.pictureBox1.CreateGraphics();
 
             SizeF sizeText = new (0, 0);
             if (!string.IsNullOrEmpty(Title.Text))
             {
-                sizeText = gfx.MeasureString(Title.Text, Font);
-                FontScaling(sizeText, Font.SizeInPoints);
+                sizeText = Drawing.GDI.MeasureString(gfx, Title.Text, Title.Font);
             }
 
-            RectTitle = new RectangleF(new PointF((Width - sizeText.Width) / 2, sizeText.Height * 0.5f), sizeText);
-            Title.Rectangle = new RectangleF(new PointF((Width - sizeText.Width) / 2, sizeText.Height * 0.5f), sizeText);
-            Title.Padding = new Padding((int)(MarginSpace * min));
+            //RectTitle = new RectangleF(new PointF((Width - sizeText.Width) / 2, sizeText.Height * 0.5f), sizeText);
+            Title.Margin = new Padding(MarginSpace, MarginSpace, MarginSpace, 0);
+            Chart.Margin = new Padding(MarginSpace);
 
-            Chart.Rectangle = new RectangleF(Center.X, Center.Y + Title.GetRectangleEx().Height / 2, 0, 0);
+            Title.Rectangle = new RectangleF(new PointF((Width - sizeText.Width) / 2, Title.Margin.Top + Title.Padding.Top), sizeText);
+            //(Title.Padding).Bottom = -Title.Padding.Top;
 
-            // Compute the minimum dimension of the control and substract 2 times the space for the title
-            min /= 2;
-            //if (!string.IsNullOrEmpty(Title))
-            //    min -= 2 * RectTitle.Height;
+            var rect = new RectangleF(Center.X,
+                Center.Y + (Title.GetRectangleEx().Height + Chart.Margin.Top - Chart.Margin.Bottom) / 2,
+                0,
+                0);
+            rect.Inflate(min/2, min/2 - (Title.GetRectangleEx().Height + Chart.Margin.Top + Chart.Margin.Bottom) / 2);
+            Chart.Rectangle = rect;
 
-            //RectData = new RectangleF(Center.X - min, Center.Y - min, 2 * min, 2 * min);
-            RectData = new RectangleF(Center.X, Center.Y + 2 * RectTitle.Height / 2, 0, 0);
-            RectData = RectangleF.Inflate(RectData, min * (1 - MarginSpace) - RectTitle.Height/2, min * (1 - MarginSpace) - 2*RectTitle.Height/2);
-            //RectData = RectangleF.Inflate(RectData, min, min);
         }
 
-        /// <summary>
-        /// Compensate for OS-specific differences in font scaling.
-        /// </summary>
-        /// <param name="sizeText"><see cref="Size"/> struct containing the text.</param>
-        protected virtual void FontScaling(SizeF sizeText, float fontSize = 0)
-        {
-            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux))
-            {
-                sizeText.Width *= 1;
-                sizeText.Height *= 27.16f / 22;
-            }
-            else if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.OSX))
-            {
-                sizeText.Width *= 82.82f / 72;
-                sizeText.Height *= 27.16f / 20;
-            }
-
-            // Ensure the measured height is at least the font size
-            sizeText.Height = Math.Max(fontSize, sizeText.Height);
-        }
 
         /// <summary>
         /// Function for drawing text 
@@ -262,7 +247,8 @@ namespace RadialGaugePlot
         protected virtual void RenderText (Bitmap bmp, bool lowQuality = false)
         {
             using Graphics newGraphics = Graphics.FromImage(bmp);
-            newGraphics.DrawString(Title.Text, Font, new SolidBrush(Color.Black), Title.GetRectangle());
+            using Font TitleFont = Drawing.GDI.Font(Title.Font);
+            newGraphics.DrawString(Title.Text, TitleFont, new SolidBrush(Title.Font.Color), Title.GetRectangle());
         }
 
         /// <summary>

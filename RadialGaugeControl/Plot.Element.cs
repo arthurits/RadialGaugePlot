@@ -42,6 +42,7 @@ namespace RadialGaugePlot
         
         public PlotElement()
         {
+            Font = new();
             Margin = Padding.Empty;
             Padding = Padding.Empty;
             Visible = true;
