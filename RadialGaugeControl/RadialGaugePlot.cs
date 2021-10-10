@@ -287,6 +287,9 @@ namespace RadialGaugePlot
 
         public RadialGaugePlot()
         {
+            base.Xaxis.Visible = false;
+            base.Yaxis.Visible = false;
+
             double[] values = { 100, 80, 65, 45, -20 };
             Update(values);
             ComputeAngularData();
@@ -299,6 +302,7 @@ namespace RadialGaugePlot
         /// <param name="labels">Legend labels.</param>
         /// <param name="lineColors">Array colors for the gauges.</param>
         public RadialGaugePlot(double[] values, string[] labels = null, Color[] lineColors = null)
+            :base()
         {
             if (labels != null && labels.Length > 0)
             {
@@ -308,7 +312,7 @@ namespace RadialGaugePlot
 
             if (lineColors != null && lineColors.Length > 0)
                 Colors = lineColors;
-
+            
             Update(values);
             ComputeAngularData();
         }

@@ -9,19 +9,11 @@ namespace RadialGaugePlot
     {
         [System.ComponentModel.Category("Plot"),
         System.ComponentModel.Description("Defines the space to be used to separate all rectangle areas as a percentage of the minimum dimension")]
-        public float MarginFactor { get; set; } = 0.05f;
+        public float MarginFactor { get; set; } = 0.03f;
 
         [System.ComponentModel.Category("Plot"),
         System.ComponentModel.Description("Defines the space inpixels to be used to separate all rectangle areas")]
         public int MarginSpace { get; private set; } = 0;
-
-        //[System.ComponentModel.Category("Plot"),
-        //System.ComponentModel.Description("Rectangle of the plot title")]
-        //public RectangleF RectTitle { get; set; }
-
-        //[System.ComponentModel.Category("Plot"),
-        //System.ComponentModel.Description("Rectangle of the plot graph")]
-        //public RectangleF RectData { get; set; }
 
         [System.ComponentModel.Category("Plot"),
         System.ComponentModel.Description("Center coordinates of the control")]
@@ -69,11 +61,21 @@ namespace RadialGaugePlot
         System.ComponentModel.Description("Plot legend.")]
         public Legend Legend { get; protected set; }
 
+        [System.ComponentModel.Category("Plot"),
+        System.ComponentModel.Description("Defines the area and properties of the chart's title")]
         public PlotElement Title { get; set; }
 
+        [System.ComponentModel.Category("Plot"),
+        System.ComponentModel.Description("Defines the area and properties where data is drawn.")]
         public PlotElement Chart { get; set; }
 
+        [System.ComponentModel.Category("Plot"),
+        System.ComponentModel.Description("Defines the area and properties of the chart's x-axis")]
         public PlotElement Xaxis { get; set; }
+
+        [System.ComponentModel.Category("Plot"),
+        System.ComponentModel.Description("Defines the area and properties of the chart's y-axis")]
+        public PlotElement Yaxis { get; set; }
 
         /// <summary>
         /// The palette defines the default colors given to the plot
@@ -89,7 +91,7 @@ namespace RadialGaugePlot
             
             // Initializes the plot elements
             Legend = new();
-            
+
             Title = new();
             Title.Render = RenderText;
             Title.Text = PlotTitle;
@@ -100,7 +102,9 @@ namespace RadialGaugePlot
 
             Xaxis = new();
             Xaxis.Render = RenderAxis;
-            Xaxis.Visible = false;
+
+            Yaxis = new();
+            Yaxis.Render = RenderAxis;
         }
 
 
@@ -135,7 +139,6 @@ namespace RadialGaugePlot
             Colors = Palette.GetColors(Data.Length);
 
             // Compute dimensions before any drawing takes place
-            //Center = new(Width / 2, Height / 2);
             ComputeRects();
 
             // First call the virtual Render() function (which can be overriden by a derived class)
@@ -143,10 +146,8 @@ namespace RadialGaugePlot
             Render(bmp, lowQuality);
 
             // Draw the title onto the bitmap
-            if (!string.IsNullOrEmpty(Title.Text))
+            if (Title.Visible && !string.IsNullOrEmpty(Title.Text))
             {
-                //using Graphics newGraphics = Graphics.FromImage(bmp);
-                //newGraphics.DrawString(Title.Text, Font, new SolidBrush(Color.Black), RectTitle);
                 Title.Render(bmp, lowQuality);
             }
 
@@ -168,11 +169,11 @@ namespace RadialGaugePlot
             using Graphics newGraphics = Graphics.FromImage(bmp);
             newGraphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
             newGraphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
-            //newGraphics.DrawRectangle(new Pen(Color.Black), RectData.X, RectData.Y, RectData.Width, RectData.Height);
             newGraphics.DrawRectangle(new Pen(Color.Black), System.Drawing.Rectangle.Round(Chart.GetRectangle()));
+            newGraphics.DrawRectangle(new Pen(Color.Black), System.Drawing.Rectangle.Round(Chart.GetRectangleEx()));
             newGraphics.DrawRectangle(new Pen(Color.Black), System.Drawing.Rectangle.Round(Title.GetRectangle()));
-            //if (!string.IsNullOrEmpty(Title.Text))
-            //    newGraphics.DrawString(Title.Text, Font, new SolidBrush(Color.Black), RectTitle);
+            newGraphics.DrawRectangle(new Pen(Color.Black), System.Drawing.Rectangle.Round(Title.GetRectangleEx()));
+
         }
 
         /// <summary>
@@ -213,22 +214,18 @@ namespace RadialGaugePlot
             // Compute the minimum dimension of the control
             float min = Math.Min(Width, Height);
 
-            // Compute the Title rect
-            using Graphics gfx = this.pictureBox1.CreateGraphics();
-
-            SizeF sizeText = new (0, 0);
-            if (!string.IsNullOrEmpty(Title.Text))
+            // Compute the title area rectangle
+            SizeF sizeText = new(0, 0);
+            if (Title.Visible && !string.IsNullOrEmpty(Title.Text))
             {
+                using Graphics gfx = this.pictureBox1.CreateGraphics();
                 sizeText = Drawing.GDI.MeasureString(gfx, Title.Text, Title.Font);
+                Title.Margin = new Padding(MarginSpace, MarginSpace, MarginSpace, 0);
             }
-
-            //RectTitle = new RectangleF(new PointF((Width - sizeText.Width) / 2, sizeText.Height * 0.5f), sizeText);
-            Title.Margin = new Padding(MarginSpace, MarginSpace, MarginSpace, 0);
-            Chart.Margin = new Padding(MarginSpace);
-
             Title.Rectangle = new RectangleF(new PointF((Width - sizeText.Width) / 2, Title.Margin.Top + Title.Padding.Top), sizeText);
-            //(Title.Padding).Bottom = -Title.Padding.Top;
 
+            // Compute the chart area rectangle
+            Chart.Margin = new Padding(MarginSpace);
             var rect = new RectangleF(Center.X,
                 Center.Y + (Title.GetRectangleEx().Height + Chart.Margin.Top - Chart.Margin.Bottom) / 2,
                 0,
@@ -236,11 +233,17 @@ namespace RadialGaugePlot
             rect.Inflate(min/2, min/2 - (Title.GetRectangleEx().Height + Chart.Margin.Top + Chart.Margin.Bottom) / 2);
             Chart.Rectangle = rect;
 
+            //// Compute the x-axis area rectangle
+            //if (Xaxis.Visible && !string.IsNullOrEmpty(Xaxis.Text))
+            //{
+            //    Xaxis.Margin = new Padding(-MarginSpace, MarginSpace, MarginSpace, MarginSpace);
+            //}
+            //Xaxis.Rectangle = new RectangleF(new PointF((Width - sizeText.Width) / 2, Title.Margin.Top + Title.Padding.Top), sizeText);
         }
 
 
         /// <summary>
-        /// Function for drawing text 
+        /// Function for drawing text. This can be overriden if needed.
         /// </summary>
         /// <param name="bmp"><see cref="Bitmap"/> where the text is rendered</param>
         /// <param name="lowQuality">Render quality</param>
@@ -252,7 +255,7 @@ namespace RadialGaugePlot
         }
 
         /// <summary>
-        /// Function for drawing the axes
+        /// Function for drawing the axes. This can be overriden if needed.
         /// </summary>
         /// <param name="bmp"><see cref="Bitmap"/> where the text is rendered</param>
         /// <param name="lowQuality">Render quality</param>
