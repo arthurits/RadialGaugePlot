@@ -6,6 +6,7 @@ using System.Windows.Forms;
 namespace RadialGaugePlot
 {
     // https://weblog.west-wind.com/posts/2020/Apr/06/Displaying-Nested-Child-Objects-in-the-Windows-Forms-Designer-Property-Grid
+    // https://stackoverflow.com/questions/12594246/how-to-add-designer-support-for-point-property-on-custom-control
     public partial class Plot : UserControl
     {
         [System.ComponentModel.Category("Plot"),
