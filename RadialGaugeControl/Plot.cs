@@ -5,6 +5,7 @@ using System.Windows.Forms;
 // https://devblogs.microsoft.com/nuget/add-a-readme-to-your-nuget-package/
 namespace RadialGaugePlot
 {
+    // https://weblog.west-wind.com/posts/2020/Apr/06/Displaying-Nested-Child-Objects-in-the-Windows-Forms-Designer-Property-Grid
     public partial class Plot : UserControl
     {
         [System.ComponentModel.Category("Plot"),
@@ -16,7 +17,8 @@ namespace RadialGaugePlot
         public int MarginSpace { get; private set; } = 0;
 
         [System.ComponentModel.Category("Plot"),
-        System.ComponentModel.Description("Center coordinates of the control")]
+        System.ComponentModel.Description("Center coordinates of the control")
+        System.ComponentModel.DisplayName("Center point")]
         public PointF Center { get; set; }
 
         /// <summary>
