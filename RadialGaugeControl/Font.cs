@@ -5,11 +5,13 @@ namespace Drawing
 {
     public class Font
     {
-        public float Size = 12;
-        public Color Color = Color.Black;
+        public float Size { get; set; } = 12;
+        public Color Color { get; set; } = Color.Black;
         //public Alignment Alignment = Alignment.UpperLeft;
-        public bool Bold = false;
-        public float Rotation = 0;
+        public bool Bold { get; set; } = false;
+        public float Rotation { get; set; } = 0;
+        
+        [System.ComponentModel.Browsable(false)]
         public string DefaultFont => InstalledFont.Sans();
 
         private string _Name;

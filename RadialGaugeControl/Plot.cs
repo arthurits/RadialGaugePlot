@@ -10,16 +10,19 @@ namespace RadialGaugePlot
     public partial class Plot : UserControl
     {
         [System.ComponentModel.Category("Plot"),
-        System.ComponentModel.Description("Defines the space to be used to separate all rectangle areas as a percentage of the minimum dimension")]
+        System.ComponentModel.Description("Defines the space to be used to separate all rectangle areas as a percentage of the minimum dimension"),
+        System.ComponentModel.DisplayName("Margin fraction")]
         public float MarginFactor { get; set; } = 0.03f;
 
         [System.ComponentModel.Category("Plot"),
-        System.ComponentModel.Description("Defines the space inpixels to be used to separate all rectangle areas")]
+        System.ComponentModel.Description("Defines the space inpixels to be used to separate all rectangle areas"),
+        System.ComponentModel.DisplayName("Margin space (px)")]
         public int MarginSpace { get; private set; } = 0;
 
         [System.ComponentModel.Category("Plot"),
-        System.ComponentModel.Description("Center coordinates of the control")
-        System.ComponentModel.DisplayName("Center point")]
+        System.ComponentModel.Description("Center coordinates of the control"),
+        System.ComponentModel.DisplayName("Center point"),
+        System.ComponentModel.TypeConverter(typeof(System.ComponentModel.ExpandableObjectConverter))]
         public PointF Center { get; set; }
 
         /// <summary>
@@ -57,7 +60,8 @@ namespace RadialGaugePlot
         private string _strTitle;
 
         [System.ComponentModel.Category("Plot"),
-        System.ComponentModel.Description("Plot legend labels.")]
+        System.ComponentModel.Description("Plot legend labels."),
+        System.ComponentModel.DisplayName("Legend labels")]
         public string[] LegendLabels { get; protected set; }
 
         [System.ComponentModel.Category("Plot"),
@@ -65,19 +69,27 @@ namespace RadialGaugePlot
         public Legend Legend { get; protected set; }
 
         [System.ComponentModel.Category("Plot"),
-        System.ComponentModel.Description("Defines the area and properties of the chart's title")]
+        System.ComponentModel.Description("Defines the area and properties of the chart's title"),
+        System.ComponentModel.DisplayName("Title area properties"),
+        System.ComponentModel.TypeConverter(typeof(System.ComponentModel.ExpandableObjectConverter))]
         public PlotElement Title { get; set; }
 
         [System.ComponentModel.Category("Plot"),
-        System.ComponentModel.Description("Defines the area and properties where data is drawn.")]
+        System.ComponentModel.Description("Defines the area and properties where data is drawn."),
+        System.ComponentModel.DisplayName("Chart area properties"),
+        System.ComponentModel.TypeConverter(typeof(System.ComponentModel.ExpandableObjectConverter))]
         public PlotElement Chart { get; set; }
 
         [System.ComponentModel.Category("Plot"),
-        System.ComponentModel.Description("Defines the area and properties of the chart's x-axis")]
+        System.ComponentModel.Description("Defines the area and properties of the chart's x-axis"),
+        System.ComponentModel.DisplayName("X-axis area properties"),
+        System.ComponentModel.TypeConverter(typeof(System.ComponentModel.ExpandableObjectConverter))]
         public PlotElement Xaxis { get; set; }
 
         [System.ComponentModel.Category("Plot"),
-        System.ComponentModel.Description("Defines the area and properties of the chart's y-axis")]
+        System.ComponentModel.Description("Defines the area and properties of the chart's y-axis"),
+        System.ComponentModel.DisplayName("Y-axis area properties"),
+        System.ComponentModel.TypeConverter(typeof(System.ComponentModel.ExpandableObjectConverter))]
         public PlotElement Yaxis { get; set; }
 
         /// <summary>
@@ -169,14 +181,17 @@ namespace RadialGaugePlot
 
         public virtual void Render(Bitmap bmp, bool lowQuality = false)
         {
-            using Graphics newGraphics = Graphics.FromImage(bmp);
-            newGraphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-            newGraphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
-            newGraphics.DrawRectangle(new Pen(Color.Black), System.Drawing.Rectangle.Round(Chart.GetRectangle()));
-            newGraphics.DrawRectangle(new Pen(Color.Black), System.Drawing.Rectangle.Round(Chart.GetRectangleEx()));
-            newGraphics.DrawRectangle(new Pen(Color.Black), System.Drawing.Rectangle.Round(Title.GetRectangle()));
-            newGraphics.DrawRectangle(new Pen(Color.Black), System.Drawing.Rectangle.Round(Title.GetRectangleEx()));
-
+            #if DEBUG
+            {
+                using Graphics newGraphics = Graphics.FromImage(bmp);
+                newGraphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                newGraphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+                newGraphics.DrawRectangle(new Pen(Color.Black), System.Drawing.Rectangle.Round(Chart.GetRectangle()));
+                newGraphics.DrawRectangle(new Pen(Color.Black), System.Drawing.Rectangle.Round(Chart.GetRectangleEx()));
+                newGraphics.DrawRectangle(new Pen(Color.Black), System.Drawing.Rectangle.Round(Title.GetRectangle()));
+                newGraphics.DrawRectangle(new Pen(Color.Black), System.Drawing.Rectangle.Round(Title.GetRectangleEx()));
+            }
+            #endif
         }
 
         /// <summary>

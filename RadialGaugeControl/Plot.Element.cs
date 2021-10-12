@@ -6,17 +6,26 @@ namespace RadialGaugePlot
 {
     public class PlotElement
     {
+        [System.ComponentModel.Category("Plot"),
+        System.ComponentModel.Description("Font properties for this element"),
+        System.ComponentModel.DisplayName("Font"),
+        System.ComponentModel.TypeConverter(typeof(System.ComponentModel.ExpandableObjectConverter))]
         public Drawing.Font Font { get; set; }
         public Padding Margin { get; set; }
         public Padding Padding { get; set; }
         public string Text { get; set; }
 
         public bool Visible { get; set; }
-        public float X { get; set; }
-        public float Y { get; set; }
-        public float Width { get; set; }
-        public float Height { get; set; }
-        public PointF Center { get; set; }
+        public float X { get; private set; }
+        public float Y { get; private set; }
+        public float Width { get; private set; }
+        public float Height { get; private set; }
+        
+        [System.ComponentModel.Category("Plot"),
+        System.ComponentModel.Description("Center point of this element"),
+        System.ComponentModel.DisplayName("Center point"),
+        System.ComponentModel.TypeConverter(typeof(System.ComponentModel.ExpandableObjectConverter))]
+        public PointF Center { get; private set; }
         public RectangleF Rectangle
         {
             set
@@ -31,12 +40,13 @@ namespace RadialGaugePlot
         /// <summary>
         /// Renders this plot element into the bitmap passed
         /// </summary>
+        [System.ComponentModel.Browsable(false)]
         public Action<Bitmap, bool> Render { get; set; }
 
         //public delegate void RenderDelegate(Bitmap bmp, bool lowQuality = false);
         //public RenderDelegate RenderTest { get; set; }
 
-        public override string ToString() => $"Plot element with text: {Text}, center at ({Center})";
+        public override string ToString() => $"Plot element with text '{Text}' and center at ({Center})";
 
         
         
