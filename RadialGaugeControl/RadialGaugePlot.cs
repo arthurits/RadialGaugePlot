@@ -291,6 +291,7 @@ namespace RadialGaugePlot
             base.Yaxis.Visible = false;
 
             double[] values = { 100, 80, 65, 45, -20 };
+            GaugeLabels = new string[] { "alpha", "beta", "gamma", "delta", "epsilon" };
             Update(values);
             ComputeAngularData();
         }
