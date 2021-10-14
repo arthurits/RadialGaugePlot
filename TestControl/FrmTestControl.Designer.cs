@@ -84,7 +84,6 @@ namespace TestControl
             this.plot1.Location = new System.Drawing.Point(0, 0);
             this.plot1.Name = "plot1";
             this.plot1.NormBackGauge = false;
-            this.plot1.RectTitle = ((System.Drawing.RectangleF)(resources.GetObject("plot1.RectTitle")));
             this.plot1.ShowGaugeValues = true;
             this.plot1.Size = new System.Drawing.Size(784, 370);
             this.plot1.StartCap = System.Drawing.Drawing2D.LineCap.Round;

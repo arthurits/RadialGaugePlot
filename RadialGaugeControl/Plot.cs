@@ -5,22 +5,24 @@ using System.Windows.Forms;
 // https://devblogs.microsoft.com/nuget/add-a-readme-to-your-nuget-package/
 namespace RadialGaugePlot
 {
+    // https://weblog.west-wind.com/posts/2020/Apr/06/Displaying-Nested-Child-Objects-in-the-Windows-Forms-Designer-Property-Grid
+    // https://stackoverflow.com/questions/12594246/how-to-add-designer-support-for-point-property-on-custom-control
     public partial class Plot : UserControl
     {
         [System.ComponentModel.Category("Plot"),
-        System.ComponentModel.Description("Defines the space to be used to separate all rectangle areas as a percentage of the minimum dimension")]
-        public float MarginSpace { get; set; } = 0.05f;
-        
-        [System.ComponentModel.Category("Plot"),
-        System.ComponentModel.Description("Rectangle of the plot title")]
-        public RectangleF RectTitle { get; set; }
+        System.ComponentModel.Description("Defines the space to be used to separate all rectangle areas as a percentage of the minimum dimension"),
+        System.ComponentModel.DisplayName("Margin fraction")]
+        public float MarginFactor { get; set; } = 0.03f;
 
         [System.ComponentModel.Category("Plot"),
-        System.ComponentModel.Description("Rectangle of the plot graph")]
-        public RectangleF RectData { get; set; }
+        System.ComponentModel.Description("Defines the space inpixels to be used to separate all rectangle areas"),
+        System.ComponentModel.DisplayName("Margin space (px)")]
+        public int MarginSpace { get; private set; } = 0;
 
         [System.ComponentModel.Category("Plot"),
-        System.ComponentModel.Description("Center coordinates of the control")]
+        System.ComponentModel.Description("Center coordinates of the control"),
+        System.ComponentModel.DisplayName("Center point"),
+        System.ComponentModel.TypeConverter(typeof(System.ComponentModel.ExpandableObjectConverter))]
         public PointF Center { get; set; }
 
         /// <summary>
@@ -58,18 +60,37 @@ namespace RadialGaugePlot
         private string _strTitle;
 
         [System.ComponentModel.Category("Plot"),
-        System.ComponentModel.Description("Plot legend labels.")]
+        System.ComponentModel.Description("Plot legend labels."),
+        System.ComponentModel.DisplayName("Legend labels")]
         public string[] LegendLabels { get; protected set; }
 
         [System.ComponentModel.Category("Plot"),
         System.ComponentModel.Description("Plot legend.")]
         public Legend Legend { get; protected set; }
 
+        [System.ComponentModel.Category("Plot"),
+        System.ComponentModel.Description("Defines the area and properties of the chart's title"),
+        System.ComponentModel.DisplayName("Title area properties"),
+        System.ComponentModel.TypeConverter(typeof(System.ComponentModel.ExpandableObjectConverter))]
         public PlotElement Title { get; set; }
 
+        [System.ComponentModel.Category("Plot"),
+        System.ComponentModel.Description("Defines the area and properties where data is drawn."),
+        System.ComponentModel.DisplayName("Chart area properties"),
+        System.ComponentModel.TypeConverter(typeof(System.ComponentModel.ExpandableObjectConverter))]
         public PlotElement Chart { get; set; }
 
+        [System.ComponentModel.Category("Plot"),
+        System.ComponentModel.Description("Defines the area and properties of the chart's x-axis"),
+        System.ComponentModel.DisplayName("X-axis area properties"),
+        System.ComponentModel.TypeConverter(typeof(System.ComponentModel.ExpandableObjectConverter))]
         public PlotElement Xaxis { get; set; }
+
+        [System.ComponentModel.Category("Plot"),
+        System.ComponentModel.Description("Defines the area and properties of the chart's y-axis"),
+        System.ComponentModel.DisplayName("Y-axis area properties"),
+        System.ComponentModel.TypeConverter(typeof(System.ComponentModel.ExpandableObjectConverter))]
+        public PlotElement Yaxis { get; set; }
 
         /// <summary>
         /// The palette defines the default colors given to the plot
@@ -85,22 +106,28 @@ namespace RadialGaugePlot
             
             // Initializes the plot elements
             Legend = new();
-            
+
             Title = new();
             Title.Render = RenderText;
             Title.Text = PlotTitle;
+            Title.Font.Size = Math.Min(Width, Height) * 0.05f;
             
             Chart = new();
             Chart.Render = Render;
 
             Xaxis = new();
             Xaxis.Render = RenderAxis;
-            Xaxis.Visible = false;
+
+            Yaxis = new();
+            Yaxis.Render = RenderAxis;
         }
 
 
         private void OnSizeChanged(object sender, EventArgs e)
         {
+            // Calculate the space between areas
+            MarginSpace = (int)(Math.Min(Width, Height) * MarginFactor);
+
             // Create the bitmap and make the corresponding drawing into it
             Render();
         }
@@ -127,7 +154,6 @@ namespace RadialGaugePlot
             Colors = Palette.GetColors(Data.Length);
 
             // Compute dimensions before any drawing takes place
-            //Center = new(Width / 2, Height / 2);
             ComputeRects();
 
             // First call the virtual Render() function (which can be overriden by a derived class)
@@ -135,10 +161,8 @@ namespace RadialGaugePlot
             Render(bmp, lowQuality);
 
             // Draw the title onto the bitmap
-            if (!string.IsNullOrEmpty(Title.Text))
+            if (Title.Visible && !string.IsNullOrEmpty(Title.Text))
             {
-                //using Graphics newGraphics = Graphics.FromImage(bmp);
-                //newGraphics.DrawString(Title.Text, Font, new SolidBrush(Color.Black), RectTitle);
                 Title.Render(bmp, lowQuality);
             }
 
@@ -157,13 +181,17 @@ namespace RadialGaugePlot
 
         public virtual void Render(Bitmap bmp, bool lowQuality = false)
         {
-            using Graphics newGraphics = Graphics.FromImage(bmp);
-            newGraphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-            newGraphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
-            newGraphics.DrawRectangle(new Pen(Color.Black), RectData.X, RectData.Y, RectData.Width, RectData.Height);
-            newGraphics.DrawRectangle(new Pen(Color.Black), RectTitle.X, RectTitle.Y, RectTitle.Width, RectTitle.Height);
-            if (!string.IsNullOrEmpty(Title.Text))
-                newGraphics.DrawString(Title.Text, Font, new SolidBrush(Color.Black), RectTitle);
+            #if DEBUG
+            {
+                using Graphics newGraphics = Graphics.FromImage(bmp);
+                newGraphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                newGraphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+                newGraphics.DrawRectangle(new Pen(Color.Black), System.Drawing.Rectangle.Round(Chart.GetRectangle()));
+                newGraphics.DrawRectangle(new Pen(Color.Black), System.Drawing.Rectangle.Round(Chart.GetRectangleEx()));
+                newGraphics.DrawRectangle(new Pen(Color.Black), System.Drawing.Rectangle.Round(Title.GetRectangle()));
+                newGraphics.DrawRectangle(new Pen(Color.Black), System.Drawing.Rectangle.Round(Title.GetRectangleEx()));
+            }
+            #endif
         }
 
         /// <summary>
@@ -200,68 +228,52 @@ namespace RadialGaugePlot
         {
             // Compute the center point of the control
             Center = new(Width / 2, Height / 2);
-
-            // Compute the Title rect
-            //using Bitmap bmp = new (1, 1);
-            //using Graphics gfx = System.Drawing.Graphics.FromImage(bmp);
-            using Graphics gfx = this.pictureBox1.CreateGraphics();
-
-            SizeF sizeText = new (0, 0);
-            if (!string.IsNullOrEmpty(Title.Text))
-            {
-                sizeText = gfx.MeasureString(Title.Text, Font);
-                FontScaling(sizeText, Font.SizeInPoints);
-            }
-
-            RectTitle = new RectangleF(new PointF((Width - sizeText.Width) / 2, sizeText.Height * 0.5f), sizeText);
-            Title.Rectangle = new RectangleF(new PointF((Width - sizeText.Width) / 2, sizeText.Height * 0.5f), sizeText);
-
-            // Compute the minimum dimension of the control and substract 2 times the space for the title
+            
+            // Compute the minimum dimension of the control
             float min = Math.Min(Width, Height);
-            min /= 2;
-            //if (!string.IsNullOrEmpty(Title))
-            //    min -= 2 * RectTitle.Height;
 
-            //RectData = new RectangleF(Center.X - min, Center.Y - min, 2 * min, 2 * min);
-            RectData = new RectangleF(Center.X, Center.Y + 2 * RectTitle.Height / 2, 0, 0);
-            RectData = RectangleF.Inflate(RectData, min * (1 - MarginSpace) - RectTitle.Height/2, min * (1 - MarginSpace) - 2*RectTitle.Height/2);
-            //RectData = RectangleF.Inflate(RectData, min, min);
+            // Compute the title area rectangle
+            SizeF sizeText = new(0, 0);
+            if (Title.Visible && !string.IsNullOrEmpty(Title.Text))
+            {
+                using Graphics gfx = this.pictureBox1.CreateGraphics();
+                sizeText = Drawing.GDI.MeasureString(gfx, Title.Text, Title.Font);
+                Title.Margin = new Padding(MarginSpace, MarginSpace, MarginSpace, 0);
+            }
+            Title.Rectangle = new RectangleF(new PointF((Width - sizeText.Width) / 2, Title.Margin.Top + Title.Padding.Top), sizeText);
+
+            // Compute the chart area rectangle
+            Chart.Margin = new Padding(MarginSpace);
+            var rect = new RectangleF(Center.X,
+                Center.Y + (Title.GetRectangleEx().Height + Chart.Margin.Top - Chart.Margin.Bottom) / 2,
+                0,
+                0);
+            rect.Inflate(min/2, min/2 - (Title.GetRectangleEx().Height + Chart.Margin.Top + Chart.Margin.Bottom) / 2);
+            Chart.Rectangle = rect;
+
+            //// Compute the x-axis area rectangle
+            //if (Xaxis.Visible && !string.IsNullOrEmpty(Xaxis.Text))
+            //{
+            //    Xaxis.Margin = new Padding(-MarginSpace, MarginSpace, MarginSpace, MarginSpace);
+            //}
+            //Xaxis.Rectangle = new RectangleF(new PointF((Width - sizeText.Width) / 2, Title.Margin.Top + Title.Padding.Top), sizeText);
         }
 
-        /// <summary>
-        /// Compensate for OS-specific differences in font scaling.
-        /// </summary>
-        /// <param name="sizeText"><see cref="Size"/> struct containing the text.</param>
-        protected virtual void FontScaling(SizeF sizeText, float fontSize = 0)
-        {
-            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux))
-            {
-                sizeText.Width *= 1;
-                sizeText.Height *= 27.16f / 22;
-            }
-            else if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.OSX))
-            {
-                sizeText.Width *= 82.82f / 72;
-                sizeText.Height *= 27.16f / 20;
-            }
-
-            // Ensure the measured height is at least the font size
-            sizeText.Height = Math.Max(fontSize, sizeText.Height);
-        }
 
         /// <summary>
-        /// Function for drawing text 
+        /// Function for drawing text. This can be overriden if needed.
         /// </summary>
         /// <param name="bmp"><see cref="Bitmap"/> where the text is rendered</param>
         /// <param name="lowQuality">Render quality</param>
         protected virtual void RenderText (Bitmap bmp, bool lowQuality = false)
         {
             using Graphics newGraphics = Graphics.FromImage(bmp);
-            newGraphics.DrawString(Title.Text, Font, new SolidBrush(Color.Black), Title.GetRectangle());
+            using Font TitleFont = Drawing.GDI.Font(Title.Font);
+            newGraphics.DrawString(Title.Text, TitleFont, new SolidBrush(Title.Font.Color), Title.GetRectangle());
         }
 
         /// <summary>
-        /// Function for drawing the axes
+        /// Function for drawing the axes. This can be overriden if needed.
         /// </summary>
         /// <param name="bmp"><see cref="Bitmap"/> where the text is rendered</param>
         /// <param name="lowQuality">Render quality</param>

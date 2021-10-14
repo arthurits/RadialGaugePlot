@@ -287,6 +287,9 @@ namespace RadialGaugePlot
 
         public RadialGaugePlot()
         {
+            base.Xaxis.Visible = false;
+            base.Yaxis.Visible = false;
+
             double[] values = { 100, 80, 65, 45, -20 };
             Update(values);
             ComputeAngularData();
@@ -299,6 +302,7 @@ namespace RadialGaugePlot
         /// <param name="labels">Legend labels.</param>
         /// <param name="lineColors">Array colors for the gauges.</param>
         public RadialGaugePlot(double[] values, string[] labels = null, Color[] lineColors = null)
+            :base()
         {
             //if (labels != null && labels.Length > 0)
             //{
@@ -481,7 +485,8 @@ namespace RadialGaugePlot
         public override void Render(Bitmap bmp, bool lowQuality = false)
         {
             int numGroups = Data.Length;
-            double minScale = Math.Min(base.RectData.Width, base.RectData.Height) / 2;
+            RectangleF RectData = base.Chart.GetRectangleIn();
+            double minScale = Math.Min(RectData.Width, RectData.Height) / 2;
 
             using Graphics gfx = Graphics.FromImage(bmp);   // https://github.com/ScottPlot/ScottPlot/blob/master/src/ScottPlot/Drawing/GDI.cs;
             gfx.SmoothingMode = lowQuality ? System.Drawing.Drawing2D.SmoothingMode.HighSpeed : System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
@@ -526,16 +531,16 @@ namespace RadialGaugePlot
                 // Draw gauge background
                 if (GaugeMode != RadialGaugeMode.SingleGauge)
                     gfx.DrawArc(penCircle,
-                        (base.RectData.X + base.RectData.Width/2 - gaugeRadius),
-                        (base.RectData.Y + base.RectData.Height / 2 - gaugeRadius),
+                        (RectData.X + RectData.Width/2 - gaugeRadius),
+                        (RectData.Y + RectData.Height / 2 - gaugeRadius),
                         (gaugeRadius * 2),
                         (gaugeRadius * 2),
                         _StartingAngleBackGauges, maxBackAngle);
 
                 // Draw gauge
                 gfx.DrawArc(pen,
-                    (base.RectData.X + base.RectData.Width / 2 - gaugeRadius),
-                    (base.RectData.Y + base.RectData.Height / 2 - gaugeRadius),
+                    (RectData.X + RectData.Width / 2 - gaugeRadius),
+                    (RectData.Y + RectData.Height / 2 - gaugeRadius),
                     (gaugeRadius * 2),
                     (gaugeRadius * 2),
                     (float)DataAngular[index, 0],
@@ -547,12 +552,12 @@ namespace RadialGaugePlot
                     DrawTextOnCircle(gfx,
                         fontGauge,
                         labelBrush,
-                        new RectangleF(base.RectData.X, base.RectData.Y, base.RectData.Width, base.RectData.Height),
+                        new RectangleF(RectData.X, RectData.Y, RectData.Width, RectData.Height),
                         gaugeRadius,
                         (float)DataAngular[index, 0],
                         (float)DataAngular[index, 1],
-                        base.RectData.X + base.RectData.Width / 2,
-                        base.RectData.Y + base.RectData.Height / 2,
+                        RectData.X + RectData.Width / 2,
+                        RectData.Y + RectData.Height / 2,
                         Data[index].ToString("0.##"),
                         _GaugeLabelPos);
                 }
