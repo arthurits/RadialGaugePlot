@@ -3,7 +3,7 @@ A customizable radial gauge control for plotting simple data. Built using C# (Wi
 
 The goal is two-fold (work in progress):
 * Integrate this plot into [ScottPlot](https://github.com/ScottPlot/ScottPlot), already present in version 4.1.18 onwards.
-* Create a standalone control (probably as a nuget packet) that's easy to mantain and update
+* Create a standalone control (probably as a nuget packet) that's easy to mantain and update.
 
 Copyright © 2021 by Arthurits Ltd. No commercial nor profit use allowed. This software is provided only for personal and not-for-profit use.
 
@@ -15,7 +15,25 @@ Download latest release: [![GitHub release (latest by date)](https://img.shields
 
 ## Developing status
 Currently fine tuning some internal routines.
-The Test project is functional and shows what functionally is supported by the plot.
+The `TestControl` project is functional and shows the functionally that is supported by the plot.
+
+## Usage
+Drag the control from the toolbox onto the form and cumtomize the plot as shown in the following code. The control does not refresh automatically. Instead, `Render()` should be invoked everytime it must be graphically updated.
+
+```csharp
+public FrmTestControl()
+{
+    InitializeComponent();
+    
+    plot1.Palette = Plotting.Colorsets.Palette.Microcharts;
+    plot1.PlotTitle = "Example title";
+    plot1.Update(new double[] { 100, 80, 65, 45, -20 },
+                 new string[] { "alpha", "beta", "gamma", "delta", "epsilon" });
+    plot1.Legend.IsVisible = true;
+    plot1.Legend.Location = RadialGaugePlot.Alignment.UpperRight;
+    plot1.Render();
+}
+```
 
 ## Screenshots
 ![Screenshot](https://github.com/arthurits/RadialGaugePlot/blob/master/TestControl/images/Screenshot01.png?raw=true "Radial gauge example 1")
