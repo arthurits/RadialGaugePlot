@@ -300,6 +300,33 @@ namespace RadialGaugePlot
         /// <param name="lineColors">Array colors for the gauges.</param>
         public RadialGaugePlot(double[] values, string[] labels = null, Color[] lineColors = null)
         {
+            //if (labels != null && labels.Length > 0)
+            //{
+            //    base.LegendLabels = labels;
+            //    //base.Legend.IsVisible = true;
+            //}
+
+            //if (lineColors != null && lineColors.Length > 0)
+            //    Colors = lineColors;
+
+            Update(values, labels, lineColors);
+            //ComputeAngularData();
+        }
+
+        public override string ToString() => $"RadialGauge with {Data.Length} points.";
+
+        /// <summary>
+        /// Replace the data values with new ones. This passed data is copied and stored in <see cref="Data"/>.
+        /// It implicitly calls the <see cref="ComputeAngularData"/> routine.
+        /// </summary>
+        /// <param name="values">Array of values to be plotted as gauges.</param>
+        /// <param name="labels">Legend labels.</param>
+        /// <param name="lineColors">Array colors for the gauges.</param>
+        public void Update(double[] values, string[] labels = null, Color[] lineColors = null)
+        {
+            Data = new double[values.Length];
+            Array.Copy(values, 0, Data, 0, values.Length);
+
             if (labels != null && labels.Length > 0)
             {
                 base.LegendLabels = labels;
@@ -309,21 +336,8 @@ namespace RadialGaugePlot
             if (lineColors != null && lineColors.Length > 0)
                 Colors = lineColors;
 
-            Update(values);
-            ComputeAngularData();
-        }
-
-        public override string ToString() => $"RadialGauge with {Data.Length} points.";
-
-        /// <summary>
-        /// Replace the data values with new ones. This passed data is copied and stored in <see cref="Data"/>.
-        /// Implicitly calls the <see cref="ComputeAngularData"/> routine
-        /// </summary>
-        /// <param name="values">Array of values to be plotted as gauges.</param>
-        public void Update(double[] values)
-        {
-            Data = new double[values.Length];
-            Array.Copy(values, 0, Data, 0, values.Length);
+            // Validate the input data
+            Validate();
 
             // Sets MaxScale and MinScale values and calls ComputeAngularData
             ComputeMaxMin();
@@ -336,7 +350,8 @@ namespace RadialGaugePlot
                 return null;
 
             List<LegendItem> legendItems = new();
-            for (int i = 0; i < GaugeLabels.Length; i++)
+
+            for (int i = 0; i < Math.Min(Data.Length, GaugeLabels.Length); i++)
             {
                 var item = new LegendItem()
                 {
@@ -423,8 +438,22 @@ namespace RadialGaugePlot
         /// <param name="deep"></param>
         public void ValidateData(bool deep = false)
         {
+            
+
+            if (Colors.Length != Data.Length)
+                throw new InvalidOperationException($"{nameof(Colors)} must be an array with length equal to number of values");
+            
             if (GaugeLabels != null && GaugeLabels.Length != Data.Length)
-                throw new InvalidOperationException("Gauge labels must match size of data values");
+                throw new InvalidOperationException($"If {nameof(GaugeLabels)} is not null, it must match size of data values");
+
+            if (AngleRange < 0 || AngleRange > 360)
+                throw new InvalidOperationException($"{nameof(AngleRange)} must be [0°-360°]");
+
+            if (GaugeLabelsFontPct < 0 || GaugeLabelsFontPct > 100)
+                throw new InvalidOperationException($"{nameof(GaugeLabelsFontPct)} must be a value from 0 to 100");
+
+            if (GaugeSpacePercentage < 0 || GaugeSpacePercentage > 100)
+                throw new InvalidOperationException($"{nameof(GaugeSpacePercentage)} must be from 0 to 100");
         }
 
         /// <summary>

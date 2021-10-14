@@ -39,6 +39,7 @@ namespace TestControl
             plot1.Palette = Plotting.Colorsets.Palette.OneHalf;
             plot1.PlotTitle = "Example title";
             plot1.GaugeLabels = new string[] { "alpha", "beta", "gamma", "delta", "epsilon" };
+            plot1.Update(new double[] { 10, 10, 10 });
             plot1.Legend.IsVisible = true;
             plot1.Legend.Location = RadialGaugePlot.Alignment.UpperRight;
             plot1.Render();
