@@ -151,7 +151,7 @@ namespace RadialGaugePlot
         public void Render(bool lowQuality = false)
         {
             // Get the needed colors from the defined palette
-            Colors = Palette.GetColors(Data.Length);
+            //Colors = Palette.GetColors(Data.Length);
 
             // Compute dimensions before any drawing takes place
             ComputeRects();

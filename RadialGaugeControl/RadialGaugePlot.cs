@@ -57,6 +57,14 @@ namespace RadialGaugePlot
         private double _AngleRange = 360;
 
         /// <summary>
+        /// <see langword="False"/> if the gauges' background is adjusted to <see cref="AngleRange"/>.
+        /// Default value is set to <see langword="True"/> (full-circle background gauges).
+        /// </summary>
+        [System.ComponentModel.Category("Radial gauge"),
+        System.ComponentModel.Description("False if the gauges' background is adjusted to AngleRange.\nDefault value is set to True (full-circle background gauges).")]
+        public bool CircularBackground { get; set; } = true;
+
+        /// <summary>
         /// Data to be plotted.
         /// It's copied from of the data passed to either the constructor or the <see cref="Update(double[], bool)"/> method.
         /// </summary>
@@ -223,14 +231,6 @@ namespace RadialGaugePlot
         private double _MinScale = 0;
 
         /// <summary>
-        /// <see langword="False"/> if the gauges' background is adjusted to <see cref="AngleRange"/>.
-        /// Default value is set to <see langword="True"/> (full-circle background gauges).
-        /// </summary>
-        [System.ComponentModel.Category("Radial gauge"),
-        System.ComponentModel.Description("False if the gauges' background is adjusted to AngleRange.\nDefault value is set to True (full-circle background gauges).")]
-        public bool CircularBackground { get; set; } = true;
-
-        /// <summary>
         /// The initial angle (in degrees) where the background gauges begin. Default value is 270° the same as <see cref="StartingAngleGauges"/>.
         /// </summary>
         [System.ComponentModel.Category("Radial gauge"),
@@ -286,12 +286,14 @@ namespace RadialGaugePlot
         #endregion Properties
 
         public RadialGaugePlot()
+            :base()
         {
             base.Xaxis.Visible = false;
             base.Yaxis.Visible = false;
 
             double[] values = { 100, 80, 65, 45, -20 };
             GaugeLabels = new string[] { "alpha", "beta", "gamma", "delta", "epsilon" };
+
             Update(values);
             ComputeAngularData();
         }
@@ -340,9 +342,11 @@ namespace RadialGaugePlot
 
             if (lineColors != null && lineColors.Length > 0)
                 Colors = lineColors;
+            else
+                Colors = Palette.GetColors(Data.Length);
 
             // Validate the input data
-            Validate();
+            ValidateData();
 
             // Sets MaxScale and MinScale values and calls ComputeAngularData
             ComputeMaxMin();
@@ -382,6 +386,32 @@ namespace RadialGaugePlot
         /// </summary>
         /// <returns>The angular data</returns>
         public double[,] GetAngularData() => DataAngular;
+
+        /// <summary>
+        /// Checks if the plot's properties are OK in order to render the plot.
+        /// </summary>
+        /// <param name="deep"></param>
+        public void ValidateData(bool deep = false)
+        {
+            // Check colors and labels. Other properties (AngleRange, GaugeLabelsFontFraction, and GaugeSpaceFraction) are checked on the setter
+            if (Colors.Length != Data.Length)
+                throw new InvalidOperationException($"{nameof(Colors)} must be an array with length equal to number of values");
+
+            if (GaugeLabels != null && GaugeLabels.Length != Data.Length)
+                throw new InvalidOperationException($"If {nameof(GaugeLabels)} is not null, it must match size of data values");
+
+            if (deep)
+            {
+                if (AngleRange < 0 || AngleRange > 360)
+                    throw new InvalidOperationException($"{nameof(AngleRange)} must be [0°-360°]");
+
+                if (GaugeLabelsFontFraction < 0 || GaugeLabelsFontFraction > 1)
+                    throw new InvalidOperationException($"{nameof(GaugeLabelsFontFraction)} must be a value from 0 to 1");
+
+                if (GaugeSpaceFraction < 0 || GaugeSpaceFraction > 1)
+                    throw new InvalidOperationException($"{nameof(GaugeSpaceFraction)} must be from 0 to 1");
+            }
+        }
 
         /// <summary>
         /// Converts <see cref="Data"/> into <see cref="DataAngular"/>.
@@ -435,30 +465,6 @@ namespace RadialGaugePlot
                 var min = Data.Min();
                 _MinScale = min < 0 ? min : 0;
             }
-        }
-
-        /// <summary>
-        /// Needed as part of IPlottable in ScottPlot.ScottForm
-        /// </summary>
-        /// <param name="deep"></param>
-        public void ValidateData(bool deep = false)
-        {
-            
-
-            if (Colors.Length != Data.Length)
-                throw new InvalidOperationException($"{nameof(Colors)} must be an array with length equal to number of values");
-            
-            if (GaugeLabels != null && GaugeLabels.Length != Data.Length)
-                throw new InvalidOperationException($"If {nameof(GaugeLabels)} is not null, it must match size of data values");
-
-            if (AngleRange < 0 || AngleRange > 360)
-                throw new InvalidOperationException($"{nameof(AngleRange)} must be [0°-360°]");
-
-            if (GaugeLabelsFontFraction < 0 || GaugeLabelsFontFraction > 1)
-                throw new InvalidOperationException($"{nameof(GaugeLabelsFontFraction)} must be a value from 0 to 1");
-
-            if (GaugeSpaceFraction < 0 || GaugeSpaceFraction > 1)
-                throw new InvalidOperationException($"{nameof(GaugeSpaceFraction)} must be from 0 to 1");
         }
 
         /// <summary>
