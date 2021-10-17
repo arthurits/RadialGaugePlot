@@ -40,7 +40,7 @@ namespace RadialGaugePlot
         /// <summary>
         /// Renders this plot element into the bitmap passed
         /// </summary>
-        [System.ComponentModel.Browsable(false)]
+        //[System.ComponentModel.Browsable(false)]
         public Action<Bitmap, bool> Render { get; set; }
 
         //public delegate void RenderDelegate(Bitmap bmp, bool lowQuality = false);

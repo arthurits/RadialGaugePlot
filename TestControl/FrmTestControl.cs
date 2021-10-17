@@ -26,13 +26,13 @@ namespace TestControl
 
             // Check boxes
             checkBox1.Checked = plot1.ShowGaugeValues;
-            checkBox2.Checked = plot1.NormBackGauge;
+            checkBox2.Checked = plot1.CircularBackground;
 
             // Other numeric controls
-            numLabelFraction.Value = (decimal)plot1.GaugeLabelPos;
+            numLabelFraction.Value = (decimal)plot1.GaugeLabelsPosition;
             numStart.Value = (decimal)plot1.StartingAngleGauges;
-            numSpace.Value = (decimal)plot1.GaugeSpacePercentage;
-            numDim.Value = (decimal)plot1.DimPercentage;
+            numSpace.Value = (decimal)plot1.GaugeSpaceFraction;
+            numDim.Value = (decimal)plot1.BackTransparency;
             numRange.Value = (decimal)plot1.AngleRange;
 
             // plot1.Palette = new Plotting.Colorsets.Palette(new Plotting.Colorsets.Custom());
@@ -72,13 +72,13 @@ namespace TestControl
         }
         private void numLabelFraction_ValueChanged(object sender, EventArgs e)
         {
-            plot1.GaugeLabelPos = Convert.ToSingle(numLabelFraction.Value);
+            plot1.GaugeLabelsPosition = Convert.ToSingle(numLabelFraction.Value / 100);
             plot1.Render();
         }
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
         {
-            plot1.NormBackGauge = checkBox2.Checked;
+            plot1.CircularBackground = checkBox2.Checked;
             plot1.Render();
         }
 
@@ -102,7 +102,7 @@ namespace TestControl
             int ratio = Convert.ToInt32(numSpace.Value);
             if (trackSpace.Value != ratio) trackSpace.Value = ratio;
 
-            plot1.GaugeSpacePercentage = (float)numSpace.Value;
+            plot1.GaugeSpaceFraction = (float)numSpace.Value / 100;
             plot1.Render();
         }
 
@@ -117,7 +117,7 @@ namespace TestControl
             int ratio = Convert.ToInt32(numDim.Value);
             if (trackDim.Value != ratio) trackDim.Value = ratio;
 
-            plot1.DimPercentage = (float)numDim.Value;
+            plot1.BackTransparency = (float)numDim.Value / 100;
             plot1.Render();
         }
 

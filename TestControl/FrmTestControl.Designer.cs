@@ -30,6 +30,14 @@ namespace TestControl
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmTestControl));
+            RadialGaugePlot.PlotElement plotElement1 = new RadialGaugePlot.PlotElement();
+            Drawing.Font font1 = new Drawing.Font();
+            RadialGaugePlot.PlotElement plotElement2 = new RadialGaugePlot.PlotElement();
+            Drawing.Font font2 = new Drawing.Font();
+            RadialGaugePlot.PlotElement plotElement3 = new RadialGaugePlot.PlotElement();
+            Drawing.Font font3 = new Drawing.Font();
+            RadialGaugePlot.PlotElement plotElement4 = new RadialGaugePlot.PlotElement();
+            Drawing.Font font4 = new Drawing.Font();
             this.plot1 = new RadialGaugePlot.RadialGaugePlot();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
@@ -70,26 +78,84 @@ namespace TestControl
             | System.Windows.Forms.AnchorStyles.Right)));
             this.plot1.AngleRange = 360D;
             this.plot1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.plot1.BackTransparency = 0.9F;
             this.plot1.Center = ((System.Drawing.PointF)(resources.GetObject("plot1.Center")));
-            this.plot1.DimPercentage = 90F;
+            font1.Bold = false;
+            font1.Color = System.Drawing.Color.Black;
+            font1.Name = "Segoe UI";
+            font1.Rotation = 0F;
+            font1.Size = 12F;
+            plotElement1.Font = font1;
+            plotElement1.Margin = new System.Windows.Forms.Padding(11);
+            plotElement1.Padding = new System.Windows.Forms.Padding(0);
+            plotElement1.Text = null;
+            plotElement1.Visible = true;
+            this.plot1.Chart = plotElement1;
+            this.plot1.CircularBackground = true;
+            this.plot1.Colors = new System.Drawing.Color[] {
+        System.Drawing.Color.FromArgb(((int)(((byte)(38)))), ((int)(((byte)(100)))), ((int)(((byte)(137))))),
+        System.Drawing.Color.FromArgb(((int)(((byte)(104)))), ((int)(((byte)(185)))), ((int)(((byte)(192))))),
+        System.Drawing.Color.FromArgb(((int)(((byte)(144)))), ((int)(((byte)(213)))), ((int)(((byte)(133))))),
+        System.Drawing.Color.FromArgb(((int)(((byte)(243)))), ((int)(((byte)(193)))), ((int)(((byte)(81))))),
+        System.Drawing.Color.FromArgb(((int)(((byte)(243)))), ((int)(((byte)(127)))), ((int)(((byte)(100)))))};
+            this.plot1.Data = new double[] {
+        100D,
+        80D,
+        65D,
+        45D,
+        -20D};
             this.plot1.EndCap = System.Drawing.Drawing2D.LineCap.Triangle;
             this.plot1.GaugeDirection = RadialGaugePlot.RadialGaugeDirection.Clockwise;
-            this.plot1.GaugeLabelPos = 100F;
             this.plot1.GaugeLabelsColor = System.Drawing.Color.White;
-            this.plot1.GaugeLabelsFontPct = 75F;
+            this.plot1.GaugeLabelsFontFraction = 0.7F;
+            this.plot1.GaugeLabelsPosition = 1F;
             this.plot1.GaugeMode = RadialGaugePlot.RadialGaugeMode.Stacked;
-            this.plot1.GaugeSpacePercentage = 50F;
+            this.plot1.GaugeSpaceFraction = 0.5F;
             this.plot1.GaugeStart = RadialGaugePlot.RadialGaugeStart.InsideToOutside;
             this.plot1.LineWidth = -1F;
             this.plot1.Location = new System.Drawing.Point(0, 0);
+            this.plot1.MarginFactor = 0.03F;
             this.plot1.Name = "plot1";
-            this.plot1.NormBackGauge = false;
+            this.plot1.PlotTitle = null;
             this.plot1.ShowGaugeValues = true;
             this.plot1.Size = new System.Drawing.Size(784, 370);
             this.plot1.StartCap = System.Drawing.Drawing2D.LineCap.Round;
             this.plot1.StartingAngleBackGauges = 210F;
             this.plot1.StartingAngleGauges = 270F;
             this.plot1.TabIndex = 0;
+            font2.Bold = false;
+            font2.Color = System.Drawing.Color.Black;
+            font2.Name = "Segoe UI";
+            font2.Rotation = 0F;
+            font2.Size = 22.5F;
+            plotElement2.Font = font2;
+            plotElement2.Margin = new System.Windows.Forms.Padding(0);
+            plotElement2.Padding = new System.Windows.Forms.Padding(0);
+            plotElement2.Text = null;
+            plotElement2.Visible = true;
+            this.plot1.Title = plotElement2;
+            font3.Bold = false;
+            font3.Color = System.Drawing.Color.Black;
+            font3.Name = "Segoe UI";
+            font3.Rotation = 0F;
+            font3.Size = 12F;
+            plotElement3.Font = font3;
+            plotElement3.Margin = new System.Windows.Forms.Padding(0);
+            plotElement3.Padding = new System.Windows.Forms.Padding(0);
+            plotElement3.Text = null;
+            plotElement3.Visible = false;
+            this.plot1.Xaxis = plotElement3;
+            font4.Bold = false;
+            font4.Color = System.Drawing.Color.Black;
+            font4.Name = "Segoe UI";
+            font4.Rotation = 0F;
+            font4.Size = 12F;
+            plotElement4.Font = font4;
+            plotElement4.Margin = new System.Windows.Forms.Padding(0);
+            plotElement4.Padding = new System.Windows.Forms.Padding(0);
+            plotElement4.Text = null;
+            plotElement4.Visible = false;
+            this.plot1.Yaxis = plotElement4;
             // 
             // comboBox1
             // 
@@ -259,9 +325,9 @@ namespace TestControl
             this.checkBox2.AutoSize = true;
             this.checkBox2.Location = new System.Drawing.Point(36, 538);
             this.checkBox2.Name = "checkBox2";
-            this.checkBox2.Size = new System.Drawing.Size(188, 19);
+            this.checkBox2.Size = new System.Drawing.Size(186, 19);
             this.checkBox2.TabIndex = 16;
-            this.checkBox2.Text = "Normalize background gauges";
+            this.checkBox2.Text = "Full-circle background gauges";
             this.checkBox2.UseVisualStyleBackColor = true;
             this.checkBox2.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
             // 

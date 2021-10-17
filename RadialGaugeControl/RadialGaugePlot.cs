@@ -71,19 +71,19 @@ namespace RadialGaugePlot
 
         /// <summary>
         /// Dimmed percentage used to draw the gauges' background.
-        /// Values in the range [0-100], default value is 90 [percent]. Outside this range, unexpected side-effects might happen.
+        /// Values in the range [0-1], default value is 0.9 (90 %). Outside this range, unexpected side-effects might happen.
         /// </summary>
         [System.ComponentModel.Category("Radial gauge"),
-        System.ComponentModel.Description("Dimmed percentage used to draw the gauges' background.\nValues in the range [0-100], default value is 90 [percent]. Outside this range, unexpected side-effects might happen.")]
-        public float DimPercentage
+        System.ComponentModel.Description("Dimmed percentage used to draw the gauges' background.\nValues in the range [0-1], default value is 0.9 (90 %). Outside this range, unexpected side-effects might happen.")]
+        public float BackTransparency
         {
-            get => _DimPercentage;
-            set => _DimPercentage = (value > 100 ? 100 : (value < 0 ? 0 : value));
+            get => _BackTransparency;
+            set => _BackTransparency = (value > 1 ? 1 : (value < 0 ? 0 : value));
         }
-        private float _DimPercentage = 90f;
+        private float _BackTransparency = 0.9f;
 
         /// <summary>
-        /// Colors for each gauge. These colors are dimmed according to <see cref="DimPercentage"/> to draw the gauges' background.
+        /// Colors for each gauge. These colors are dimmed according to <see cref="BackTransparency"/> to draw the gauges' background.
         /// Length must be equal to the length of data passed to either the constructor or the <see cref="Update(double[], bool)"/> method.
         /// </summary>
         public override Color[] Colors { get; set; }
@@ -105,17 +105,17 @@ namespace RadialGaugePlot
         private RadialGaugeDirection _GaugeDirection = RadialGaugeDirection.Clockwise;
 
         /// <summary>
-        /// Determines the gauge label position as a percentage of the gauge length
-        /// 0 being the beginning and 100 (default value) the ending of the gauge.
+        /// Determines the gauge label position as a percentage of the gauge length, 
+        /// 0 being the beginning and 1 (default value) the ending of the gauge.
         /// </summary>
         [System.ComponentModel.Category("Radial gauge"),
         System.ComponentModel.Description("Determines the gauge label position as a percentage of the gauge length: 0 is the beginning and 100 the ending (default value).")]
-        public float GaugeLabelPos
+        public float GaugeLabelsPosition
         {
-            get => _GaugeLabelPos;
-            set => _GaugeLabelPos = value > 100 ? 100 : (value < 0 ? 0 : value);
+            get => _GaugeLabelsPosition;
+            set => _GaugeLabelsPosition = value > 1 ? 1 : (value < 0 ? 0 : value);
         }
-        private float _GaugeLabelPos = 100;
+        private float _GaugeLabelsPosition = 1;
 
         /// <summary>
         /// Labels for each gauge.
@@ -132,16 +132,16 @@ namespace RadialGaugePlot
 
         /// <summary>
         /// Size of the gague label text as a percentage of the gauge width.
-        /// Values in the range [0-100], default value is 75 [percent]. Other values might produce unexpected side-effects.
+        /// Values in the range [0-1], default value is 0.75 (75%). Other values might produce unexpected side-effects.
         /// </summary>
         [System.ComponentModel.Category("Radial gauge"),
-        System.ComponentModel.Description("Size of the gague label text as a percentage of the gauge width.\nValues in the range [0-100], default value is 75 [percent]. Other values might produce unexpected side-effects.")]
-        public float GaugeLabelsFontPct
+        System.ComponentModel.Description("Size of the gague label text as a percentage of the gauge width.\nValues in the range [0-1], default value is 0.75 (75%). Other values might produce unexpected side-effects.")]
+        public float GaugeLabelsFontFraction
         {
-            get => _GaugeLabelsFontPct;
-            set => _GaugeLabelsFontPct = (value > 100 ? 100 : (value < 0 ? 0 : value));
+            get => _GaugeLabelsFontFraction;
+            set => _GaugeLabelsFontFraction = (value > 1 ? 1 : (value < 0 ? 0 : value));
         }
-        private float _GaugeLabelsFontPct = 75f;
+        private float _GaugeLabelsFontFraction = 0.75f;
 
         /// <summary>
         /// Determines whether the gauges are drawn stacked (dafault value), sequentially, or as a single gauge (ressembling a pie plot).
@@ -162,16 +162,16 @@ namespace RadialGaugePlot
 
         /// <summary>
         /// The empty space between gauges as a percentage of the gauge width.
-        /// Values in the range [0-100], default value is 50 [percent]. Other values might produce unexpected side-effects.
+        /// Values in the range [0-1], default value is 0.5 (50%). Other values might produce unexpected side-effects.
         /// </summary>
         [System.ComponentModel.Category("Radial gauge"),
-        System.ComponentModel.Description("The empty space between gauges as a percentage of the gauge width.\nValues in the range [0-100], default value is 50 [percent]. Other values might produce unexpected side-effects.")]
-        public float GaugeSpacePercentage
+        System.ComponentModel.Description("The empty space between gauges as a percentage of the gauge width.\nValues in the range [0-1], default value is 0.5 (50%). Other values might produce unexpected side-effects.")]
+        public float GaugeSpaceFraction
         {
-            get => _GaugeSpacePercentage;
-            set => _GaugeSpacePercentage = (value > 100 ? 100 : (value < 0 ? 0 : value));
+            get => _GaugeSpaceFraction;
+            set => _GaugeSpaceFraction = (value > 1 ? 1 : (value < 0 ? 0 : value));
         }
-        private float _GaugeSpacePercentage = 50f;
+        private float _GaugeSpaceFraction = 0.5f;
 
         /// <summary>
         /// Determines whether the gauges are drawn starting from the inside (default value) or from the outside.
@@ -223,12 +223,12 @@ namespace RadialGaugePlot
         private double _MinScale = 0;
 
         /// <summary>
-        /// <see langword="True"/> if the gauges' background is adjusted to <see cref="StartingAngleGauges"/>.
-        /// Default value is set to <see langword="False"/>.
+        /// <see langword="False"/> if the gauges' background is adjusted to <see cref="AngleRange"/>.
+        /// Default value is set to <see langword="True"/> (full-circle background gauges).
         /// </summary>
         [System.ComponentModel.Category("Radial gauge"),
-        System.ComponentModel.Description("True if the gauges' background is adjusted to StartingAngleGauges.\nDefault value is set to False.")]
-        public bool NormBackGauge { get; set; } = false;
+        System.ComponentModel.Description("False if the gauges' background is adjusted to AngleRange.\nDefault value is set to True (full-circle background gauges).")]
+        public bool CircularBackground { get; set; } = true;
 
         /// <summary>
         /// The initial angle (in degrees) where the background gauges begin. Default value is 270° the same as <see cref="StartingAngleGauges"/>.
@@ -265,10 +265,10 @@ namespace RadialGaugePlot
 
         /// <summary>
         /// <see langword="True"/> if value labels are shown inside the gauges.
-        /// Size of the text is set by <see cref="GaugeLabelsFontPct"/> and color by <see cref="GaugeLabelsColor"/>.
+        /// Size of the text is set by <see cref="GaugeLabelsFontFraction"/> and color by <see cref="GaugeLabelsColor"/>.
         /// </summary>
         [System.ComponentModel.Category("Radial gauge"),
-        System.ComponentModel.Description("True if value labels are shown inside the gauges.\nSize of the text is set by GaugeLabelsFontPct and color by GaugeLabelsColor.")]
+        System.ComponentModel.Description("True if value labels are shown inside the gauges.\nSize of the text is set by GaugeLabelsFontFraction and color by GaugeLabelsColor.")]
         public bool ShowGaugeValues { get; set; } = true;
 
         [System.ComponentModel.Category("Radial gauge"),
@@ -454,11 +454,11 @@ namespace RadialGaugePlot
             if (AngleRange < 0 || AngleRange > 360)
                 throw new InvalidOperationException($"{nameof(AngleRange)} must be [0°-360°]");
 
-            if (GaugeLabelsFontPct < 0 || GaugeLabelsFontPct > 100)
-                throw new InvalidOperationException($"{nameof(GaugeLabelsFontPct)} must be a value from 0 to 100");
+            if (GaugeLabelsFontFraction < 0 || GaugeLabelsFontFraction > 1)
+                throw new InvalidOperationException($"{nameof(GaugeLabelsFontFraction)} must be a value from 0 to 1");
 
-            if (GaugeSpacePercentage < 0 || GaugeSpacePercentage > 100)
-                throw new InvalidOperationException($"{nameof(GaugeSpacePercentage)} must be from 0 to 100");
+            if (GaugeSpaceFraction < 0 || GaugeSpaceFraction > 1)
+                throw new InvalidOperationException($"{nameof(GaugeSpaceFraction)} must be from 0 to 1");
         }
 
         /// <summary>
@@ -496,10 +496,10 @@ namespace RadialGaugePlot
             using Pen penCircle = new(Color.Black);
             using Brush labelBrush = new SolidBrush(GaugeLabelsColor);
 
-            float lineWidth = (LineWidth < 0) ? (float)(minScale / ((numGroups + 0.33) * (GaugeSpacePercentage + 100) / 100)) : LineWidth;
-            float radiusSpace = lineWidth * (GaugeSpacePercentage + 100) / 100;
+            float lineWidth = (LineWidth < 0) ? (float)(minScale / ((numGroups + 0.33) * (GaugeSpaceFraction + 1))) : LineWidth;
+            float radiusSpace = lineWidth * (GaugeSpaceFraction + 1);
             float gaugeRadius = numGroups * radiusSpace;  // By default, the outer-most radius is computed
-            float maxBackAngle = (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * (NormBackGauge ? (float)AngleRange : 360);
+            float maxBackAngle = (GaugeDirection == RadialGaugeDirection.AntiClockwise ? -1 : 1) * (CircularBackground ? 360 : (float)AngleRange);
 
             pen.Width = (float)lineWidth;
             pen.StartCap = StartCap;
@@ -508,7 +508,7 @@ namespace RadialGaugePlot
             penCircle.StartCap = System.Drawing.Drawing2D.LineCap.Round;
             penCircle.EndCap = System.Drawing.Drawing2D.LineCap.Round;
 
-            using System.Drawing.Font fontGauge = new(Font.Name, lineWidth * GaugeLabelsFontPct / 100, FontStyle.Bold);
+            using System.Drawing.Font fontGauge = new(Font.Name, lineWidth * GaugeLabelsFontFraction, FontStyle.Bold);
 
             int index;
             for (int i = 0; i < numGroups; i++)
@@ -527,7 +527,7 @@ namespace RadialGaugePlot
 
                 // Set color values
                 pen.Color = Colors[index];
-                penCircle.Color = LightenBy(Colors[index], DimPercentage);
+                penCircle.Color = LightenBy(Colors[index], BackTransparency);
 
                 // Draw gauge background
                 if (GaugeMode != RadialGaugeMode.SingleGauge)
@@ -560,7 +560,7 @@ namespace RadialGaugePlot
                         RectData.X + RectData.Width / 2,
                         RectData.Y + RectData.Height / 2,
                         Data[index].ToString("0.##"),
-                        _GaugeLabelPos);
+                        GaugeLabelsPosition);
                 }
 
             }
@@ -601,14 +601,14 @@ namespace RadialGaugePlot
             return Color.FromArgb(color.A, (int)red, (int)green, (int)blue);
         }
 
-        private Color LightenBy(Color color, float percent)
+        private Color LightenBy(Color color, float fraction)
         {
-            return ChangeColorBrightness(color, percent / 100f);
+            return ChangeColorBrightness(color, fraction);
         }
 
-        private Color DarkenBy(Color color, float percent)
+        private Color DarkenBy(Color color, float fraction)
         {
-            return ChangeColorBrightness(color, -1f * percent / 100f);
+            return ChangeColorBrightness(color, -1 * fraction);
         }
 
         #endregion Color routines
@@ -628,7 +628,7 @@ namespace RadialGaugePlot
         /// <param name="cx">The x-coordinate of the circle centre.</param>
         /// <param name="cy">The y-coordinate of the circle centre.</param>
         /// <param name="text">String of text to be drawn.</param>
-        /// <param name="posPct">Label's position as a percentage of the gauge's angular range.</param>
+        /// <param name="posPct">Label's position as a percentage (0-1) of the gauge's angular range.</param>
         /// <seealso cref="http://csharphelper.com/blog/2018/02/draw-text-on-a-circle-in-c/"/>
         protected virtual void DrawTextOnCircle(Graphics gfx, System.Drawing.Font font,
             Brush brush, RectangleF clientRectangle, float radius, float angleInit, float angleSwept, float cx, float cy,
@@ -657,8 +657,8 @@ namespace RadialGaugePlot
 
             // Angular data
             bool isPositive = angleSwept >= 0;
-            double angle = ReduceAngle(angleInit + angleSwept * (posPct / 100));
-            angle += (1 - 2 * (posPct / 100)) * (isPositive ? 1 : -1) * RadToDeg * text_width / 2; // Set the position to the middle of the text
+            double angle = ReduceAngle(angleInit + angleSwept * posPct);
+            angle += (1 - 2 * posPct) * (isPositive ? 1 : -1) * RadToDeg * text_width / 2; // Set the position to the middle of the text
 
             bool isBelow = angle < 180 && angle > 0;
             int sign = isBelow ? 1 : -1;
