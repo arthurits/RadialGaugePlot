@@ -29,10 +29,10 @@ namespace TestControl
             checkBox2.Checked = plot1.CircularBackground;
 
             // Other numeric controls
-            numLabelFraction.Value = (decimal)plot1.GaugeLabelsPosition;
+            numLabelFraction.Value = 100 * (decimal)plot1.GaugeLabelsPosition;
             numStart.Value = (decimal)plot1.StartingAngleGauges;
-            numSpace.Value = (decimal)plot1.GaugeSpaceFraction;
-            numDim.Value = (decimal)plot1.BackTransparency;
+            numSpace.Value = 100 * (decimal)plot1.GaugeSpaceFraction;
+            numDim.Value = 100 * (decimal)plot1.BackTransparency;
             numRange.Value = (decimal)plot1.AngleRange;
 
             // plot1.Palette = new Plotting.Colorsets.Palette(new Plotting.Colorsets.Custom());

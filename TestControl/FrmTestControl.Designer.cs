@@ -133,7 +133,7 @@ namespace TestControl
             plotElement2.Padding = new System.Windows.Forms.Padding(0);
             plotElement2.Text = null;
             plotElement2.Visible = true;
-            this.plot1.Title = plotElement2;
+            // this.plot1.Title = plotElement2;
             font3.Bold = false;
             font3.Color = System.Drawing.Color.Black;
             font3.Name = "Segoe UI";
