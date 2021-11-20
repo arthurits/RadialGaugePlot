@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0-windows</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>RadialGaugePlot</RootNamespace>
     <PackageId>RadialGauge plot</PackageId>
@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="NuGet\Readme.md" Pack="true" PackagePath="\"/>
+    <None Include="NuGet\Readme.md" Pack="true" PackagePath="\" />
   </ItemGroup>
   
 </Project>
