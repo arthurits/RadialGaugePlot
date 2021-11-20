@@ -295,7 +295,7 @@ namespace RadialGaugePlot
             GaugeLabels = new string[] { "alpha", "beta", "gamma", "delta", "epsilon" };
 
             Update(values);
-            ComputeAngularData();
+            //ComputeAngularData();
         }
 
         /// <summary>
@@ -315,6 +315,9 @@ namespace RadialGaugePlot
 
             //if (lineColors != null && lineColors.Length > 0)
             //    Colors = lineColors;
+
+            base.Xaxis.Visible = false;
+            base.Yaxis.Visible = false;
 
             Update(values, labels, lineColors);
             //ComputeAngularData();
