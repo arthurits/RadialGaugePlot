@@ -541,11 +541,12 @@ namespace RadialGaugePlot
                 // Draw gauge background
                 if (GaugeMode != RadialGaugeMode.SingleGauge)
                     gfx.DrawArc(penCircle,
-                        (RectData.X + RectData.Width/2 - gaugeRadius),
+                        (RectData.X + RectData.Width / 2 - gaugeRadius),
                         (RectData.Y + RectData.Height / 2 - gaugeRadius),
                         (gaugeRadius * 2),
                         (gaugeRadius * 2),
-                        _StartingAngleBackGauges, maxBackAngle);
+                        _StartingAngleBackGauges,
+                        maxBackAngle <= 0.01 ? 0 : maxBackAngle);
 
                 // Draw gauge
                 gfx.DrawArc(pen,
@@ -554,7 +555,7 @@ namespace RadialGaugePlot
                     (gaugeRadius * 2),
                     (gaugeRadius * 2),
                     (float)DataAngular[index, 0],
-                    (float)DataAngular[index, 1]);
+                    DataAngular[index, 1] <= 0.01 ? 0 : (float)DataAngular[index, 1]);
 
                 // Draw gauge labels
                 if (ShowGaugeValues)
