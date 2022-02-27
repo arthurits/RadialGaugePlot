@@ -492,13 +492,13 @@ namespace RadialGaugePlot
         /// <param name="dims">Plot dimensions</param>
         /// <param name="bmp">Bitmap where the drawing is done</param>
         /// <param name="lowQuality">Image quality</param>
-        public override void Render(Bitmap bmp, bool lowQuality = false)
+        public override void Render(Graphics gfx, bool lowQuality = false)
         {
             int numGroups = Data.Length;
             RectangleF RectData = base.Chart.GetRectangleIn();
             double minScale = Math.Min(RectData.Width, RectData.Height) / 2;
 
-            using Graphics gfx = Graphics.FromImage(bmp);   // https://github.com/ScottPlot/ScottPlot/blob/master/src/ScottPlot/Drawing/GDI.cs;
+            //using Graphics gfx = Graphics.FromImage(bmp);   // https://github.com/ScottPlot/ScottPlot/blob/master/src/ScottPlot/Drawing/GDI.cs;
             gfx.SmoothingMode = lowQuality ? System.Drawing.Drawing2D.SmoothingMode.HighSpeed : System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             gfx.TextRenderingHint = lowQuality ? System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit : System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
             using Pen pen = new (Color.Black);

@@ -156,9 +156,13 @@ namespace RadialGaugePlot
             // Compute dimensions before any drawing takes place
             ComputeRects();
 
+            // Create a Graphics object for the Control.
+            //Graphics g = this.CreateGraphics();
+            
             // First call the virtual Render() function (which can be overriden by a derived class)
             Bitmap bmp = new((int)Width, (int)Height);
-            Render(bmp, lowQuality);
+            using Graphics gfx = Graphics.FromImage(bmp);
+            Render(gfx, lowQuality);
 
             // Draw the title onto the bitmap
             if (Title.Visible && !string.IsNullOrEmpty(Title.Text))
@@ -179,17 +183,17 @@ namespace RadialGaugePlot
             SetImage(bmp);
         }
 
-        public virtual void Render(Bitmap bmp, bool lowQuality = false)
+        public virtual void Render(Graphics gfx, bool lowQuality = false)
         {
             #if DEBUG
             {
-                using Graphics newGraphics = Graphics.FromImage(bmp);
-                newGraphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                newGraphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
-                newGraphics.DrawRectangle(new Pen(Color.Black), System.Drawing.Rectangle.Round(Chart.GetRectangle()));
-                newGraphics.DrawRectangle(new Pen(Color.Black), System.Drawing.Rectangle.Round(Chart.GetRectangleEx()));
-                newGraphics.DrawRectangle(new Pen(Color.Black), System.Drawing.Rectangle.Round(Title.GetRectangle()));
-                newGraphics.DrawRectangle(new Pen(Color.Black), System.Drawing.Rectangle.Round(Title.GetRectangleEx()));
+                //using Graphics newGraphics = Graphics.FromImage(bmp);
+                gfx.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                gfx.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+                gfx.DrawRectangle(new Pen(Color.Black), System.Drawing.Rectangle.Round(Chart.GetRectangle()));
+                gfx.DrawRectangle(new Pen(Color.Black), System.Drawing.Rectangle.Round(Chart.GetRectangleEx()));
+                gfx.DrawRectangle(new Pen(Color.Black), System.Drawing.Rectangle.Round(Title.GetRectangle()));
+                gfx.DrawRectangle(new Pen(Color.Black), System.Drawing.Rectangle.Round(Title.GetRectangleEx()));
             }
             #endif
         }
