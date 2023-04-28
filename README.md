@@ -5,7 +5,7 @@ The goal is two-fold (work in progress):
 * Integrate this plot into [ScottPlot](https://github.com/ScottPlot/ScottPlot), already present in version 4.1.18 onwards.
 * Create a standalone control (probably as a nuget packet) that's easy to mantain and update.
 
-Copyright © 2021 by Arthurits Ltd. No commercial nor profit use allowed. This software is provided only for personal and not-for-profit use.
+Copyright © 2021-2023 by Arthurits Ltd. No commercial nor profit use allowed. This software is provided only for personal and not-for-profit use.
 
 Sponsor this project!
 
